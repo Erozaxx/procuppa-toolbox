@@ -1,0 +1,82 @@
+# Zrcadlo ročních kurzových lístků ČNB do cnb/ (čte je toolbox na stejném originu).
+# Zdroj: deploy/pages/.github/ v privátním repu procuppa_apps, sem se kopíruje
+# skriptem deploy/deploy-pages.sh. Needitovat tady, při dalším nasazení se přepíše.
+#
+# ČNB publikuje kurzy v pracovní dny po 14:30 pražského času. Cron běží v UTC:
+# 13:45 UTC = 14:45 SEČ / 15:45 SELČ, druhý běh 15:45 UTC je pojistka pro zpoždění
+# ČNB nebo zpožděný start plánovaného běhu na GitHubu.
+#
+# Backfill: Actions > Zrcadlo kurzů ČNB > Run workflow, from_year = 2020.
+
+name: Zrcadlo kurzů ČNB
+
+on:
+  schedule:
+    - cron: "45 13 * * 1-5"
+    - cron: "45 15 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      from_year:
+        description: "Backfill: stáhnout všechny roky od tohoto roku do aktuálního (např. 2020). Prázdné = jen aktuální rok, v lednu i předchozí."
+        required: false
+        default: ""
+        type: string
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/cnb-mirror.yml"
+      - ".github/scripts/cnb-mirror.sh"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: cnb-mirror
+  cancel-in-progress: false
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v4
+
+      - name: Stažení kurzů ČNB
+        env:
+          FROM_YEAR: ${{ github.event_name == 'workflow_dispatch' && inputs.from_year || '' }}
+        run: |
+          if [ -n "$FROM_YEAR" ]; then
+            bash .github/scripts/cnb-mirror.sh --out cnb --from-year "$FROM_YEAR"
+          else
+            bash .github/scripts/cnb-mirror.sh --out cnb
+          fi
+
+      # Běží i po chybě stažení: skript ukládá jen roky, které prošly kontrolou,
+      # takže se commitnou platné změny a běh přesto skončí jako neúspěšný.
+      - name: Commit při změně
+        if: ${{ !cancelled() && steps.checkout.outcome == 'success' }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          [ -d cnb ] || { echo "Adresář cnb neexistuje, není co commitnout."; exit 0; }
+          git add -A cnb
+          if git diff --cached --quiet; then
+            echo "Kurzy beze změny, není co commitnout."
+            exit 0
+          fi
+          last="$(jq -r '.lastDate // "?"' cnb/index.json)"
+          git commit --quiet -m "Kurzy CNB k ${last}"
+          # Souběh s nasazením toolboxu: při odmítnutém pushi rebase a nový pokus.
+          for attempt in 1 2 3; do
+            if git push --quiet origin "HEAD:${GITHUB_REF_NAME}"; then
+              echo "Pushnuto: $(git log -1 --format='%h %s')"
+              exit 0
+            fi
+            echo "Push odmítnut (pokus ${attempt}), rebase na origin/${GITHUB_REF_NAME}."
+            sleep $((attempt * 5))
+            git pull --quiet --rebase origin "${GITHUB_REF_NAME}"
+          done
+          echo "::error::Push zrcadla kurzů selhal i po rebase."
+          exit 1
