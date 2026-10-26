@@ -1,0 +1,1371 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Procuppa Toolbox 6 – Rychlá pomoc</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --color-primary:      #1A1A1A;
+      --color-accent:       #FFD956;
+      --color-success:      #16A34A;
+      --color-warning:      #D97706;
+      --color-danger:       #DC2626;
+      --color-bg:           #FAFAF8;
+      --color-surface:      #FFFFFF;
+      --color-text:         #1A1A1A;
+      --color-text-muted:   #5C6370;
+      --color-border:       #E5E3DC;
+      --color-accent-text:  #1A1A1A;
+      --color-primary-text: #FFFFFF;
+      --font-base: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+      --font-size-sm: 0.875rem;
+      --font-size-md: 1rem;
+      --font-size-lg: 1.25rem;
+      --font-size-xl: 1.5rem;
+      --space-xs: 0.25rem;
+      --space-sm: 0.5rem;
+      --space-md: 1rem;
+      --space-lg: 1.5rem;
+      --space-xl: 2rem;
+      --radius-sm: 3px;
+      --radius-md: 6px;
+      --radius-lg: 10px;
+      --shadow-card: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-base); font-size: var(--font-size-md); color: var(--color-text); background: var(--color-bg); line-height: 1.5; }
+    header { position: relative; background: var(--color-surface); border-bottom: 1px solid var(--color-border); padding: var(--space-md) var(--space-xl); display: flex; align-items: center; min-height: 60px; }
+    #logo { height: 40px; width: auto; }
+    .lang-switcher { position: absolute; top: var(--space-md); right: var(--space-md); display: flex; gap: var(--space-xs); }
+    .lang-btn { background: none; border: 1px solid var(--color-border); border-radius: var(--radius-sm); padding: var(--space-xs) var(--space-sm); font-size: var(--font-size-sm); cursor: pointer; color: var(--color-text-muted); font-family: var(--font-base); transition: background 0.15s, color 0.15s, border-color 0.15s; }
+    .lang-btn.active, .lang-btn:hover { background: var(--color-primary); color: var(--color-primary-text); border-color: var(--color-primary); }
+    .tab-nav { position: sticky; top: 0; z-index: 100; background: var(--color-surface); border-bottom: 1px solid var(--color-border); display: flex; padding: 0 var(--space-xl); overflow-x: auto; }
+    .tab-btn { background: none; border: none; border-bottom: 3px solid transparent; padding: var(--space-md) var(--space-lg); font-size: var(--font-size-md); font-weight: 500; font-family: var(--font-base); color: var(--color-text-muted); cursor: pointer; transition: color 0.15s, border-color 0.15s; white-space: nowrap; }
+    .tab-btn:hover { color: var(--color-primary); }
+    .tab-btn.active { color: var(--color-primary); border-bottom: 3px solid var(--color-accent); font-weight: 700; }
+    .tab-btn:focus-visible { outline: 2px solid var(--color-accent); outline-offset: -2px; }
+    main { max-width: 960px; margin: 0 auto; padding: var(--space-xl) var(--space-md); }
+    .tool-panel { display: none; }
+    .tool-panel.active { display: block; }
+    .tool-panel > h1 { font-size: var(--font-size-xl); font-weight: 700; margin-bottom: var(--space-lg); color: var(--color-text); }
+    .tool-card { background: var(--color-surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-card); padding: var(--space-lg); margin-bottom: var(--space-lg); }
+    .tool-card h2 { font-size: var(--font-size-lg); font-weight: 700; color: var(--color-primary); margin-bottom: var(--space-xs); }
+    .tool-card .tool-desc { font-size: var(--font-size-sm); color: var(--color-text-muted); margin-bottom: var(--space-lg); }
+    .input-group { margin-bottom: var(--space-md); }
+    .input-group label { display: block; font-size: var(--font-size-sm); font-weight: 600; margin-bottom: var(--space-xs); color: var(--color-text); }
+    .input-field { width: 100%; max-width: 400px; padding: var(--space-sm) var(--space-md); border: 1px solid var(--color-border); border-radius: var(--radius-md); font-size: var(--font-size-md); font-family: var(--font-base); color: var(--color-text); background: var(--color-surface); transition: border-color 0.15s; }
+    .input-field:focus { outline: 2px solid var(--color-accent); outline-offset: 0; border-color: var(--color-accent); }
+    .btn { background: var(--color-accent); color: var(--color-accent-text); border: none; border-radius: var(--radius-md); padding: var(--space-sm) var(--space-lg); font-size: var(--font-size-sm); font-weight: 600; font-family: var(--font-base); cursor: pointer; transition: background 0.15s, color 0.15s; }
+    .btn:hover { background: var(--color-primary); color: var(--color-primary-text); }
+    .btn:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+    .btn-reset { background: none; border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-sm) var(--space-md); font-size: var(--font-size-sm); font-family: var(--font-base); color: var(--color-text-muted); cursor: pointer; transition: background 0.15s, color 0.15s, border-color 0.15s; }
+    .btn-reset:hover { background: var(--color-bg); border-color: var(--color-primary); color: var(--color-primary); }
+    .btn-group { display: flex; gap: var(--space-sm); flex-wrap: wrap; align-items: center; margin-top: var(--space-md); }
+    .section-heading { font-size: var(--font-size-sm); font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin: var(--space-lg) 0 var(--space-md); padding-bottom: var(--space-xs); border-bottom: 1px solid var(--color-border); }
+    .hidden { display: none !important; }
+
+    /* ===== 6a EMAIL BUILDER ===== */
+    .eb-scenario-select { width: 100%; max-width: 500px; }
+    .eb-tone-toggle { display: flex; gap: var(--space-xs); flex-wrap: wrap; margin-bottom: var(--space-md); }
+    .eb-tone-btn { background: none; border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-xs) var(--space-md); font-size: var(--font-size-sm); font-weight: 500; font-family: var(--font-base); color: var(--color-text-muted); cursor: pointer; transition: background 0.15s, color 0.15s, border-color 0.15s; }
+    .eb-tone-btn.active { background: var(--color-accent); color: var(--color-accent-text); border-color: var(--color-accent); font-weight: 700; }
+    .eb-tone-btn:hover:not(.active) { border-color: var(--color-primary); color: var(--color-primary); }
+    .eb-variables-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-sm) var(--space-lg); margin-bottom: var(--space-md); }
+    @media (max-width: 600px) { .eb-variables-grid { grid-template-columns: 1fr; } }
+    .eb-variables-grid .input-group { margin-bottom: 0; }
+    .eb-variables-grid .input-field { max-width: 100%; }
+    .eb-subject-line { font-size: var(--font-size-sm); font-weight: 600; color: var(--color-text-muted); margin-bottom: var(--space-xs); }
+    .eb-subject-value { font-size: var(--font-size-sm); color: var(--color-text); background: var(--color-bg); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-sm) var(--space-md); margin-bottom: var(--space-md); word-break: break-word; }
+    .eb-output { width: 100%; min-height: 180px; padding: var(--space-md); border: 1px solid var(--color-border); border-radius: var(--radius-md); font-family: var(--font-base); font-size: var(--font-size-sm); color: var(--color-text); background: var(--color-bg); resize: vertical; line-height: 1.6; }
+    .eb-copy-confirm { color: var(--color-success); font-size: var(--font-size-sm); font-weight: 600; display: none; }
+    .eb-copy-error { color: var(--color-danger); font-size: var(--font-size-sm); display: none; }
+
+    /* ===== 6b ARGUMENTY ===== */
+    .arg-situation-select, .arg-goal-select { width: 100%; max-width: 500px; }
+    .arg-output-section { margin-top: var(--space-lg); }
+    .arg-list, .arg-counter-list { list-style: none; padding: 0; margin: 0; }
+    .arg-list li, .arg-counter-list li { padding: var(--space-sm) 0 var(--space-sm) var(--space-lg); position: relative; font-size: var(--font-size-sm); border-bottom: 1px solid var(--color-border); line-height: 1.5; }
+    .arg-list li:last-child, .arg-counter-list li:last-child { border-bottom: none; }
+    .arg-list li::before { content: '→'; position: absolute; left: 0; color: var(--color-success); font-weight: 700; }
+    .arg-counter-list li::before { content: '↔'; position: absolute; left: 0; color: var(--color-warning); font-weight: 700; }
+    .arg-style-badge { display: inline-block; background: var(--color-accent); color: var(--color-accent-text); border-radius: var(--radius-md); padding: var(--space-xs) var(--space-md); font-size: var(--font-size-sm); font-weight: 600; margin-top: var(--space-sm); }
+
+    /* ===== 6c RED FLAG CHECKER ===== */
+    .rf-category-heading { font-size: var(--font-size-sm); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-muted); margin: var(--space-lg) 0 var(--space-sm); padding-bottom: var(--space-xs); border-bottom: 1px solid var(--color-border); }
+    .rf-item { display: flex; align-items: flex-start; gap: var(--space-sm); padding: var(--space-sm) 0; border-bottom: 1px solid var(--color-border); }
+    .rf-item:last-child { border-bottom: none; }
+    .rf-item input[type="checkbox"] { margin-top: 2px; width: 16px; height: 16px; flex-shrink: 0; cursor: pointer; accent-color: var(--color-primary); }
+    .rf-item label { font-size: var(--font-size-sm); cursor: pointer; flex: 1; line-height: 1.4; }
+    .rf-item-weight { font-size: var(--font-size-sm); color: var(--color-text-muted); white-space: nowrap; flex-shrink: 0; }
+    .rf-score-section { margin-top: var(--space-xl); }
+    .rf-score-label { font-size: var(--font-size-sm); font-weight: 600; color: var(--color-text-muted); margin-bottom: var(--space-sm); }
+    .rf-score-bar { background: var(--color-border); border-radius: 999px; height: 14px; overflow: hidden; margin-bottom: var(--space-md); }
+    .rf-score-fill { height: 100%; border-radius: 999px; transition: width 0.3s, background 0.3s; width: 0%; background: var(--color-success); }
+    .rf-level-badge { display: inline-flex; align-items: center; gap: var(--space-xs); border-radius: var(--radius-md); padding: var(--space-xs) var(--space-md); font-size: var(--font-size-sm); font-weight: 700; color: #FFFFFF; }
+    .rf-level-badge[data-level="low"] { background: var(--color-success); }
+    .rf-level-badge[data-level="medium"] { background: var(--color-warning); }
+    .rf-level-badge[data-level="high"] { background: var(--color-danger); }
+    .rf-level-badge[data-level="none"] { background: var(--color-text-muted); }
+    .rf-partial-note { font-size: var(--font-size-sm); color: var(--color-text-muted); margin-bottom: var(--space-md); }
+    .rf-critical { background: var(--color-bg); border-left: 4px solid var(--color-danger); border-radius: 0 var(--radius-md) var(--radius-md) 0; padding: var(--space-md); margin-bottom: var(--space-md); font-size: var(--font-size-sm); }
+    .rf-critical strong { color: var(--color-danger); }
+    .rf-critical ul { list-style: none; padding: 0; margin-top: var(--space-xs); }
+    .rf-critical ul li { padding: var(--space-xs) 0 var(--space-xs) var(--space-md); position: relative; }
+    .rf-critical ul li::before { content: '!'; position: absolute; left: 0; color: var(--color-danger); font-weight: 700; }
+    .rf-recommendation { background: var(--color-bg); border-left: 4px solid var(--color-border); border-radius: 0 var(--radius-md) var(--radius-md) 0; padding: var(--space-md); margin-top: var(--space-md); font-size: var(--font-size-sm); }
+    .rf-active-flags { margin-top: var(--space-md); }
+    .rf-active-flags ul { list-style: none; padding: 0; }
+    .rf-active-flags ul li { font-size: var(--font-size-sm); padding: var(--space-xs) 0 var(--space-xs) var(--space-md); position: relative; }
+    .rf-active-flags ul li::before { content: '⚠'; position: absolute; left: 0; }
+
+    /* ===== 6d VYJEDNÁVACÍ POZICE ===== */
+    .pos-factor-group { margin-bottom: var(--space-md); }
+    .pos-factor-group label { display: block; font-size: var(--font-size-sm); font-weight: 600; margin-bottom: var(--space-xs); }
+    .pos-factor-group select { width: 100%; max-width: 400px; padding: var(--space-sm) var(--space-md); border: 1px solid var(--color-border); border-radius: var(--radius-md); font-size: var(--font-size-sm); font-family: var(--font-base); color: var(--color-text); background: var(--color-surface); }
+    .pos-factor-group select:focus { outline: 2px solid var(--color-accent); outline-offset: 0; border-color: var(--color-accent); }
+    .pos-result-section { margin-top: var(--space-xl); }
+    .pos-score-label { font-size: var(--font-size-sm); font-weight: 600; color: var(--color-text-muted); margin-bottom: var(--space-sm); }
+    .pos-score-bar { background: var(--color-border); border-radius: 999px; height: 14px; overflow: hidden; margin-bottom: var(--space-md); }
+    .pos-score-fill { height: 100%; border-radius: 999px; transition: width 0.3s, background 0.3s; width: 0%; background: var(--color-success); }
+    .pos-level-badge { display: inline-flex; align-items: center; gap: var(--space-xs); border-radius: var(--radius-md); padding: var(--space-xs) var(--space-md); font-size: var(--font-size-sm); font-weight: 700; color: #FFFFFF; }
+    .pos-level-badge[data-level="strong"] { background: var(--color-success); }
+    .pos-level-badge[data-level="medium"] { background: var(--color-warning); }
+    .pos-level-badge[data-level="weak"] { background: var(--color-danger); color: #FFFFFF; }
+    .pos-level-badge[data-level="incomplete"] { background: var(--color-text-muted); }
+    .pos-comment { background: var(--color-bg); border-left: 4px solid var(--color-border); border-radius: 0 var(--radius-md) var(--radius-md) 0; padding: var(--space-md); margin-top: var(--space-md); font-size: var(--font-size-sm); }
+    .pos-steps-list { list-style: none; padding: 0; margin-top: var(--space-sm); }
+    .pos-steps-list li { font-size: var(--font-size-sm); padding: var(--space-xs) 0 var(--space-xs) var(--space-lg); position: relative; border-bottom: 1px solid var(--color-border); line-height: 1.5; }
+    .pos-steps-list li:last-child { border-bottom: none; }
+    .pos-steps-list li::before { content: '→'; position: absolute; left: 0; color: var(--color-primary); font-weight: 700; }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <svg id="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 148.163 28.4534" role="img" aria-label="Procuppa"><g><g><path d="M11.569,11.2632c-.6381.0075-1.0349.6975-.7216,1.2547l7.802,13.8774c.2352.4185-.0665.9357-.5458.9357h-8.9926c-.226,0-.4346-.1223-.5457-.3194L.0815,11.9215c-.2352-.4185.0665-.9357.5457-.9357h8.2121c1.1317-.0133,2.1706-.6299,2.7263-1.6178L16.6304.3604c.1251-.2227.3607-.3604.6156-.3604h8.8079c.5406,0,.8812.5838.6156,1.0559l-5.5366,9.8459c-.1251.2227-.3606.3604-.6156.3604h-8.948v.001h-.0003Z" style="fill:#fdd757;"/><path d="M34.1531,24.0212V5.1582h8.2839c2.1897,0,3.8253.6332,4.9334,1.7676,1.0552,1.0817,1.6884,2.559,1.6884,4.3003,0,3.5615-2.348,5.9622-6.3052,5.9622h-4.6432v6.8329h-3.9573ZM38.1104,8.4824v5.5929h3.9572c2.005,0,3.0603-1.108,3.0603-2.8229,0-1.7675-1.108-2.7701-3.0075-2.7701h-4.01ZM53.5891,10.4874v2.1633h.0791c.8178-1.5302,1.7412-2.3216,3.3241-2.3216.3957,0,.6332.0264.8442.1055v3.1394h-.0791c-2.348-.2374-4.0364,1.0025-4.0364,3.8518v6.5954h-3.588v-13.5338h3.4561ZM64.8788,24.417c-4.1947,0-7.0703-3.1131-7.0703-7.1495s2.8756-7.1495,7.0703-7.1495,7.0704,3.1131,7.0704,7.1495-2.8757,7.1495-7.0704,7.1495ZM64.8788,21.6733c2.1897,0,3.4297-1.7676,3.4297-4.4058s-1.24-4.4322-3.4297-4.4322c-2.216,0-3.4296,1.794-3.4296,4.4322s1.2136,4.4058,3.4296,4.4058ZM79.3682,24.417c-4.2738,0-6.9384-3.1131-6.9384-7.1495s2.6382-7.1495,6.7538-7.1495c3.5087,0,5.672,2.0314,6.1469,4.9598h-3.5088c-.2374-1.1872-1.1608-2.0842-2.4799-2.0842-2.1633,0-3.2713,1.6621-3.2713,4.2739,0,2.559,1.0289,4.2738,3.2186,4.2738,1.451,0,2.4799-.765,2.7173-2.2952h3.456c-.2374,2.8756-2.4799,5.1709-6.0942,5.1709ZM98.5035,24.0212h-3.456v-1.5829h-.0792c-.9233,1.24-1.9786,1.9523-3.8781,1.9523-3.0075,0-4.696-1.9259-4.696-4.8807v-9.0225h3.5616v8.4158c0,1.5829.7123,2.4535,2.2424,2.4535,1.6885,0,2.7174-1.2664,2.7174-3.0603v-7.809h3.5879v13.5338ZM100.297,28.4534V10.4874h3.456v1.6884h.079c.87-1.1872,2.137-2.0578,3.983-2.0578,3.588,0,5.884,2.9284,5.884,7.1495,0,4.3794-2.375,7.1495-5.857,7.1495-1.9,0-3.14-.7651-3.905-1.9259h-.052v5.9623h-3.588ZM107.077,21.4358c1.82,0,2.981-1.5037,2.981-4.0628s-.897-4.353-3.113-4.353c-2.243,0-3.14,1.9259-3.14,4.353,0,2.4535,1.135,4.0628,3.272,4.0628ZM114.841,28.4534V10.4874h3.456v1.6884h.079c.87-1.1872,2.137-2.0578,3.983-2.0578,3.588,0,5.884,2.9284,5.884,7.1495,0,4.3794-2.375,7.1495-5.857,7.1495-1.9,0-3.14-.7651-3.905-1.9259h-.052v5.9623h-3.588ZM121.621,21.4358c1.82,0,2.981-1.5037,2.981-4.0628s-.897-4.353-3.113-4.353c-2.243,0-3.14,1.9259-3.14,4.353,0,2.4535,1.135,4.0628,3.272,4.0628ZM137.906,24.0212c-.211-.2638-.343-.8969-.422-1.5037h-.053c-.686,1.0289-1.662,1.8203-3.984,1.8203-2.77,0-4.722-1.451-4.722-4.1419,0-2.9812,2.427-3.9309,5.435-4.353,2.242-.3166,3.271-.5013,3.271-1.5302,0-.9761-.765-1.6093-2.269-1.6093-1.688,0-2.506.6068-2.612,1.8995h-3.192c.106-2.3743,1.873-4.4585,5.831-4.4585,4.062,0,5.698,1.8203,5.698,4.9862v6.8856c0,1.0289.158,1.6357.475,1.8731v.1319h-3.456ZM134.318,21.8315c2.058,0,3.192-1.2663,3.192-2.5854v-2.0314c-.633.3694-1.609.5804-2.506.7915-1.873.4221-2.796.8442-2.796,2.1105s.844,1.7148,2.11,1.7148Z"/><path d="M145.163,13.1927c-1.651,0-3-1.3066-3-3.1,0-1.7806,1.349-3.1,3-3.1,1.652,0,3,1.3194,3,3.1,0,1.7934-1.348,3.1-3,3.1ZM145.163,12.7443c1.437,0,2.484-1.1144,2.484-2.6516,0-1.5244-1.047-2.6517-2.484-2.6517s-2.483,1.1273-2.483,2.6517c0,1.5372,1.046,2.6516,2.483,2.6516ZM143.991,11.6939v-3.2793h1.487c.593,0,1.021.3843,1.021.9223,0,.3715-.189.6789-.605.7814v.0128c.316.0897.467.269.505.6661.05.4612.025.807.138.8583v.0384h-.617c-.089-.0384-.126-.4099-.139-.7558-.013-.3458-.214-.5636-.618-.5636h-.529v1.3194h-.643ZM144.634,8.9526v.9223h.706c.353,0,.529-.1922.529-.4612s-.176-.4612-.529-.4612h-.706Z"/></g></g></svg>
+    <div class="lang-switcher">
+      <button class="lang-btn active" data-lang="cs" id="btn-lang-cs">CZ</button>
+      <button class="lang-btn" data-lang="en" id="btn-lang-en">EN</button>
+    </div>
+  </header>
+
+  <!-- TAB NAVIGATION -->
+  <nav class="tab-nav" role="tablist">
+    <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="tab-6a" data-tab="6a" data-i18n="tab6a">Email builder</button>
+    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-6b" data-tab="6b" data-i18n="tab6b">Argumenty</button>
+    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-6c" data-tab="6c" data-i18n="tab6c">Red flag checker</button>
+    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-6d" data-tab="6d" data-i18n="tab6d">Vyjednávací pozice</button>
+  </nav>
+
+  <main>
+
+    <!-- ===== TAB 6a: Email builder ===== -->
+    <section id="tab-6a" class="tool-panel active" role="tabpanel">
+      <h1 data-i18n="panel6a_heading">Email builder</h1>
+      <div class="tool-card">
+        <p class="tool-desc" data-i18n="toolDesc6a">Sestavte profesionální email na míru situaci a zvolenému tónu.</p>
+
+        <div class="input-group">
+          <label for="eb-scenario" data-i18n="selectScenario">Vyberte scénář</label>
+          <select id="eb-scenario" class="input-field eb-scenario-select" onchange="onScenarioChange()">
+            <option value="" disabled selected data-i18n="selectScenarioPlaceholder">— vyberte scénář —</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label data-i18n="selectTone">Tón emailu</label>
+          <div class="eb-tone-toggle" id="eb-tone-toggle">
+            <button class="eb-tone-btn active" data-tone="firm" onclick="onToneChange('firm')" data-i18n="toneFirm">Pevný</button>
+            <button class="eb-tone-btn" data-tone="polite" onclick="onToneChange('polite')" data-i18n="tonePolite">Zdvořilý</button>
+            <button class="eb-tone-btn" data-tone="urgent" onclick="onToneChange('urgent')" data-i18n="toneUrgent">Urgentní</button>
+          </div>
+        </div>
+
+        <div id="eb-variables-section" class="hidden">
+          <div class="section-heading" data-i18n="fillVariables">Vyplňte proměnné</div>
+          <div class="eb-variables-grid" id="eb-variables-grid"></div>
+        </div>
+
+        <div id="eb-output-section" class="hidden">
+          <div class="section-heading" data-i18n="subjectLabel">Předmět:</div>
+          <div class="eb-subject-value" id="eb-subject"></div>
+          <div class="section-heading" data-i18n="emailBody">Text emailu:</div>
+          <textarea class="eb-output" id="eb-output" readonly></textarea>
+          <div class="btn-group">
+            <button class="btn eb-copy-btn" onclick="copyEmail()" data-i18n="copyBtn">Kopírovat email</button>
+            <button class="btn-reset" onclick="resetEmail()" data-i18n="resetBtn">Resetovat</button>
+            <span class="eb-copy-confirm" id="eb-copy-confirm" data-i18n="copyConfirm">Zkopírováno!</span>
+            <span class="eb-copy-error" id="eb-copy-error">Kopírování selhalo. Vyberte text ručně.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== TAB 6b: Argumenty pro vyjednávání ===== -->
+    <section id="tab-6b" class="tool-panel" role="tabpanel">
+      <h1 data-i18n="panel6b_heading">Argumenty pro vyjednávání</h1>
+      <div class="tool-card">
+        <p class="tool-desc" data-i18n="toolDesc6b">Získejte argumenty, protiargumenty a doporučený styl pro vaši situaci.</p>
+
+        <div class="input-group">
+          <label for="arg-situation" data-i18n="selectSituation">Vyberte situaci</label>
+          <select id="arg-situation" class="input-field arg-situation-select" onchange="onArgSituationChange()">
+            <option value="" disabled selected data-i18n="selectSituationPlaceholder">— vyberte situaci —</option>
+          </select>
+        </div>
+
+        <div class="input-group" id="arg-goal-group" style="display:none;">
+          <label for="arg-goal" data-i18n="selectGoal">Cíl nákupčího</label>
+          <select id="arg-goal" class="input-field arg-goal-select" onchange="onArgGoalChange()">
+            <option value="" disabled selected data-i18n="selectGoalPlaceholder">— vyberte cíl —</option>
+          </select>
+        </div>
+
+        <div class="arg-output-section" id="arg-output-section" style="display:none;">
+          <div class="section-heading" data-i18n="argumentsTitle">Argumenty</div>
+          <ul class="arg-list" id="arg-list"></ul>
+
+          <div class="section-heading" data-i18n="counterArgsTitle">Možné protiargumenty</div>
+          <ul class="arg-counter-list" id="arg-counter-list"></ul>
+
+          <div class="section-heading" data-i18n="recommendedStyle">Doporučený styl</div>
+          <span class="arg-style-badge" id="arg-style-badge"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== TAB 6c: Red flag checker ===== -->
+    <section id="tab-6c" class="tool-panel" role="tabpanel">
+      <h1 data-i18n="panel6c_heading">Red flag checker</h1>
+      <div class="tool-card">
+        <p class="tool-desc" data-i18n="toolDesc6c">Vyhodnoťte rizikovost dodavatele na základě příznaků.</p>
+
+        <div class="section-heading" data-i18n="rfCategoryFinancial">Finanční stabilita</div>
+        <div id="rf-cat-financial"></div>
+
+        <div class="section-heading" data-i18n="rfCategoryQuality">Kvalita</div>
+        <div id="rf-cat-quality"></div>
+
+        <div class="section-heading" data-i18n="rfCategorySupplyRisk">Dodavatelské riziko</div>
+        <div id="rf-cat-supply-risk"></div>
+
+        <div class="section-heading" data-i18n="rfCategoryCommunication">Komunikace</div>
+        <div id="rf-cat-communication"></div>
+
+        <div class="rf-score-section">
+          <div class="rf-score-label"><span data-i18n="rfScoreLabel">Skóre rizika z označených bodů</span>: <strong id="rf-score-value">—</strong>/100</div>
+          <div class="rf-score-bar"><div class="rf-score-fill" id="rf-score-fill"></div></div>
+          <div id="rf-level-badge-wrap" style="margin-bottom:1rem;"></div>
+          <p class="rf-partial-note hidden" id="rf-partial-note" data-i18n="rfPartialNote">Výsledek vychází jen z označených bodů. Neoznačený příznak neznamená, že je ověřený.</p>
+
+          <div class="rf-critical hidden" id="rf-critical" role="alert">
+            <strong data-i18n="rfCriticalTitle">Prioritně prověřit</strong>: <span data-i18n="rfCriticalText">tento signál je vážný sám o sobě, bez ohledu na skóre. Úroveň rizika je proto nejméně střední.</span>
+            <ul id="rf-critical-list"></ul>
+          </div>
+
+          <div id="rf-active-flags" class="rf-active-flags hidden">
+            <div class="section-heading" data-i18n="rfActiveFlagsLabel">Aktivní příznaky</div>
+            <ul id="rf-active-flags-list"></ul>
+          </div>
+
+          <div class="rf-recommendation hidden" id="rf-recommendation">
+            <strong data-i18n="rfRecommendationLabel">Doporučení</strong>: <span id="rf-recommendation-text"></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== TAB 6d: Vyjednávací pozice ===== -->
+    <section id="tab-6d" class="tool-panel" role="tabpanel">
+      <h1 data-i18n="panel6d_heading">Vyjednávací pozice</h1>
+      <div class="tool-card">
+        <p class="tool-desc" data-i18n="toolDesc6d">Zjistěte sílu vaší vyjednávací pozice a získejte doporučení.</p>
+
+        <div class="section-heading" data-i18n="posTitle">Vyplňte faktory</div>
+        <div id="pos-factors-container"></div>
+
+        <div class="pos-result-section" id="pos-result-section" style="display:none;">
+          <div class="section-heading"></div>
+          <div class="pos-score-label"><span data-i18n="posScoreLabel">Celkové skóre pozice</span>: <strong id="pos-score-value">0</strong>/100</div>
+          <div class="pos-score-bar"><div class="pos-score-fill" id="pos-score-fill"></div></div>
+          <div id="pos-level-badge-wrap" style="margin-bottom:1rem;"></div>
+
+          <div class="pos-comment" id="pos-comment"></div>
+
+          <div class="section-heading" id="pos-steps-heading" data-i18n="posStepsLabel" style="margin-top:1rem;">Doporučené kroky</div>
+          <ul class="pos-steps-list" id="pos-steps-list"></ul>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+  // ============================================================
+  // DATA
+  // ============================================================
+
+  const EMAIL_TEMPLATES = [
+    {
+      id: "supplier-price-increase",
+      label: { cs: "Dodavatel zdražil", en: "Supplier price increase" },
+      variables: [
+        { id: "firma",       label: { cs: "Název firmy dodavatele", en: "Supplier company name" }, placeholder: "ABC s.r.o.", required: true },
+        { id: "castka",      label: { cs: "Původní cena vč. měny", en: "Original price incl. currency" }, placeholder: "100 000 Kč", required: true },
+        { id: "nova_castka", label: { cs: "Nová cena vč. měny", en: "New price incl. currency" },           placeholder: "115 000 Kč", required: true },
+        { id: "datum",       label: { cs: "Datum účinnosti zdražení", en: "Effective date" },       placeholder: "01.05.2026", required: true },
+        { id: "kontakt",     label: { cs: "Jméno vašeho kontaktu", en: "Your contact name" },       placeholder: "Jana Nová",  required: false }
+      ],
+      tones: {
+        firm: {
+          subject: { cs: "Nesouhlas s navrhovaným zdražením – ${firma}", en: "Rejection of proposed price increase – ${firma}" },
+          body: {
+            cs: "Dobrý den,\n\nobdrželi jsme Vaše oznámení o zvýšení cen z ${castka} na ${nova_castka} s účinností od ${datum}.\n\nToto zdražení považujeme za neakceptovatelné a vyzýváme Vás k jednání o zachování stávajících cenových podmínek. Bez písemné dohody nebudeme navrhované ceny akceptovat.\n\nOčekáváme Vaši odpověď do 5 pracovních dnů.\n\nS pozdravem",
+            en: "Dear Sir/Madam,\n\nWe have received your notice of a price increase from ${castka} to ${nova_castka} with effect from ${datum}.\n\nWe consider this increase unacceptable and request negotiations to maintain current pricing. Without written agreement, we will not accept the proposed prices.\n\nWe expect your response within 5 business days.\n\nBest regards"
+          }
+        },
+        polite: {
+          subject: { cs: "Podnět k jednání o cenových podmínkách – ${firma}", en: "Request for pricing negotiations – ${firma}" },
+          body: {
+            cs: "Dobrý den,\n\nděkujeme za informaci o aktualizaci ceníku. Zaznamenali jsme navrhované zvýšení z ${castka} na ${nova_castka} s platností od ${datum}.\n\nRádi bychom Vás požádali o schůzku či videohovor, abychom společně projednali možnosti zachování stávajících podmínek nebo nalezení kompromisního řešení.\n\nBudeme rádi za Vaši odpověď.\n\nS pozdravem",
+            en: "Dear Sir/Madam,\n\nThank you for informing us about your updated pricing. We have noted the proposed increase from ${castka} to ${nova_castka} effective ${datum}.\n\nWe would appreciate a meeting or call to discuss maintaining current terms or finding a mutually acceptable solution.\n\nWe look forward to your response.\n\nBest regards"
+          }
+        },
+        urgent: {
+          subject: { cs: "URGENTNÍ: Nesouhlasíme se zdražením – ${firma} – odpověď do 48h", en: "URGENT: Price increase rejected – ${firma} – respond within 48h" },
+          body: {
+            cs: "Dobrý den,\n\noznámení o zdražení z ${castka} na ${nova_castka} (${datum}) jsme obdrželi. Tuto změnu ODMÍTÁME.\n\nVyžadujeme okamžitá vyjednávání. Bez dohody zahájíme výběrové řízení na alternativní dodavatele.\n\nOdpovězte prosím do 48 hodin.\n\nS pozdravem",
+            en: "Dear Sir/Madam,\n\nWe have received the notice of a price increase from ${castka} to ${nova_castka} (${datum}). We REJECT this change.\n\nWe require immediate negotiations. Without agreement, we will initiate a tender for alternative suppliers.\n\nPlease respond within 48 hours.\n\nBest regards"
+          }
+        }
+      }
+    },
+    {
+      id: "quality-complaint",
+      label: { cs: "Reklamace kvality", en: "Quality complaint" },
+      variables: [
+        { id: "firma",      label: { cs: "Dodavatel", en: "Supplier" },                        placeholder: "ABC s.r.o.",     required: true },
+        { id: "produkt",    label: { cs: "Produkt / služba", en: "Product / service" },        placeholder: "Ocel typ X",     required: true },
+        { id: "mnozstvi",   label: { cs: "Množství / rozsah vady", en: "Quantity / defect scope" }, placeholder: "500 ks",   required: true },
+        { id: "datum",      label: { cs: "Datum dodávky", en: "Delivery date" },               placeholder: "15.03.2026",     required: true },
+        { id: "objednavka", label: { cs: "Číslo objednávky", en: "Order number" },             placeholder: "OBJ-2026-0042", required: false }
+      ],
+      tones: {
+        firm: {
+          subject: { cs: "Reklamace – ${produkt} – ${objednavka} – ${firma}", en: "Quality complaint – ${produkt} – ${objednavka} – ${firma}" },
+          body: {
+            cs: "Dobrý den,\n\nformálně reklamujeme dodávku ${produkt} (objednávka ${objednavka}) ze dne ${datum}. Rozsah vady: ${mnozstvi}.\n\nPožadujeme bezodkladné písemné stanovisko, plán nápravných opatření a kompenzaci vzniklých nákladů. Lhůta pro odpověď: 5 pracovních dnů.\n\nS pozdravem",
+            en: "Dear Sir/Madam,\n\nWe formally raise a complaint regarding delivery of ${produkt} (order ${objednavka}) dated ${datum}. Defect scope: ${mnozstvi}.\n\nWe require an immediate written response, corrective action plan and compensation for incurred costs. Response deadline: 5 business days.\n\nBest regards"
+          }
+        },
+        polite: {
+          subject: { cs: "Podnět k řešení neshody – ${produkt} – ${firma}", en: "Non-conformity resolution request – ${produkt} – ${firma}" },
+          body: {
+            cs: "Dobrý den,\n\nrádi bychom Vás upozornili na neshodu v dodávce ${produkt} (objednávka ${objednavka}) ze dne ${datum}. Rozsah: ${mnozstvi}.\n\nVěříme, že situaci vyřešíme společně. Prosíme o kontakt a návrh řešení do 5 pracovních dnů.\n\nS pozdravem",
+            en: "Dear Sir/Madam,\n\nWe would like to bring to your attention a non-conformity in the delivery of ${produkt} (order ${objednavka}) dated ${datum}. Scope: ${mnozstvi}.\n\nWe trust we can resolve this together. Please contact us with a proposed solution within 5 business days.\n\nBest regards"
+          }
+        },
+        urgent: {
+          subject: { cs: "URGENTNÍ: Kritická neshoda dodávky – ${produkt} – ${firma}", en: "URGENT: Critical delivery non-conformity – ${produkt} – ${firma}" },
+          body: {
+            cs: "Dobrý den,\n\nkritická neshoda v dodávce ${produkt} (${objednavka}, ${datum}), rozsah ${mnozstvi}, ZASTAVUJE naši výrobu.\n\nVyžadujeme okamžitou náhradu nebo expresní dodávku konformního zboží. Odpověď do 24 hodin, jinak eskalujeme na management a zahájíme alternativní nákup.\n\nS pozdravem",
+            en: "Dear Sir/Madam,\n\nA critical non-conformity in delivery of ${produkt} (${objednavka}, ${datum}), scope ${mnozstvi}, is HALTING our production.\n\nWe require immediate replacement or express delivery of conforming goods. Response within 24 hours or we escalate to management and initiate alternative sourcing.\n\nBest regards"
+          }
+        }
+      }
+    },
+    {
+      id: "discount-request",
+      label: { cs: "Žádost o slevu", en: "Discount request" },
+      variables: [
+        { id: "firma",            label: { cs: "Dodavatel", en: "Supplier" },                    placeholder: "ABC s.r.o.",  required: true },
+        { id: "produkt",          label: { cs: "Produkt / komodita", en: "Product / commodity" }, placeholder: "Ocel X",     required: true },
+        { id: "objem",            label: { cs: "Objem objednávky", en: "Order volume" },          placeholder: "500 tun",    required: true },
+        { id: "pozadovana_sleva", label: { cs: "Požadovaná sleva (%)", en: "Requested discount (%)" }, placeholder: "8 %",  required: true },
+        { id: "datum",            label: { cs: "Požadované datum platnosti", en: "Requested effective date" }, placeholder: "01.06.2026", required: false }
+      ],
+      tones: {
+        firm: {
+          subject: { cs: "Žádost o cenové podmínky – objem ${objem} – ${firma}", en: "Request for volume pricing – ${objem} – ${firma}" },
+          body: {
+            cs: "Dobrý den,\n\ns ohledem na plánovaný objem odběru ${objem} produktu ${produkt} požadujeme sjednání slevy ${pozadovana_sleva}.\n\nBez přijetí této úpravy budeme nuceni oslovit alternativní dodavatele. Očekáváme Vaši odpověď do 5 pracovních dnů.\n\nS pozdravem",
+            en: "Dear Sir/Madam,\n\nGiven our planned purchase volume of ${objem} of ${produkt}, we request a discount of ${pozadovana_sleva}.\n\nWithout acceptance of this adjustment, we will be forced to contact alternative suppliers. We expect your response within 5 business days.\n\nBest regards"
+          }
+        },
+        polite: {
+          subject: { cs: "Podnět k revizi cen – ${produkt} – ${firma}", en: "Request to review pricing – ${produkt} – ${firma}" },
+          body: {
+            cs: "Dobrý den,\n\nv rámci rozvoje naší spolupráce bychom rádi projednali možnost cenové úpravy u produktu ${produkt} při odběru ${objem}.\n\nNaše představa je sleva ve výši ${pozadovana_sleva}, případně jiná forma benefitu. Rádi si domluvíme schůzku.\n\nS pozdravem",
+            en: "Dear Sir/Madam,\n\nAs part of our ongoing partnership, we would like to discuss pricing adjustments for ${produkt} at a volume of ${objem}.\n\nWe envision a discount of ${pozadovana_sleva} or another form of benefit. We would be happy to arrange a meeting.\n\nBest regards"
+          }
+        },
+        urgent: {
+          subject: { cs: "URGENTNÍ: Cenová nabídka do 48h – ${produkt} – ${firma}", en: "URGENT: Pricing offer within 48h – ${produkt} – ${firma}" },
+          body: {
+            cs: "Dobrý den,\n\nrozhodujeme o nákupu ${objem} produktu ${produkt}. Finální rozhodnutí padne do 48 hodin.\n\nPožadujeme potvrzení slevy ${pozadovana_sleva} nebo nejlepší dostupnou nabídku obratem. Bez odpovědi zadáme objednávku jinde.\n\nS pozdravem",
+            en: "Dear Sir/Madam,\n\nWe are deciding on a purchase of ${objem} of ${produkt}. Final decision will be made within 48 hours.\n\nWe require confirmation of a ${pozadovana_sleva} discount or your best available offer immediately. Without a response, we will place the order elsewhere.\n\nBest regards"
+          }
+        }
+      }
+    },
+    {
+      id: "payment-reminder",
+      label: { cs: "Upomínka platby", en: "Payment reminder" },
+      variables: [
+        { id: "firma",        label: { cs: "Odběratel / partner", en: "Customer / partner" },   placeholder: "XYZ a.s.",       required: true },
+        { id: "castka",       label: { cs: "Dlužná částka (Kč/EUR)", en: "Amount due" },        placeholder: "50 000 Kč",      required: true },
+        { id: "cislo_faktury",label: { cs: "Číslo faktury", en: "Invoice number" },             placeholder: "FAK-2026-0099",  required: true },
+        { id: "splatnost",    label: { cs: "Datum splatnosti", en: "Due date" },                placeholder: "01.03.2026",     required: true },
+        { id: "datum",        label: { cs: "Dnešní datum", en: "Today's date" },                placeholder: "23.03.2026",     required: false }
+      ],
+      tones: {
+        firm: {
+          subject: { cs: "Upomínka platby – faktura ${cislo_faktury} – ${firma}", en: "Payment reminder – invoice ${cislo_faktury} – ${firma}" },
+          body: {
+            cs: "Dobrý den,\n\nupozorňujeme Vás, že faktura ${cislo_faktury} na částku ${castka} se splatností ${splatnost} nebyla dosud uhrazena.\n\nPožadujeme úhradu do 3 pracovních dnů. Při prodlení jsme oprávněni uplatnit smluvní penále.\n\nS pozdravem",
+            en: "Dear Sir/Madam,\n\nWe draw your attention to invoice ${cislo_faktury} for ${castka} with due date ${splatnost} which remains unpaid.\n\nWe require payment within 3 business days. In case of continued delay, we are entitled to apply contractual penalties.\n\nBest regards"
+          }
+        },
+        polite: {
+          subject: { cs: "Připomínka k faktuře ${cislo_faktury} – ${firma}", en: "Reminder regarding invoice ${cislo_faktury} – ${firma}" },
+          body: {
+            cs: "Dobrý den,\n\npřátelsky upozorňujeme, že faktura ${cislo_faktury} na částku ${castka} se splatností ${splatnost} ještě nebyla zaplacena. Možná jde o přehlédnutí.\n\nProsíme o úhradu nebo o zprávu, pokud je problém na Vaší straně.\n\nS pozdravem",
+            en: "Dear Sir/Madam,\n\nWe kindly remind you that invoice ${cislo_faktury} for ${castka} due ${splatnost} has not yet been paid. This may be an oversight.\n\nPlease arrange payment or let us know if there is an issue on your side.\n\nBest regards"
+          }
+        },
+        urgent: {
+          subject: { cs: "URGENTNÍ: Nezaplacená faktura ${cislo_faktury} – ${firma} – hrozí penále", en: "URGENT: Unpaid invoice ${cislo_faktury} – ${firma} – penalties imminent" },
+          body: {
+            cs: "Dobrý den,\n\nfaktura ${cislo_faktury} (${castka}, splatnost ${splatnost}) je po lhůtě splatnosti. Pokud neobdržíme platbu do 24 hodin, aktivujeme smluvní penále a předáme pohledávku k vymáhání.\n\nS pozdravem",
+            en: "Dear Sir/Madam,\n\nInvoice ${cislo_faktury} (${castka}, due ${splatnost}) is overdue. If we do not receive payment within 24 hours, we will activate contractual penalties and refer the debt for collection.\n\nBest regards"
+          }
+        }
+      }
+    },
+    {
+      id: "offer-rejection",
+      label: { cs: "Odmítnutí nabídky", en: "Offer rejection" },
+      variables: [
+        { id: "firma",   label: { cs: "Dodavatel", en: "Supplier" },             placeholder: "ABC s.r.o.",  required: true },
+        { id: "produkt", label: { cs: "Předmět nabídky", en: "Subject of offer" }, placeholder: "Ocel X",   required: true },
+        { id: "datum",   label: { cs: "Datum nabídky", en: "Offer date" },        placeholder: "10.03.2026", required: true },
+        { id: "duvod",   label: { cs: "Důvod odmítnutí", en: "Reason for rejection" }, placeholder: "cena", required: false }
+      ],
+      tones: {
+        firm: {
+          subject: { cs: "Odmítnutí nabídky – ${produkt} – ${firma}", en: "Offer rejection – ${produkt} – ${firma}" },
+          body: {
+            cs: "Dobrý den,\n\npo zvážení Vaší nabídky ze dne ${datum} na ${produkt} Vám sdělujeme, že ji nepřijímáme. Důvod: ${duvod}.\n\nDěkujeme za čas věnovaný přípravě nabídky.\n\nS pozdravem",
+            en: "Dear Sir/Madam,\n\nHaving considered your offer dated ${datum} for ${produkt}, we inform you that we are declining it. Reason: ${duvod}.\n\nThank you for the time invested in preparing the offer.\n\nBest regards"
+          }
+        },
+        polite: {
+          subject: { cs: "Odpověď na nabídku – ${produkt} – ${firma}", en: "Response to offer – ${produkt} – ${firma}" },
+          body: {
+            cs: "Dobrý den,\n\nděkujeme za nabídku ze dne ${datum} na ${produkt}. Po pečlivém zvážení jsme se rozhodli v tuto chvíli nenakupovat od Vaší společnosti, a to z důvodu: ${duvod}.\n\nVážíme si Vaší snahy a rádi budeme spolupracovat v budoucnu.\n\nS pozdravem",
+            en: "Dear Sir/Madam,\n\nThank you for your offer dated ${datum} for ${produkt}. After careful consideration, we have decided not to proceed at this time due to: ${duvod}.\n\nWe appreciate your effort and look forward to potential future collaboration.\n\nBest regards"
+          }
+        },
+        urgent: {
+          subject: { cs: "Zamítnutí nabídky – ${produkt} – ${firma} – finální rozhodnutí", en: "Offer rejected – ${produkt} – ${firma} – final decision" },
+          body: {
+            cs: "Dobrý den,\n\nVaši nabídku ze dne ${datum} na ${produkt} ZAMÍTÁME. Hlavní důvod: ${duvod}. Toto je naše finální rozhodnutí.\n\nS pozdravem",
+            en: "Dear Sir/Madam,\n\nWe REJECT your offer dated ${datum} for ${produkt}. Primary reason: ${duvod}. This is our final decision.\n\nBest regards"
+          }
+        }
+      }
+    },
+    {
+      id: "payment-extension",
+      label: { cs: "Žádost o prodloužení splatnosti", en: "Payment term extension" },
+      variables: [
+        { id: "firma",           label: { cs: "Dodavatel / věřitel", en: "Supplier / creditor" }, placeholder: "ABC s.r.o.",  required: true },
+        { id: "castka",          label: { cs: "Výše závazku (Kč/EUR)", en: "Amount owed" },        placeholder: "200 000 Kč", required: true },
+        { id: "puvodni_splatnost", label: { cs: "Původní splatnost", en: "Original due date" },    placeholder: "01.04.2026", required: true },
+        { id: "nova_splatnost",  label: { cs: "Nová požadovaná splatnost", en: "Requested new due date" }, placeholder: "01.05.2026", required: true },
+        { id: "duvod",           label: { cs: "Důvod žádosti", en: "Reason for request" },        placeholder: "výpadek cashflow", required: false }
+      ],
+      tones: {
+        firm: {
+          subject: { cs: "Žádost o odložení splatnosti – ${castka} – ${firma}", en: "Request to defer payment – ${castka} – ${firma}" },
+          body: {
+            cs: "Dobrý den,\n\nžádáme o odložení splatnosti závazku ${castka} z původního termínu ${puvodni_splatnost} na ${nova_splatnost}. Důvod: ${duvod}.\n\nZávazek uhradíme v plné výši k novému termínu. Prosíme o písemné potvrzení.\n\nS pozdravem",
+            en: "Dear Sir/Madam,\n\nWe request deferral of payment of ${castka} from the original due date ${puvodni_splatnost} to ${nova_splatnost}. Reason: ${duvod}.\n\nWe will pay the full amount by the new date. Please confirm in writing.\n\nBest regards"
+          }
+        },
+        polite: {
+          subject: { cs: "Podnět k dohodě o splatnosti – ${firma}", en: "Request for payment agreement – ${firma}" },
+          body: {
+            cs: "Dobrý den,\n\nobrací se na Vás s žádostí o dočasné prodloužení splatnosti závazku ${castka} (původně ${puvodni_splatnost}) na ${nova_splatnost}. Vede nás k tomu: ${duvod}.\n\nDěkujeme za pochopení a rádi domluvíme podmínky osobně.\n\nS pozdravem",
+            en: "Dear Sir/Madam,\n\nWe kindly request a temporary extension of the payment due date for ${castka} (originally ${puvodni_splatnost}) to ${nova_splatnost}. The reason is: ${duvod}.\n\nWe appreciate your understanding and are happy to discuss the terms in person.\n\nBest regards"
+          }
+        },
+        urgent: {
+          subject: { cs: "URGENTNÍ: Potřebujeme odložení platby ${castka} – ${firma}", en: "URGENT: Payment deferral needed – ${castka} – ${firma}" },
+          body: {
+            cs: "Dobrý den,\n\nz důvodu ${duvod} nemůžeme uhradit ${castka} k termínu ${puvodni_splatnost}. Urgentně žádáme o prodloužení do ${nova_splatnost}.\n\nBez potvrzení do 24 hodin budeme nuceni eskalovat situaci na nejvyšší úroveň.\n\nS pozdravem",
+            en: "Dear Sir/Madam,\n\nDue to ${duvod}, we are unable to pay ${castka} by ${puvodni_splatnost}. We urgently request an extension to ${nova_splatnost}.\n\nWithout confirmation within 24 hours, we will be forced to escalate the situation to senior management.\n\nBest regards"
+          }
+        }
+      }
+    }
+  ];
+
+  const NEGOTIATION_SCENARIOS = [
+    {
+      id: "supplier-wants-price-increase",
+      label: { cs: "Dodavatel chce zdražit", en: "Supplier wants to raise prices" },
+      goals: [
+        { id: "freeze-price",    label: { cs: "Zmrazit cenu", en: "Freeze price" } },
+        { id: "reduce-increase", label: { cs: "Snížit nárůst", en: "Reduce the increase" } },
+        { id: "defer-increase",  label: { cs: "Odložit zdražení", en: "Defer the increase" } }
+      ],
+      outcomes: {
+        "freeze-price": {
+          arguments: [
+            { cs: "Náklady dodavatele na suroviny vzrostly méně než navrhované zdražení – máme srovnání z trhu.", en: "Supplier raw material costs rose less than the proposed increase – we have market benchmarks." },
+            { cs: "Trh nabízí alternativní dodavatele za stávající ceny — ochotně předložíme srovnání.", en: "The market offers alternative suppliers at current prices — we are ready to provide a comparison." },
+            { cs: "Naše partnerství trvá roky; stabilita cen je základem dlouhodobé spolupráce.", en: "Our partnership spans years; price stability is the basis of long-term cooperation." },
+            { cs: "Objem, který odebíráme, garantuje plné využití kapacit dodavatele – to má hodnotu.", en: "Our purchase volume guarantees full capacity utilization for the supplier – that has value." },
+            { cs: "Zdražení ohrožuje naši konkurenceschopnost a může vést k přesunu zakázek.", en: "The price increase threatens our competitiveness and may lead to order transfer." }
+          ],
+          counterArguments: [
+            { cs: "Energie a logistika zdražily plošně — sdílíme tyto náklady.", en: "Energy and logistics costs have risen broadly — share these costs with us." },
+            { cs: "Inflace nám umožňuje upravit ceny dle smlouvy.", en: "Inflation allows us to adjust prices per contract." },
+            { cs: "Naše marže je pod tlakem, jinak ohrožujeme investice do kvality.", en: "Our margins are under pressure; otherwise we risk investment in quality." }
+          ],
+          style: { cs: "Analytický, s daty. Předem si připravte srovnání tržních cen.", en: "Analytical, data-driven. Prepare market price benchmarks in advance." }
+        },
+        "reduce-increase": {
+          arguments: [
+            { cs: "Akceptujeme částečnou úpravu – navrhujeme kompromis nižší než plné zdražení.", en: "We accept a partial adjustment – we propose a compromise below the full increase." },
+            { cs: "Nabízíme protiplnění: prodloužení kontraktu, zvýšení odběrů nebo rychlejší platby.", en: "We offer counter-value: contract extension, higher volumes, or faster payments." },
+            { cs: "Nižší nárůst zachová naší schopnost zakázku udržet u vás.", en: "A smaller increase preserves our ability to keep the order with you." },
+            { cs: "Navrhujeme postupnou úpravu – plný efekt rozložit do 2 let.", en: "We propose gradual adjustment – spread the full effect over 2 years." }
+          ],
+          counterArguments: [
+            { cs: "Kompromis pod naše náklady znamená prodej se ztrátou.", en: "A compromise below our costs means selling at a loss." },
+            { cs: "Ostatní odběratelé přijali plné zdražení.", en: "Other customers accepted the full increase." }
+          ],
+          style: { cs: "Hledejte win-win. Přineste protinabídku s konkrétní hodnotou.", en: "Seek win-win. Bring a counter-offer with concrete value." }
+        },
+        "defer-increase": {
+          arguments: [
+            { cs: "Naše interní schvalovací procesy potřebují čas – prosíme o odložení o 3 měsíce.", en: "Our internal approval processes need time – please defer by 3 months." },
+            { cs: "Máme sjednaný kontrakt s fixní cenou do určitého data – žádáme dodržení.", en: "We have a fixed-price contract until a certain date – we request it be honored." },
+            { cs: "Odložení nám umožní přizpůsobit vlastní ceník zákazníkům.", en: "Deferral allows us to adjust our own pricing to customers." }
+          ],
+          counterArguments: [
+            { cs: "Každý měsíc odkladu jsou naše ztráty větší.", en: "Each month of deferral increases our losses." },
+            { cs: "Smlouva nám umožňuje úpravu s kratším předstihem.", en: "The contract allows us to adjust with shorter notice." }
+          ],
+          style: { cs: "Formální přístup – odkazujte na smluvní podmínky a lhůty.", en: "Formal approach – reference contract terms and timelines." }
+        }
+      }
+    },
+    {
+      id: "volume-discount",
+      label: { cs: "Chceme slevu za objem", en: "We want a volume discount" },
+      goals: [
+        { id: "get-discount", label: { cs: "Získat slevu", en: "Get a discount" } },
+        { id: "long-term",    label: { cs: "Sjednat dlouhodobou dohodu", en: "Negotiate long-term agreement" } }
+      ],
+      outcomes: {
+        "get-discount": {
+          arguments: [
+            { cs: "Náš objem je pro vás strategicky klíčový – tvoří X % vaší produkce.", en: "Our volume is strategically key for you – it represents X % of your production." },
+            { cs: "Sleva sníží naše náklady a zvýší loajalitu – budeme nakupovat více.", en: "A discount reduces our costs and increases loyalty – we will buy more." },
+            { cs: "Konkurence nabízí srovnatelný produkt s cenou nižší o Y %.", en: "Competition offers a comparable product at Y % lower price." },
+            { cs: "Consolidujeme poptávku více interních center k vám – to si zaslouží ocenění.", en: "We are consolidating demand from multiple internal centers to you – that deserves recognition." },
+            { cs: "Sleva ve výši Z % je standardem v odvětví při tomto objemu.", en: "A discount of Z % is the industry standard at this volume." }
+          ],
+          counterArguments: [
+            { cs: "Naše marže jsou již na minimu.", en: "Our margins are already at a minimum." },
+            { cs: "Slevu nelze poskytnout bez schválení ústředím.", en: "A discount cannot be granted without headquarters approval." }
+          ],
+          style: { cs: "Datový přístup. Přineste čísla – objem, podíl, srovnání trhu.", en: "Data-driven approach. Bring numbers – volume, share, market comparison." }
+        },
+        "long-term": {
+          arguments: [
+            { cs: "Dlouhodobá smlouva vám garantuje stabilní objem a předvídatelnost.", en: "A long-term contract guarantees you stable volume and predictability." },
+            { cs: "Výměnou za cenu pod tržním průměrem vám nabízíme 3letý závazek.", en: "In exchange for a below-market price, we offer a 3-year commitment." },
+            { cs: "Snížíme vám obchodní riziko – žádná volatilita poptávky.", en: "We reduce your commercial risk – no demand volatility." }
+          ],
+          counterArguments: [
+            { cs: "Dlouhodobé závazky jsou pro nás rizikové při volatilitě cen surovin.", en: "Long-term commitments are risky for us with raw material price volatility." }
+          ],
+          style: { cs: "Partnerský tón. Zdůrazněte výhody pro obě strany.", en: "Partnership tone. Emphasize mutual benefits." }
+        }
+      }
+    },
+    {
+      id: "sla-breach",
+      label: { cs: "Dodavatel nesplňuje SLA", en: "Supplier fails SLA" },
+      goals: [
+        { id: "enforce-sla",  label: { cs: "Vymoci SLA", en: "Enforce SLA" } },
+        { id: "compensate",   label: { cs: "Získat kompenzaci", en: "Get compensation" } }
+      ],
+      outcomes: {
+        "enforce-sla": {
+          arguments: [
+            { cs: "Smlouva jasně stanoví metriky SLA – překračujete je X krát za Q.", en: "The contract clearly defines SLA metrics – you are breaching them X times per Q." },
+            { cs: "Každé porušení SLA nás stojí přímo měřitelné ztráty.", en: "Each SLA breach directly costs us measurable losses." },
+            { cs: "Máme dokumentaci všech porušení – datum, rozsah, dopad.", en: "We have documentation of all breaches – date, scope, impact." },
+            { cs: "Pokud se situace nezlepší, aktivujeme penále a audit.", en: "If the situation does not improve, we will activate penalties and an audit." }
+          ],
+          counterArguments: [
+            { cs: "Situace byla způsobena vyšší mocí nebo subdodavateli.", en: "The situation was caused by force majeure or subcontractors." },
+            { cs: "Metriky SLA jsou nastaveny příliš přísně.", en: "The SLA metrics are set too strictly." }
+          ],
+          style: { cs: "Formální, s dokumentací. Buďte věcní a přesní.", en: "Formal, with documentation. Be factual and precise." }
+        },
+        "compensate": {
+          arguments: [
+            { cs: "Porušení SLA způsobilo přímé škody v hodnotě X Kč – žádáme náhradu.", en: "SLA breach caused direct damages of X CZK – we request compensation." },
+            { cs: "Smluvní penále je X % z hodnoty zakázky za každý den prodlení.", en: "Contractual penalty is X % of contract value per day of delay." },
+            { cs: "Kompenzace je podmínkou pro pokračování spolupráce.", en: "Compensation is a condition for continued cooperation." }
+          ],
+          counterArguments: [
+            { cs: "Škody nebyly prokázány kauzálně.", en: "Damages have not been causally proven." }
+          ],
+          style: { cs: "Asertivní, ale věcný. Mějte připravenou kalkulaci škod.", en: "Assertive but factual. Have a damage calculation ready." }
+        }
+      }
+    },
+    {
+      id: "seeking-alternative",
+      label: { cs: "Hledáme alternativu / tlak na dodavatele", en: "Seeking alternative / leverage on supplier" },
+      goals: [
+        { id: "get-better-price", label: { cs: "Získat lepší cenu", en: "Get a better price" } },
+        { id: "dual-source",      label: { cs: "Zavést dual sourcing", en: "Introduce dual sourcing" } }
+      ],
+      outcomes: {
+        "get-better-price": {
+          arguments: [
+            { cs: "Obdrželi jsme konkurenční nabídku za nižší cenu – dáváme vám možnost reagovat.", en: "We have received a competitive offer at a lower price – we give you the opportunity to respond." },
+            { cs: "Bez cenové úpravy zahájíme přechod k alternativnímu dodavateli.", en: "Without a price adjustment, we will initiate a transition to an alternative supplier." },
+            { cs: "Přechod je pro nás nákladný – proto vám dáváme šanci first.", en: "Transition is costly for us – that is why we give you the first chance." },
+            { cs: "Jedná se o standardní benchmarking – nikoliv o osobní útok.", en: "This is standard benchmarking – not a personal attack." }
+          ],
+          counterArguments: [
+            { cs: "Kvalita alternativy není srovnatelná s naší.", en: "The alternative's quality is not comparable to ours." },
+            { cs: "Přechod způsobí výpadky a problémy s certifikací.", en: "Transition will cause disruptions and certification issues." }
+          ],
+          style: { cs: "Věcný, s konkrétní konkurenční nabídkou. Neprozrazujte dodavatele.", en: "Factual, with a concrete competitive offer. Do not disclose the supplier." }
+        },
+        "dual-source": {
+          arguments: [
+            { cs: "Dual sourcing je standardní risk management – není to nedůvěra.", en: "Dual sourcing is standard risk management – it is not distrust." },
+            { cs: "U vás zůstane X % objemu – neztratíte zakázku, jen snížíme koncentraci.", en: "X % of volume stays with you – you do not lose the order, we just reduce concentration." },
+            { cs: "Zvyšujeme odolnost dodavatelského řetězce – to je náš závazek.", en: "We increase supply chain resilience – that is our commitment." }
+          ],
+          counterArguments: [
+            { cs: "Nižší objem u nás sníží naši schopnost vám nabídnout nejlepší cenu.", en: "Lower volume with us reduces our ability to offer you the best price." }
+          ],
+          style: { cs: "Transparentní a partnerský. Zdůrazněte, že vztah pokračuje.", en: "Transparent and partnership-oriented. Emphasize the relationship continues." }
+        }
+      }
+    },
+    {
+      id: "claim-resolution",
+      label: { cs: "Řešíme reklamaci / spor", en: "Resolving a complaint / dispute" },
+      goals: [
+        { id: "replacement",  label: { cs: "Náhrada zboží", en: "Replacement of goods" } },
+        { id: "credit-note",  label: { cs: "Dobropis / sleva", en: "Credit note / discount" } }
+      ],
+      outcomes: {
+        "replacement": {
+          arguments: [
+            { cs: "Dodané zboží nesplňuje dohodnuté specifikace – to je závazek ze smlouvy.", en: "The delivered goods do not meet agreed specifications – that is a contractual obligation." },
+            { cs: "Náhrada je nejrychlejší cesta k obnovení provozu.", en: "Replacement is the fastest way to restore operations." },
+            { cs: "Náklady na vadu neseme my – požadujeme plnou kompenzaci náhradou.", en: "We bear the costs of the defect – we require full compensation through replacement." },
+            { cs: "Máme fotodokumentaci a laboratorní analýzu vady.", en: "We have photographic documentation and laboratory analysis of the defect." }
+          ],
+          counterArguments: [
+            { cs: "Vada mohla vzniknout při manipulaci na vaší straně.", en: "The defect may have occurred during handling on your side." },
+            { cs: "Naše výrobní kapacity neumožňují okamžitou náhradu.", en: "Our production capacity does not allow immediate replacement." }
+          ],
+          style: { cs: "Formální. Odkazujte na smlouvu a technická kritéria.", en: "Formal. Reference contract and technical criteria." }
+        },
+        "credit-note": {
+          arguments: [
+            { cs: "Pokud náhrada není možná, požadujeme dobropis odpovídající rozsahu vady.", en: "If replacement is not possible, we request a credit note corresponding to the defect scope." },
+            { cs: "Dobropis je nejrychlejší forma vypořádání bez nutnosti logistiky.", en: "A credit note is the fastest settlement form without logistics." },
+            { cs: "Výše dobropisu vychází z prokazatelné ztráty – nikoliv z dohadu.", en: "The credit note amount is based on demonstrable loss – not on guesswork." }
+          ],
+          counterArguments: [
+            { cs: "Naše interní procesy vyžadují schválení dobropisu na vyšší úrovni.", en: "Our internal processes require approval of credit notes at a higher level." }
+          ],
+          style: { cs: "Konstruktivní. Navrhněte konkrétní částku a lhůtu.", en: "Constructive. Propose a specific amount and timeline." }
+        }
+      }
+    },
+    {
+      id: "payment-terms",
+      label: { cs: "Vyjednáváme platební podmínky", en: "Negotiating payment terms" },
+      goals: [
+        { id: "extend-terms", label: { cs: "Prodloužit splatnost", en: "Extend payment terms" } },
+        { id: "early-discount", label: { cs: "Získat discount za rychlou platbu", en: "Get early payment discount" } }
+      ],
+      outcomes: {
+        "extend-terms": {
+          arguments: [
+            { cs: "Prodloužení splatnosti z 30 na 60 dní odpovídá standardu v odvětví.", en: "Extension from 30 to 60 days matches the industry standard." },
+            { cs: "Naše cashflow nám neumožňuje platit dříve bez ohrožení ostatních závazků.", en: "Our cashflow does not allow earlier payment without jeopardizing other obligations." },
+            { cs: "Kompenzujeme prodloužením kontraktu nebo zvýšením objemu.", en: "We compensate with a contract extension or higher volume." },
+            { cs: "Delší splatnost je pro nás podmínkou pro zachování tohoto dodavatele.", en: "Longer payment terms are our condition for keeping this supplier." }
+          ],
+          counterArguments: [
+            { cs: "Delší splatnost zvyšuje naše náklady na financování.", en: "Longer payment terms increase our financing costs." },
+            { cs: "Standardní naše podmínky jsou 30 dní.", en: "Our standard terms are 30 days." }
+          ],
+          style: { cs: "Věcný. Nabídněte protiplnění – objem nebo délku smlouvy.", en: "Factual. Offer counter-value – volume or contract length." }
+        },
+        "early-discount": {
+          arguments: [
+            { cs: "Nabízíme platbu do 10 dní výměnou za discount 2-3 %.", en: "We offer payment within 10 days in exchange for a 2-3 % discount." },
+            { cs: "Rychlá platba zlepší váš cashflow a sníží potřebu financování.", en: "Early payment improves your cashflow and reduces financing needs." },
+            { cs: "Je to win-win: my šetříme na ceně, vy na financování pohledávek.", en: "It is a win-win: we save on price, you save on receivables financing." }
+          ],
+          counterArguments: [
+            { cs: "Naše fakturační systém nepodporuje variabilní splatnosti.", en: "Our invoicing system does not support variable payment terms." }
+          ],
+          style: { cs: "Konstruktivní, s výpočtem výhody pro dodavatele.", en: "Constructive, with calculation of the benefit for the supplier." }
+        }
+      }
+    }
+  ];
+
+  const RED_FLAGS = [
+    { id: "rf-01", category: "financial",      weight: 15, label: { cs: "Dodavatel odmítá poskytnout finanční výkazy nebo audit", en: "Supplier refuses to provide financial statements or audit" } },
+    { id: "rf-02", category: "financial",      weight: 12, label: { cs: "Žádá o neobvykle vysoké zálohy (>50 % hodnoty zakázky)", en: "Requests unusually high prepayments (>50 % of order value)" } },
+    { id: "rf-03", category: "financial",      weight: 10, critical: true, label: { cs: "Nedávno prošel insolvencí nebo je v restrukturalizaci", en: "Recently went through insolvency or is in restructuring" } },
+    { id: "rf-04", category: "financial",      weight: 8,  critical: true, label: { cs: "Časté změny bankovního účtu nebo platebních instrukcí", en: "Frequent changes of bank account or payment instructions" } },
+    { id: "rf-05", category: "quality",        weight: 12, label: { cs: "Certifikace ISO/QS vypršela nebo nebyla obnovena", en: "ISO/QS certification expired or not renewed" } },
+    { id: "rf-06", category: "quality",        weight: 10, label: { cs: "Opakované neshody v dodávkách (>3× za rok)", en: "Repeated delivery non-conformities (>3× per year)" } },
+    { id: "rf-07", category: "quality",        weight: 8,  label: { cs: "Odmítá auditní návštěvy nebo zpřístupnění procesů", en: "Refuses audit visits or process access" } },
+    { id: "rf-08", category: "quality",        weight: 6,  label: { cs: "Změna subdodavatele bez předchozího oznámení", en: "Change of subcontractor without prior notice" } },
+    { id: "rf-09", category: "supply-risk",    weight: 12, critical: true, label: { cs: "Jediný zdroj pro kritickou komoditu bez alternativy", en: "Single source for critical commodity with no alternative" } },
+    { id: "rf-10", category: "supply-risk",    weight: 10, label: { cs: "Produkce koncentrována v jediné lokalitě s vysokým geo-rizikem", en: "Production concentrated in a single location with high geopolitical risk" } },
+    { id: "rf-11", category: "supply-risk",    weight: 8,  label: { cs: "Dodavatel odebírá >80 % kapacity od jediného subdodavatele", en: "Supplier sources >80 % capacity from a single sub-supplier" } },
+    { id: "rf-12", category: "supply-risk",    weight: 6,  label: { cs: "Prodleva v dodávkách >10 dní bez zdůvodnění (2×+ za rok)", en: "Delivery delays >10 days without explanation (2×+ per year)" } },
+    { id: "rf-13", category: "communication",  weight: 8,  label: { cs: "Časté střídání kontaktních osob na straně dodavatele", en: "Frequent turnover of contact persons on supplier side" } },
+    { id: "rf-14", category: "communication",  weight: 7,  label: { cs: "Vyhýbá se písemné komunikaci, preferuje ústní dohody", en: "Avoids written communication, prefers verbal agreements" } },
+    { id: "rf-15", category: "communication",  weight: 8,  label: { cs: "Odpovědi na dotazy trvají >5 pracovních dní", en: "Response to queries takes >5 business days" } },
+    { id: "rf-16", category: "communication",  weight: 5,  label: { cs: "Nejasná nebo rozporná smluvní dokumentace", en: "Unclear or contradictory contract documentation" } }
+  ];
+
+  const MAX_WEIGHT = RED_FLAGS.reduce((s, f) => s + f.weight, 0); // 145
+
+  const POSITION_FACTORS = [
+    {
+      id: "alternatives",
+      label: { cs: "Počet alternativních dodavatelů", en: "Number of alternative suppliers" },
+      options: [
+        { value: 0, label: { cs: "Žádný (0)", en: "None (0)" } },
+        { value: 1, label: { cs: "Jeden (1)", en: "One (1)" } },
+        { value: 2, label: { cs: "Dva až tři (2–3)", en: "Two to three (2–3)" } },
+        { value: 3, label: { cs: "Čtyři a více (4+)", en: "Four or more (4+)" } }
+      ],
+      weight: 25
+    },
+    {
+      id: "criticality",
+      label: { cs: "Kritičnost komodity", en: "Commodity criticality" },
+      options: [
+        { value: 3, label: { cs: "Kritická", en: "Critical" } },
+        { value: 2, label: { cs: "Vysoká", en: "High" } },
+        { value: 1, label: { cs: "Střední", en: "Medium" } },
+        { value: 0, label: { cs: "Nízká", en: "Low" } }
+      ],
+      weight: 25,
+      inverted: true
+    },
+    {
+      id: "volume",
+      label: { cs: "Objem obchodu", en: "Deal volume" },
+      options: [
+        { value: 0, label: { cs: "Malý (<100 tis. Kč)", en: "Small (<100K CZK)" } },
+        { value: 1, label: { cs: "Střední (<1M Kč)", en: "Medium (<1M CZK)" } },
+        { value: 2, label: { cs: "Velký (1–10M Kč)", en: "Large (1–10M CZK)" } },
+        { value: 3, label: { cs: "Klíčový (>10M Kč)", en: "Key (>10M CZK)" } }
+      ],
+      weight: 20
+    },
+    {
+      id: "time-pressure",
+      label: { cs: "Časový tlak na nás", en: "Time pressure on us" },
+      options: [
+        { value: 3, label: { cs: "Urgentní (dnes/zítra)", en: "Urgent (today/tomorrow)" } },
+        { value: 2, label: { cs: "Krátký (<1 týden)", en: "Short (<1 week)" } },
+        { value: 1, label: { cs: "Střední (~1 měsíc)", en: "Medium (~1 month)" } },
+        { value: 0, label: { cs: "Bez tlaku", en: "No pressure" } }
+      ],
+      weight: 15,
+      inverted: true
+    },
+    {
+      id: "substitutability",
+      label: { cs: "Míra substituovatelnosti komodity", en: "Commodity substitutability" },
+      options: [
+        { value: 0, label: { cs: "Nelze substituovat", en: "Cannot substitute" } },
+        { value: 1, label: { cs: "Obtížná substituce", en: "Difficult to substitute" } },
+        { value: 2, label: { cs: "Možná substituce", en: "Possible to substitute" } },
+        { value: 3, label: { cs: "Snadná substituce", en: "Easy to substitute" } }
+      ],
+      weight: 15
+    }
+  ];
+
+  const POSITION_COMMENTS = {
+    strong: {
+      cs: {
+        comment: "Vaše vyjednávací pozice je silná. Máte páky pro prosazení lepších podmínek.",
+        steps: [
+          "Definujte si jasné cílové podmínky (target) a nejhorší přijatelnou variantu (walk-away).",
+          "Zvažte kompetitivní nabídkové řízení – informujte dodavatele o alternativách.",
+          "Vyjednávejte o balíčku podmínek, ne pouze o ceně (platební termíny, záruka, SLA).",
+          "Zdokumentujte výsledek jednání písemně."
+        ]
+      },
+      en: {
+        comment: "Your negotiating position is strong. You have leverage to secure better terms.",
+        steps: [
+          "Define clear target terms and your walk-away position.",
+          "Consider a competitive tender – inform the supplier about alternatives.",
+          "Negotiate a package of terms, not just price (payment terms, warranty, SLA).",
+          "Document the negotiation outcome in writing."
+        ]
+      }
+    },
+    medium: {
+      cs: {
+        comment: "Střední pozice – máte prostor pro vyjednávání, ale s určitými omezeními.",
+        steps: [
+          "Identifikujte klíčový argument (objem, spolehlivost, dlouhodobé partnerství).",
+          "Zmapujte alternativní dodavatele — i samotné zmínění alternativ zvyšuje váš vliv.",
+          "Navrhněte win-win řešení (např. delší kontrakt za lepší cenu).",
+          "Vyhněte se extrémnímu časovému tlaku — informujte dodavatele, že máte čas."
+        ]
+      },
+      en: {
+        comment: "Medium position – you have room to negotiate, but with certain constraints.",
+        steps: [
+          "Identify your key argument (volume, reliability, long-term partnership).",
+          "Map alternative suppliers – even mentioning alternatives increases your leverage.",
+          "Propose a win-win solution (e.g. longer contract for better price).",
+          "Avoid extreme time pressure – signal to the supplier that you have time."
+        ]
+      }
+    },
+    weak: {
+      cs: {
+        comment: "Slabá pozice – dodavatel má výhodu. Zaměřte se na zlepšení podmínek před dalším vyjednáváním.",
+        steps: [
+          "Krátkodobě: přistupte na podmínky, ale trvejte na smluvním zajištění kvality a dodávek.",
+          "Střednědobě: spusťte program rozvoje alternativních dodavatelů.",
+          "Snižte kritičnost komodity (substituce, standardizace, redesign).",
+          "Snižte časový tlak – plánujte nákupy s dostatečným předstihem.",
+          "Zvyšte objem pro zlepšení páky (konsolidace poptávky, skupinový nákup)."
+        ]
+      },
+      en: {
+        comment: "Weak position – the supplier has the advantage. Focus on improving conditions before the next negotiation.",
+        steps: [
+          "Short-term: accept the terms but insist on contractual quality and delivery guarantees.",
+          "Medium-term: launch an alternative supplier development program.",
+          "Reduce commodity criticality (substitution, standardization, redesign).",
+          "Reduce time pressure – plan purchases well in advance.",
+          "Increase volume to improve leverage (demand consolidation, group purchasing)."
+        ]
+      }
+    }
+  };
+
+  const TEXTS = {
+    cs: {
+      tab6a: "Email builder", tab6b: "Argumenty", tab6c: "Red flag checker", tab6d: "Vyjednávací pozice",
+      panel6a_heading: "Email builder", panel6b_heading: "Argumenty pro vyjednávání",
+      panel6c_heading: "Red flag checker", panel6d_heading: "Vyjednávací pozice",
+      selectScenario: "Vyberte scénář", selectScenarioPlaceholder: "— vyberte scénář —",
+      selectTone: "Tón emailu", toneFirm: "Pevný", tonePolite: "Zdvořilý", toneUrgent: "Urgentní",
+      fillVariables: "Vyplňte proměnné", subjectLabel: "Předmět:", emailBody: "Text emailu:",
+      copyBtn: "Kopírovat email", copyConfirm: "Zkopírováno!", resetBtn: "Resetovat",
+      copyErrorMsg: "Kopírování selhalo. Vyberte text ručně.",
+      selectSituation: "Vyberte situaci", selectSituationPlaceholder: "— vyberte situaci —",
+      selectGoal: "Cíl nákupčího", argumentsTitle: "Argumenty",
+      counterArgsTitle: "Možné protiargumenty", recommendedStyle: "Doporučený styl",
+      rfTitle: "Zaškrtněte příznaky, které platí",
+      rfCategoryFinancial: "Finanční stabilita", rfCategoryQuality: "Kvalita",
+      rfCategorySupplyRisk: "Dodavatelské riziko", rfCategoryCommunication: "Komunikace",
+      rfScoreLabel: "Skóre rizika z označených bodů", rfRecommendationLabel: "Doporučení",
+      rfActiveFlagsLabel: "Aktivní příznaky",
+      rfLow: "✓ NÍZKÉ RIZIKO", rfMedium: "⚠ STŘEDNÍ RIZIKO", rfHigh: "⚠ VYSOKÉ RIZIKO",
+      rfNone: "NIC NEOZNAČENO",
+      rfRecNone: "Zatím není označený žádný příznak. Označte ty, které u dodavatele platí. Neoznačený příznak neznamená, že je ověřený.",
+      rfPartialNote: "Výsledek vychází jen z označených bodů. Neoznačený příznak neznamená, že je ověřený.",
+      rfCriticalTitle: "Prioritně prověřit",
+      rfCriticalText: "tento signál je vážný sám o sobě, bez ohledu na skóre. Úroveň rizika je proto nejméně střední.",
+      rfRecLow: "Z označených bodů nevyplývá závažné riziko. Neoznačené body nejsou ověřené, pokračujte ve standardním monitoringu.",
+      rfRecMedium: "Identifikovali jsme střední rizikové příznaky. Doporučujeme hloubkový audit a pravidelné KPI review.",
+      rfRecHigh: "Kritická úroveň rizika. Zvažte okamžitý přechod na záložního dodavatele a eskalaci na management.",
+      posTitle: "Vyplňte faktory", posScoreLabel: "Celkové skóre pozice",
+      posCommentLabel: "Komentář", posStepsLabel: "Doporučené kroky",
+      posStrong: "↑ SILNÁ POZICE", posMedium: "STŘEDNÍ POZICE", posWeak: "⚠ SLABÁ POZICE",
+      posSelectPlaceholder: "— vyberte —",
+      posIncompleteBadge: "VYPLNĚNO {n} Z {total}",
+      posIncomplete: "Skóre a verdikt ukážeme až po vyplnění všech faktorů. Chybí: {missing}.",
+      selectGoalPlaceholder: "— vyberte cíl —",
+      toolDesc6a: "Sestavte profesionální email na míru situaci a zvolenému tónu.",
+      toolDesc6b: "Získejte argumenty, protiargumenty a doporučený styl pro vaši situaci.",
+      toolDesc6c: "Vyhodnoťte rizikovost dodavatele na základě příznaků.",
+      toolDesc6d: "Zjistěte sílu vaší vyjednávací pozice a získejte doporučení.",
+      weightLabel: "váha"
+    },
+    en: {
+      tab6a: "Email builder", tab6b: "Arguments", tab6c: "Red flag checker", tab6d: "Negotiation position",
+      panel6a_heading: "Email builder", panel6b_heading: "Negotiation arguments",
+      panel6c_heading: "Red flag checker", panel6d_heading: "Negotiation position",
+      selectScenario: "Select scenario", selectScenarioPlaceholder: "— select scenario —",
+      selectTone: "Email tone", toneFirm: "Firm", tonePolite: "Polite", toneUrgent: "Urgent",
+      fillVariables: "Fill in variables", subjectLabel: "Subject:", emailBody: "Email body:",
+      copyBtn: "Copy email", copyConfirm: "Copied!", resetBtn: "Reset",
+      copyErrorMsg: "Copy failed. Please select the text manually.",
+      selectSituation: "Select situation", selectSituationPlaceholder: "— select situation —",
+      selectGoal: "Buyer goal", argumentsTitle: "Arguments",
+      counterArgsTitle: "Possible counter-arguments", recommendedStyle: "Recommended style",
+      rfTitle: "Check symptoms that apply",
+      rfCategoryFinancial: "Financial stability", rfCategoryQuality: "Quality",
+      rfCategorySupplyRisk: "Supply risk", rfCategoryCommunication: "Communication",
+      rfScoreLabel: "Risk score from flagged items", rfRecommendationLabel: "Recommendation",
+      rfActiveFlagsLabel: "Active flags",
+      rfLow: "✓ LOW RISK", rfMedium: "⚠ MEDIUM RISK", rfHigh: "⚠ HIGH RISK",
+      rfNone: "NOTHING FLAGGED",
+      rfRecNone: "No warning sign is flagged yet. Flag the ones that apply to the supplier. An unflagged sign is not a verified one.",
+      rfPartialNote: "The result is based only on the flagged items. An unflagged sign is not a verified one.",
+      rfCriticalTitle: "Check with priority",
+      rfCriticalText: "this signal is serious on its own, regardless of the score. The risk level is therefore at least medium.",
+      rfRecLow: "The flagged items show no significant risk. Unflagged items are not verified, continue standard monitoring.",
+      rfRecMedium: "Medium risk indicators identified. We recommend a deep audit and regular KPI review.",
+      rfRecHigh: "Critical risk level. Consider immediate transition to a backup supplier and escalation to management.",
+      posTitle: "Fill in factors", posScoreLabel: "Total position score",
+      posCommentLabel: "Comment", posStepsLabel: "Recommended steps",
+      posStrong: "↑ STRONG POSITION", posMedium: "MEDIUM POSITION", posWeak: "⚠ WEAK POSITION",
+      posSelectPlaceholder: "— select —",
+      posIncompleteBadge: "{n} OF {total} ANSWERED",
+      posIncomplete: "Score and verdict appear once all factors are filled in. Missing: {missing}.",
+      selectGoalPlaceholder: "— select goal —",
+      toolDesc6a: "Build a professional email tailored to the situation and chosen tone.",
+      toolDesc6b: "Get arguments, counter-arguments and a recommended style for your situation.",
+      toolDesc6c: "Assess supplier risk based on warning signs.",
+      toolDesc6d: "Discover the strength of your negotiating position and get recommendations.",
+      weightLabel: "weight"
+    }
+  };
+
+  // ============================================================
+  // STATE
+  // ============================================================
+  let currentLang = 'cs';
+  let currentTone = 'firm';
+  let currentScenarioId = null;
+  const selections = Object.fromEntries(POSITION_FACTORS.map(f => [f.id, null]));
+
+  // ============================================================
+  // CORE: TABS & LANG
+  // ============================================================
+  function initTabs() {
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tab = btn.dataset.tab;
+        document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
+        document.querySelectorAll('.tool-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        btn.setAttribute('aria-selected', 'true');
+        document.getElementById('tab-' + tab)?.classList.add('active');
+      });
+    });
+
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+      btn.addEventListener('click', () => setLang(btn.dataset.lang));
+    });
+  }
+
+  function setLang(lang) {
+    currentLang = lang;
+    document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.lang === lang));
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.dataset.i18n;
+      if (TEXTS[lang]?.[key] !== undefined) el.textContent = TEXTS[lang][key];
+    });
+    // Refresh dynamic content
+    populateScenarioSelect();
+    populateSituationSelect();
+    renderRedFlagCategories();
+    renderPositionFactors();
+    if (currentScenarioId) onScenarioChange();
+    const argSit = document.getElementById('arg-situation').value;
+    const argGoal = document.getElementById('arg-goal').value;
+    if (argSit && argGoal) renderArguments(argSit, argGoal);
+    calcRedFlags();
+    calcPosition();
+    // update copy error text
+    document.getElementById('eb-copy-error').textContent = TEXTS[lang].copyErrorMsg;
+  }
+
+  // ============================================================
+  // 6a EMAIL BUILDER
+  // ============================================================
+  function populateScenarioSelect() {
+    const sel = document.getElementById('eb-scenario');
+    const current = sel.value;
+    sel.innerHTML = `<option value="" disabled ${!current ? 'selected' : ''} data-i18n="selectScenarioPlaceholder">${TEXTS[currentLang].selectScenarioPlaceholder}</option>`;
+    EMAIL_TEMPLATES.forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = t.id;
+      opt.textContent = t.label[currentLang];
+      if (t.id === current) opt.selected = true;
+      sel.appendChild(opt);
+    });
+  }
+
+  function onScenarioChange() {
+    const scenarioId = document.getElementById('eb-scenario').value;
+    currentScenarioId = scenarioId || null;
+    if (!scenarioId) {
+      document.getElementById('eb-variables-section').classList.add('hidden');
+      document.getElementById('eb-output-section').classList.add('hidden');
+      return;
+    }
+    const tpl = EMAIL_TEMPLATES.find(t => t.id === scenarioId);
+    if (!tpl) return;
+    renderVariables(tpl);
+    document.getElementById('eb-variables-section').classList.remove('hidden');
+    rebuildEmail();
+  }
+
+  function renderVariables(tpl) {
+    const grid = document.getElementById('eb-variables-grid');
+    grid.innerHTML = '';
+    tpl.variables.forEach(v => {
+      const div = document.createElement('div');
+      div.className = 'input-group';
+      const lbl = v.label[currentLang] + (v.required ? ' *' : '');
+      div.innerHTML = `<label for="var-${v.id}">${lbl}</label><input type="text" id="var-${v.id}" class="input-field" placeholder="${v.placeholder}" oninput="rebuildEmail()">`;
+      grid.appendChild(div);
+    });
+  }
+
+  function getVars(tpl) {
+    const vars = {};
+    tpl.variables.forEach(v => {
+      vars[v.id] = document.getElementById('var-' + v.id)?.value || '';
+    });
+    return vars;
+  }
+
+  /**
+   * T6-1: dosadí proměnné ${klic} do šablony v jednom průchodu. Hodnota se vkládá doslovně
+   * (náhrada přes funkci, takže „$&“, „$$“ ani „${…}“ v uživatelském textu nemají zvláštní význam
+   * a dosazený text se znovu neprochází). Prázdná hodnota → „[klic]“, klíč mimo vars zůstane beze změny.
+   */
+  function fillTemplate(template, vars) {
+    return String(template).replace(/\$\{([A-Za-z0-9_]+)\}/g, (placeholder, key) => {
+      if (!Object.prototype.hasOwnProperty.call(vars, key)) return placeholder;
+      const value = vars[key] == null ? '' : String(vars[key]);
+      return value || '[' + key + ']';
+    });
+  }
+
+  function buildEmail(templateId, tone, lang, vars) {
+    const tpl = EMAIL_TEMPLATES.find(t => t.id === templateId);
+    if (!tpl || !tpl.tones[tone]) return null;
+    const raw = tpl.tones[tone];
+    return { subject: fillTemplate(raw.subject[lang], vars), body: fillTemplate(raw.body[lang], vars) };
+  }
+
+  function rebuildEmail() {
+    const scenarioId = document.getElementById('eb-scenario').value;
+    if (!scenarioId) return;
+    const tpl = EMAIL_TEMPLATES.find(t => t.id === scenarioId);
+    if (!tpl) return;
+    const vars = getVars(tpl);
+    const result = buildEmail(scenarioId, currentTone, currentLang, vars);
+    if (!result) return;
+    document.getElementById('eb-subject').textContent = result.subject;
+    document.getElementById('eb-output').value = result.body;
+    document.getElementById('eb-output-section').classList.remove('hidden');
+  }
+
+  function onToneChange(tone) {
+    currentTone = tone;
+    document.querySelectorAll('.eb-tone-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.tone === tone));
+    rebuildEmail();
+  }
+
+  function resetEmail() {
+    document.getElementById('eb-scenario').value = '';
+    currentScenarioId = null;
+    document.getElementById('eb-variables-section').classList.add('hidden');
+    document.getElementById('eb-output-section').classList.add('hidden');
+    document.getElementById('eb-variables-grid').innerHTML = '';
+  }
+
+  async function copyEmail() {
+    const subject = document.getElementById('eb-subject').textContent;
+    const body = document.getElementById('eb-output').value;
+    const text = (TEXTS[currentLang].subjectLabel + ' ' + subject + '\n\n' + body).trim();
+    const confirmEl = document.getElementById('eb-copy-confirm');
+    const errorEl = document.getElementById('eb-copy-error');
+    confirmEl.style.display = 'none';
+    errorEl.style.display = 'none';
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        const ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        if (!ok) throw new Error('execCommand failed');
+      }
+      confirmEl.style.display = 'inline';
+      setTimeout(() => { confirmEl.style.display = 'none'; }, 2000);
+    } catch (e) {
+      errorEl.textContent = TEXTS[currentLang].copyErrorMsg;
+      errorEl.style.display = 'inline';
+      setTimeout(() => { errorEl.style.display = 'none'; }, 4000);
+    }
+  }
+
+  // ============================================================
+  // 6b ARGUMENTY
+  // ============================================================
+  function populateSituationSelect() {
+    const sel = document.getElementById('arg-situation');
+    const current = sel.value;
+    sel.innerHTML = `<option value="" disabled ${!current ? 'selected' : ''} data-i18n="selectSituationPlaceholder">${TEXTS[currentLang].selectSituationPlaceholder}</option>`;
+    NEGOTIATION_SCENARIOS.forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s.id;
+      opt.textContent = s.label[currentLang];
+      if (s.id === current) opt.selected = true;
+      sel.appendChild(opt);
+    });
+  }
+
+  function onArgSituationChange() {
+    const situationId = document.getElementById('arg-situation').value;
+    document.getElementById('arg-output-section').style.display = 'none';
+    if (!situationId) { document.getElementById('arg-goal-group').style.display = 'none'; return; }
+    const scenario = NEGOTIATION_SCENARIOS.find(s => s.id === situationId);
+    if (!scenario) return;
+    const goalSel = document.getElementById('arg-goal');
+    goalSel.innerHTML = `<option value="" disabled selected data-i18n="selectGoalPlaceholder">${TEXTS[currentLang].selectGoalPlaceholder}</option>`;
+    scenario.goals.forEach(g => {
+      const opt = document.createElement('option');
+      opt.value = g.id;
+      opt.textContent = g.label[currentLang];
+      goalSel.appendChild(opt);
+    });
+    document.getElementById('arg-goal-group').style.display = '';
+  }
+
+  function onArgGoalChange() {
+    const situationId = document.getElementById('arg-situation').value;
+    const goalId = document.getElementById('arg-goal').value;
+    if (situationId && goalId) renderArguments(situationId, goalId);
+  }
+
+  function renderArguments(scenarioId, goalId) {
+    const scenario = NEGOTIATION_SCENARIOS.find(s => s.id === scenarioId);
+    const outcome = scenario?.outcomes[goalId];
+    if (!outcome) return;
+    const argList = document.getElementById('arg-list');
+    const counterList = document.getElementById('arg-counter-list');
+    const styleBadge = document.getElementById('arg-style-badge');
+    argList.innerHTML = outcome.arguments.map(a => `<li>${a[currentLang]}</li>`).join('');
+    counterList.innerHTML = outcome.counterArguments.map(a => `<li>${a[currentLang]}</li>`).join('');
+    styleBadge.textContent = outcome.style[currentLang];
+    document.getElementById('arg-output-section').style.display = '';
+  }
+
+  // ============================================================
+  // 6c RED FLAG CHECKER
+  // ============================================================
+  function renderRedFlagCategories() {
+    const cats = { financial: 'rf-cat-financial', quality: 'rf-cat-quality', 'supply-risk': 'rf-cat-supply-risk', communication: 'rf-cat-communication' };
+    Object.entries(cats).forEach(([cat, elId]) => {
+      const container = document.getElementById(elId);
+      const flags = RED_FLAGS.filter(f => f.category === cat);
+      container.innerHTML = flags.map(f => `
+        <div class="rf-item">
+          <input type="checkbox" id="${f.id}" data-weight="${f.weight}" onchange="calcRedFlags()">
+          <label for="${f.id}">${f.label[currentLang]}</label>
+          <span class="rf-item-weight">${TEXTS[currentLang].weightLabel}: ${f.weight}</span>
+        </div>`).join('');
+    });
+  }
+
+  function getCheckedFlags() {
+    return [...document.querySelectorAll('.rf-item input[type="checkbox"]:checked')].map(cb => cb.id);
+  }
+
+  /**
+   * Q2 (a), T6-6, T6-7: skóre platí jen z označených bodů. Nic neoznačeno → úroveň 'none' bez skóre.
+   * Kritický signál (critical: true, rf-03, rf-04, rf-09) vyvolá samostatné upozornění a úroveň nejméně střední,
+   * bez ohledu na skóre. Prahy skóre (25 a 55) a váhy jsou ze zadání beze změny.
+   */
+  function redFlagStatus(checkedIds) {
+    const activeFlags = RED_FLAGS.filter(f => checkedIds.includes(f.id));
+    if (!activeFlags.length) return { flagged: 0, score: null, level: 'none', critical: [], activeFlags };
+    const rawScore = activeFlags.reduce((s, f) => s + f.weight, 0);
+    const score = Math.round((rawScore / MAX_WEIGHT) * 100);
+    const critical = activeFlags.filter(f => f.critical === true);
+    let level = score < 25 ? 'low' : score < 55 ? 'medium' : 'high';
+    if (critical.length && level === 'low') level = 'medium';
+    return { flagged: activeFlags.length, score, level, critical, activeFlags };
+  }
+
+  function calcRedFlags() {
+    renderRedFlagResult(redFlagStatus(getCheckedFlags()));
+  }
+
+  function renderRedFlagResult({ score, level, critical, activeFlags }) {
+    const T = TEXTS[currentLang];
+    document.getElementById('rf-score-value').textContent = score === null ? '—' : score;
+    const fill = document.getElementById('rf-score-fill');
+    fill.style.width = (score || 0) + '%';
+    fill.style.background = level === 'high' ? 'var(--color-danger)' : level === 'medium' ? 'var(--color-warning)' : 'var(--color-success)';
+
+    const levelKey = 'rf' + level.charAt(0).toUpperCase() + level.slice(1);
+    const badgeWrap = document.getElementById('rf-level-badge-wrap');
+    badgeWrap.innerHTML = `<span class="rf-level-badge" data-level="${level}">${T[levelKey]}</span>`;
+    document.getElementById('rf-partial-note').classList.toggle('hidden', level === 'none');
+
+    const criticalEl = document.getElementById('rf-critical');
+    document.getElementById('rf-critical-list').innerHTML = critical.map(f => `<li>${f.label[currentLang]}</li>`).join('');
+    criticalEl.classList.toggle('hidden', critical.length === 0);
+
+    const activeSection = document.getElementById('rf-active-flags');
+    const flagsList = document.getElementById('rf-active-flags-list');
+    if (activeFlags.length > 0) {
+      flagsList.innerHTML = activeFlags.map(f => `<li>${f.label[currentLang]}</li>`).join('');
+      activeSection.classList.remove('hidden');
+    } else {
+      activeSection.classList.add('hidden');
+    }
+
+    const recEl = document.getElementById('rf-recommendation');
+    const recText = document.getElementById('rf-recommendation-text');
+    recText.textContent = T['rfRec' + level.charAt(0).toUpperCase() + level.slice(1)];
+    recEl.classList.remove('hidden');
+  }
+
+  // ============================================================
+  // 6d VYJEDNÁVACÍ POZICE
+  // ============================================================
+  function renderPositionFactors() {
+    const container = document.getElementById('pos-factors-container');
+    container.innerHTML = POSITION_FACTORS.map(f => {
+      const currentVal = selections[f.id];
+      const opts = f.options.map(o => `<option value="${o.value}" ${currentVal !== null && currentVal === o.value ? 'selected' : ''}>${o.label[currentLang]}</option>`).join('');
+      return `<div class="pos-factor-group">
+        <label for="pos-${f.id}">${f.label[currentLang]}</label>
+        <select id="pos-${f.id}" data-factor="${f.id}" onchange="onFactorChange('${f.id}', this.value)">
+          <option value="" disabled ${currentVal === null ? 'selected' : ''}>${TEXTS[currentLang].posSelectPlaceholder}</option>
+          ${opts}
+        </select>
+      </div>`;
+    }).join('');
+  }
+
+  function onFactorChange(factorId, rawValue) {
+    selections[factorId] = rawValue === '' ? null : Number(rawValue);
+    calcPosition();
+  }
+
+  function hasAnySelection() {
+    return POSITION_FACTORS.some(f => selections[f.id] !== null);
+  }
+
+  /**
+   * Q2 (a), T6-10: skóre a verdikt až po vyplnění všech faktorů. Neúplné → known/total a seznam chybějících,
+   * bez skóre a bez úrovně. Úplné → vážený součet ze zadání (váhy 25/25/20/15/15, škála 0–3, invertované faktory 3 − v).
+   */
+  function positionStatus(sel) {
+    const missing = POSITION_FACTORS.filter(f => sel[f.id] === null || sel[f.id] === undefined);
+    const known = POSITION_FACTORS.length - missing.length;
+    if (missing.length) return { known, total: POSITION_FACTORS.length, complete: false, score: null, level: null, missing };
+    const totalWeight = POSITION_FACTORS.reduce((s, f) => s + f.weight, 0);
+    const totalScore = POSITION_FACTORS.reduce((s, f) => s + ((f.inverted ? 3 - sel[f.id] : sel[f.id]) / 3) * f.weight, 0);
+    const score = Math.round((totalScore / totalWeight) * 100);
+    const level = score >= 60 ? 'strong' : score >= 35 ? 'medium' : 'weak';
+    return { known, total: POSITION_FACTORS.length, complete: true, score, level, missing };
+  }
+
+  function calcPosition() {
+    if (!hasAnySelection()) {
+      document.getElementById('pos-result-section').style.display = 'none';
+      return;
+    }
+    renderPositionResult(positionStatus(selections));
+    document.getElementById('pos-result-section').style.display = '';
+  }
+
+  function renderPositionResult({ known, total, complete, score, level, missing }) {
+    const T = TEXTS[currentLang];
+    const fill = document.getElementById('pos-score-fill');
+    const badgeWrap = document.getElementById('pos-level-badge-wrap');
+    const stepsList = document.getElementById('pos-steps-list');
+    const stepsHeading = document.getElementById('pos-steps-heading');
+    if (!complete) {
+      document.getElementById('pos-score-value').textContent = '—';
+      fill.style.width = '0%';
+      badgeWrap.innerHTML = `<span class="pos-level-badge" data-level="incomplete">${T.posIncompleteBadge.replace('{n}', known).replace('{total}', total)}</span>`;
+      document.getElementById('pos-comment').textContent = T.posIncomplete.replace('{missing}', missing.map(f => f.label[currentLang]).join(', '));
+      stepsList.innerHTML = '';
+      stepsList.classList.add('hidden');
+      stepsHeading.classList.add('hidden');
+      return;
+    }
+    document.getElementById('pos-score-value').textContent = score;
+    fill.style.width = score + '%';
+    fill.style.background = level === 'strong' ? 'var(--color-success)' : level === 'medium' ? 'var(--color-warning)' : 'var(--color-danger)';
+
+    const badgeKey = level === 'strong' ? 'posStrong' : level === 'medium' ? 'posMedium' : 'posWeak';
+    badgeWrap.innerHTML = `<span class="pos-level-badge" data-level="${level}">${T[badgeKey]}</span>`;
+
+    const commentData = POSITION_COMMENTS[level][currentLang];
+    document.getElementById('pos-comment').textContent = commentData.comment;
+    stepsList.innerHTML = commentData.steps.map(s => `<li>${s}</li>`).join('');
+    stepsList.classList.remove('hidden');
+    stepsHeading.classList.remove('hidden');
+  }
+
+  // ============================================================
+  // INIT
+  // ============================================================
+  document.addEventListener('DOMContentLoaded', () => {
+    initTabs();
+    populateScenarioSelect();
+    populateSituationSelect();
+    renderRedFlagCategories();
+    renderPositionFactors();
+    calcRedFlags();
+    // Set initial copy error text
+    document.getElementById('eb-copy-error').textContent = TEXTS[currentLang].copyErrorMsg;
+  });
+  </script>
+</body>
+</html>
