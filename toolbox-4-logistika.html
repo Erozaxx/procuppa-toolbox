@@ -1,0 +1,1803 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Procuppa Toolbox 4 – Logistika</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ===== CSS CUSTOM PROPERTIES ===== */
+    :root {
+      /* === BARVY === */
+      --color-primary:      #1A1A1A;
+      --color-accent:       #FFD956;
+      --color-success:      #16A34A;
+      --color-warning:      #D97706;
+      --color-danger:       #DC2626;
+      --color-bg:           #FAFAF8;
+      --color-surface:      #FFFFFF;
+      --color-text:         #1A1A1A;
+      --color-text-muted:   #5C6370;
+      --color-border:       #E5E3DC;
+      --color-accent-text:  #1A1A1A;
+      --color-primary-text: #FFFFFF;
+
+      /* === TYPOGRAFIE === */
+      --font-base: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+      --font-size-sm: 0.875rem;
+      --font-size-md: 1rem;
+      --font-size-lg: 1.25rem;
+      --font-size-xl: 1.5rem;
+      --font-tracking-tight: -0.01em;
+      --font-tracking-normal: 0em;
+
+      /* === SPACING === */
+      --space-xs: 0.25rem;
+      --space-sm: 0.5rem;
+      --space-md: 1rem;
+      --space-lg: 1.5rem;
+      --space-xl: 2rem;
+
+      /* === RADIUS === */
+      --radius-sm: 3px;
+      --radius-md: 6px;
+      --radius-lg: 10px;
+
+      /* === SHADOW === */
+      --shadow-card: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+
+      /* === LEAD TIME FÁZE BARVY === */
+      --lt-color-production: #1A1A1A;
+      --lt-color-dispatch:   #5C6370;
+      --lt-color-transit:    #0891B2;
+      --lt-color-customs:    #D97706;
+      --lt-color-receiving:  #16A34A;
+    }
+
+    /* ===== RESET + BASE ===== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-base);
+      font-size: var(--font-size-md);
+      color: var(--color-text);
+      background: var(--color-bg);
+      line-height: 1.5;
+    }
+
+    /* ===== LAYOUT ===== */
+    header {
+      position: relative;
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      padding: var(--space-md) var(--space-xl);
+      display: flex;
+      align-items: center;
+      min-height: 60px;
+    }
+
+    #logo {
+      height: 40px;
+      width: auto;
+    }
+
+    .lang-switcher {
+      position: absolute;
+      top: var(--space-md);
+      right: var(--space-md);
+      display: flex;
+      gap: var(--space-xs);
+    }
+
+    .lang-btn {
+      background: none;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-xs) var(--space-sm);
+      font-size: var(--font-size-sm);
+      cursor: pointer;
+      color: var(--color-text-muted);
+      font-family: var(--font-base);
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+
+    .lang-btn.active,
+    .lang-btn:hover {
+      background: var(--color-primary);
+      color: var(--color-primary-text);
+      border-color: var(--color-primary);
+    }
+
+    /* ===== TAB NAVIGATION ===== */
+    .tab-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      padding: 0 var(--space-xl);
+      gap: 0;
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      padding: var(--space-md) var(--space-lg);
+      font-size: var(--font-size-md);
+      font-weight: 500;
+      font-family: var(--font-base);
+      color: var(--color-text-muted);
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover {
+      color: var(--color-primary);
+    }
+
+    .tab-btn.active {
+      color: var(--color-primary);
+      border-bottom: 3px solid var(--color-accent);
+      font-weight: 700;
+    }
+
+    .tab-btn:focus-visible {
+      outline: 2px solid var(--color-accent);
+      outline-offset: -2px;
+    }
+
+    /* ===== TOOL PANELS ===== */
+    main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: var(--space-xl) var(--space-md);
+    }
+
+    .tool-panel {
+      display: none;
+    }
+
+    .tool-panel.active {
+      display: block;
+    }
+
+    .tool-panel > h1 {
+      font-size: var(--font-size-xl);
+      font-weight: 700;
+      margin-bottom: var(--space-lg);
+      color: var(--color-text);
+    }
+
+    /* ===== TOOL CARD ===== */
+    .tool-card {
+      background: var(--color-surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+      padding: var(--space-lg);
+      margin-bottom: var(--space-lg);
+    }
+
+    .tool-card h2 {
+      font-size: var(--font-size-lg);
+      font-weight: 700;
+      color: var(--color-primary);
+      margin-bottom: var(--space-xs);
+    }
+
+    .tool-card .tool-desc {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-lg);
+    }
+
+    /* ===== INPUT GROUP ===== */
+    .input-group {
+      margin-bottom: var(--space-md);
+    }
+
+    .input-group label {
+      display: block;
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      margin-bottom: var(--space-xs);
+      color: var(--color-text);
+    }
+
+    .input-field {
+      width: 100%;
+      max-width: 300px;
+      padding: var(--space-sm) var(--space-md);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      font-size: var(--font-size-md);
+      font-family: var(--font-base);
+      color: var(--color-text);
+      background: var(--color-surface);
+      transition: border-color 0.15s;
+    }
+
+    .input-field:focus {
+      outline: 2px solid var(--color-accent);
+      outline-offset: 0;
+      border-color: var(--color-accent);
+    }
+
+    .input-field.input-error {
+      border-color: var(--color-danger);
+    }
+
+    /* ===== ERROR MESSAGE ===== */
+    .error-msg {
+      display: none;
+      color: var(--color-danger);
+      font-size: var(--font-size-sm);
+      margin-top: var(--space-xs);
+    }
+
+    .error-msg.visible {
+      display: block;
+    }
+
+    /* ===== RESULT BOX ===== */
+    .result-box {
+      background: var(--color-bg);
+      border-left: 4px solid var(--color-accent);
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      padding: var(--space-md);
+      margin-top: var(--space-md);
+    }
+
+    .result-value {
+      font-size: var(--font-size-xl);
+      font-weight: 700;
+      color: var(--color-primary);
+    }
+
+    .result-label {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+      margin-top: var(--space-xs);
+    }
+
+    /* ===== BTN ===== */
+    .btn {
+      background: var(--color-accent);
+      color: var(--color-accent-text);
+      border: none;
+      border-radius: var(--radius-md);
+      padding: var(--space-sm) var(--space-lg);
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      font-family: var(--font-base);
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .btn:hover {
+      background: var(--color-primary);
+      color: var(--color-primary-text);
+    }
+
+    .btn:focus-visible {
+      outline: 2px solid var(--color-accent);
+      outline-offset: 2px;
+    }
+
+    .btn-reset {
+      background: none;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-sm) var(--space-md);
+      font-size: var(--font-size-sm);
+      font-family: var(--font-base);
+      color: var(--color-text-muted);
+      cursor: pointer;
+      margin-top: var(--space-md);
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+
+    .btn-reset:hover {
+      background: var(--color-bg);
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+
+    /* ===== WARNING ===== */
+    .warn-msg {
+      display: none;
+      background: #FEF3C7;
+      color: #92400E;
+      border-left: 3px solid var(--color-warning);
+      padding: var(--space-sm) var(--space-md);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      font-size: var(--font-size-sm);
+      margin-top: var(--space-sm);
+    }
+
+    .warn-msg.visible {
+      display: block;
+    }
+
+    /* ===== 4a INCOTERMS ===== */
+    .inco-filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-xs);
+      margin-bottom: var(--space-md);
+    }
+
+    .inco-filter-btn {
+      background: none;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-xs) var(--space-sm);
+      font-size: var(--font-size-sm);
+      font-family: var(--font-base);
+      color: var(--color-text-muted);
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+
+    .inco-filter-btn.active,
+    .inco-filter-btn:hover {
+      background: var(--color-primary);
+      color: var(--color-primary-text);
+      border-color: var(--color-primary);
+    }
+
+    .inco-table-wrap {
+      overflow-x: auto;
+    }
+
+    .inco-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--font-size-sm);
+    }
+
+    .inco-table thead th {
+      text-align: left;
+      padding: var(--space-sm) var(--space-md);
+      background: var(--color-bg);
+      color: var(--color-text);
+      font-weight: 600;
+      border-bottom: 2px solid var(--color-border);
+      white-space: nowrap;
+    }
+
+    .inco-table tbody tr {
+      border-bottom: 1px solid var(--color-border);
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+
+    .inco-table tbody tr:hover {
+      background: var(--color-bg);
+    }
+
+    .inco-table tbody tr.selected {
+      background: #FFF8DC;
+    }
+
+    .inco-table tbody td {
+      padding: var(--space-sm) var(--space-md);
+      vertical-align: middle;
+    }
+
+    .inco-table tbody tr.hidden {
+      display: none;
+    }
+
+    .inco-code {
+      font-weight: 700;
+      font-size: var(--font-size-md);
+      color: var(--color-primary);
+    }
+
+    /* Badge – seller/buyer/split */
+    .inco-tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+      font-size: var(--font-size-sm);
+      font-weight: 500;
+      line-height: 1.5;
+      white-space: nowrap;
+    }
+
+    .inco-tag.seller {
+      background-color: var(--color-accent);
+      color: var(--color-accent-text);
+    }
+
+    .inco-tag.buyer {
+      background-color: var(--color-primary);
+      color: var(--color-primary-text);
+    }
+
+    .inco-tag.split {
+      background-color: var(--color-border);
+      color: var(--color-text);
+    }
+
+    /* Responsibility bar */
+    .resp-bar-wrap {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      min-width: 140px;
+    }
+
+    .resp-bar {
+      flex: 1;
+      height: 8px;
+      background: var(--color-border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .resp-bar-fill {
+      height: 100%;
+      background: var(--color-accent);
+      border-radius: 4px;
+      transition: width 0.2s;
+    }
+
+    .resp-bar-fill.buyer-fill {
+      background: var(--color-primary);
+    }
+
+    .resp-label {
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+      min-width: 24px;
+    }
+
+    /* Detail panel */
+    .inco-detail-row {
+      display: none;
+    }
+
+    .inco-detail-row.visible {
+      display: table-row;
+    }
+
+    .inco-detail-cell {
+      padding: var(--space-md) var(--space-lg);
+      background: #FAFAF8;
+      border-bottom: 2px solid var(--color-accent);
+    }
+
+    .inco-detail-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: var(--space-md);
+    }
+
+    .inco-detail-item strong {
+      display: block;
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-xs);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .inco-detail-item span {
+      font-size: var(--font-size-sm);
+      color: var(--color-text);
+    }
+
+    .mode-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      color: var(--color-text);
+    }
+
+    .mode-badge.sea {
+      background: #EFF6FF;
+      border-color: #93C5FD;
+      color: #1E40AF;
+    }
+
+    /* ===== 4b LEAD TIME ===== */
+    .lt-phases {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: var(--space-md);
+      margin-bottom: var(--space-lg);
+    }
+
+    .lt-phase-row {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .lt-phase-row label {
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      margin-bottom: var(--space-xs);
+      color: var(--color-text);
+    }
+
+    .lt-phase-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .lt-phase-row input {
+      width: 100%;
+      padding: var(--space-sm) var(--space-md);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      font-size: var(--font-size-md);
+      font-family: var(--font-base);
+      color: var(--color-text);
+      background: var(--color-surface);
+      transition: border-color 0.15s;
+    }
+
+    .lt-phase-row input:focus {
+      outline: 2px solid var(--color-accent);
+      outline-offset: 0;
+      border-color: var(--color-accent);
+    }
+
+    .lt-bar {
+      height: 28px;
+      background: var(--color-border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      display: flex;
+      margin-bottom: var(--space-md);
+    }
+
+    .lt-bar-segment {
+      height: 100%;
+      transition: width 0.3s ease;
+    }
+
+    .lt-seg-production { background: var(--lt-color-production); }
+    .lt-seg-dispatch   { background: var(--lt-color-dispatch); }
+    .lt-seg-transit    { background: var(--lt-color-transit); }
+    .lt-seg-customs    { background: var(--lt-color-customs); }
+    .lt-seg-receiving  { background: var(--lt-color-receiving); }
+
+    .lt-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-md);
+      font-size: var(--font-size-sm);
+    }
+
+    .lt-legend-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      color: var(--color-text-muted);
+    }
+
+    .lt-legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    .lt-result-total {
+      font-size: var(--font-size-xl);
+      font-weight: 700;
+      color: var(--color-primary);
+    }
+
+    .lt-result-breakdown {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+      margin-top: var(--space-xs);
+      line-height: 1.8;
+    }
+
+    /* ===== 4c SAFETY STOCK ===== */
+    .ss-mode-toggle {
+      display: flex;
+      gap: var(--space-xs);
+      margin-bottom: var(--space-lg);
+    }
+
+    .ss-mode-btn {
+      background: none;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-sm) var(--space-md);
+      font-size: var(--font-size-sm);
+      font-weight: 500;
+      font-family: var(--font-base);
+      color: var(--color-text-muted);
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+
+    .ss-mode-btn.active {
+      background: var(--color-primary);
+      color: var(--color-primary-text);
+      border-color: var(--color-primary);
+    }
+
+    .ss-mode-btn:hover:not(.active) {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+
+    .ss-inputs-a,
+    .ss-inputs-b {
+      display: none;
+    }
+
+    .ss-inputs-a.active,
+    .ss-inputs-b.active {
+      display: block;
+    }
+
+    .ss-formula-box {
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      margin-top: var(--space-md);
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+      font-style: italic;
+    }
+
+    .ss-formula-box strong {
+      font-style: normal;
+      color: var(--color-text);
+    }
+
+    .ss-result-row {
+      display: flex;
+      gap: var(--space-xl);
+      flex-wrap: wrap;
+      margin-bottom: var(--space-xs);
+    }
+
+    .ss-result-item {}
+
+    .ss-result-value {
+      font-size: var(--font-size-xl);
+      font-weight: 700;
+      color: var(--color-primary);
+    }
+
+    .ss-result-label {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+      margin-top: var(--space-xs);
+    }
+
+    /* ===== FOOTER ===== */
+    footer {
+      text-align: center;
+      padding: var(--space-xl) var(--space-md);
+      color: var(--color-text-muted);
+      font-size: var(--font-size-sm);
+      border-top: 1px solid var(--color-border);
+      margin-top: var(--space-xl);
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 600px) {
+      header {
+        padding: var(--space-sm) var(--space-md);
+        padding-right: 80px;
+      }
+
+      #logo {
+        height: 28px;
+      }
+
+      .tab-nav {
+        padding: 0 var(--space-md);
+        overflow-x: auto;
+      }
+
+      .tab-btn {
+        padding: var(--space-sm) var(--space-md);
+        font-size: var(--font-size-sm);
+      }
+
+      main {
+        padding: var(--space-md) var(--space-sm);
+      }
+
+      .tool-card {
+        padding: var(--space-md);
+      }
+
+      .input-field {
+        max-width: 100%;
+      }
+
+      .lt-phases {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .ss-mode-toggle {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <svg id="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 148.163 28.4534" role="img" aria-label="Procuppa"><g><g><path d="M11.569,11.2632c-.6381.0075-1.0349.6975-.7216,1.2547l7.802,13.8774c.2352.4185-.0665.9357-.5458.9357h-8.9926c-.226,0-.4346-.1223-.5457-.3194L.0815,11.9215c-.2352-.4185.0665-.9357.5457-.9357h8.2121c1.1317-.0133,2.1706-.6299,2.7263-1.6178L16.6304.3604c.1251-.2227.3607-.3604.6156-.3604h8.8079c.5406,0,.8812.5838.6156,1.0559l-5.5366,9.8459c-.1251.2227-.3606.3604-.6156.3604h-8.948v.001h-.0003Z" style="fill:#fdd757;"/><path d="M34.1531,24.0212V5.1582h8.2839c2.1897,0,3.8253.6332,4.9334,1.7676,1.0552,1.0817,1.6884,2.559,1.6884,4.3003,0,3.5615-2.348,5.9622-6.3052,5.9622h-4.6432v6.8329h-3.9573ZM38.1104,8.4824v5.5929h3.9572c2.005,0,3.0603-1.108,3.0603-2.8229,0-1.7675-1.108-2.7701-3.0075-2.7701h-4.01ZM53.5891,10.4874v2.1633h.0791c.8178-1.5302,1.7412-2.3216,3.3241-2.3216.3957,0,.6332.0264.8442.1055v3.1394h-.0791c-2.348-.2374-4.0364,1.0025-4.0364,3.8518v6.5954h-3.588v-13.5338h3.4561ZM64.8788,24.417c-4.1947,0-7.0703-3.1131-7.0703-7.1495s2.8756-7.1495,7.0703-7.1495,7.0704,3.1131,7.0704,7.1495-2.8757,7.1495-7.0704,7.1495ZM64.8788,21.6733c2.1897,0,3.4297-1.7676,3.4297-4.4058s-1.24-4.4322-3.4297-4.4322c-2.216,0-3.4296,1.794-3.4296,4.4322s1.2136,4.4058,3.4296,4.4058ZM79.3682,24.417c-4.2738,0-6.9384-3.1131-6.9384-7.1495s2.6382-7.1495,6.7538-7.1495c3.5087,0,5.672,2.0314,6.1469,4.9598h-3.5088c-.2374-1.1872-1.1608-2.0842-2.4799-2.0842-2.1633,0-3.2713,1.6621-3.2713,4.2739,0,2.559,1.0289,4.2738,3.2186,4.2738,1.451,0,2.4799-.765,2.7173-2.2952h3.456c-.2374,2.8756-2.4799,5.1709-6.0942,5.1709ZM98.5035,24.0212h-3.456v-1.5829h-.0792c-.9233,1.24-1.9786,1.9523-3.8781,1.9523-3.0075,0-4.696-1.9259-4.696-4.8807v-9.0225h3.5616v8.4158c0,1.5829.7123,2.4535,2.2424,2.4535,1.6885,0,2.7174-1.2664,2.7174-3.0603v-7.809h3.5879v13.5338ZM100.297,28.4534V10.4874h3.456v1.6884h.079c.87-1.1872,2.137-2.0578,3.983-2.0578,3.588,0,5.884,2.9284,5.884,7.1495,0,4.3794-2.375,7.1495-5.857,7.1495-1.9,0-3.14-.7651-3.905-1.9259h-.052v5.9623h-3.588ZM107.077,21.4358c1.82,0,2.981-1.5037,2.981-4.0628s-.897-4.353-3.113-4.353c-2.243,0-3.14,1.9259-3.14,4.353,0,2.4535,1.135,4.0628,3.272,4.0628ZM114.841,28.4534V10.4874h3.456v1.6884h.079c.87-1.1872,2.137-2.0578,3.983-2.0578,3.588,0,5.884,2.9284,5.884,7.1495,0,4.3794-2.375,7.1495-5.857,7.1495-1.9,0-3.14-.7651-3.905-1.9259h-.052v5.9623h-3.588ZM121.621,21.4358c1.82,0,2.981-1.5037,2.981-4.0628s-.897-4.353-3.113-4.353c-2.243,0-3.14,1.9259-3.14,4.353,0,2.4535,1.135,4.0628,3.272,4.0628ZM137.906,24.0212c-.211-.2638-.343-.8969-.422-1.5037h-.053c-.686,1.0289-1.662,1.8203-3.984,1.8203-2.77,0-4.722-1.451-4.722-4.1419,0-2.9812,2.427-3.9309,5.435-4.353,2.242-.3166,3.271-.5013,3.271-1.5302,0-.9761-.765-1.6093-2.269-1.6093-1.688,0-2.506.6068-2.612,1.8995h-3.192c.106-2.3743,1.873-4.4585,5.831-4.4585,4.062,0,5.698,1.8203,5.698,4.9862v6.8856c0,1.0289.158,1.6357.475,1.8731v.1319h-3.456ZM134.318,21.8315c2.058,0,3.192-1.2663,3.192-2.5854v-2.0314c-.633.3694-1.609.5804-2.506.7915-1.873.4221-2.796.8442-2.796,2.1105s.844,1.7148,2.11,1.7148Z"/><path d="M145.163,13.1927c-1.651,0-3-1.3066-3-3.1,0-1.7806,1.349-3.1,3-3.1,1.652,0,3,1.3194,3,3.1,0,1.7934-1.348,3.1-3,3.1ZM145.163,12.7443c1.437,0,2.484-1.1144,2.484-2.6516,0-1.5244-1.047-2.6517-2.484-2.6517s-2.483,1.1273-2.483,2.6517c0,1.5372,1.046,2.6516,2.483,2.6516ZM143.991,11.6939v-3.2793h1.487c.593,0,1.021.3843,1.021.9223,0,.3715-.189.6789-.605.7814v.0128c.316.0897.467.269.505.6661.05.4612.025.807.138.8583v.0384h-.617c-.089-.0384-.126-.4099-.139-.7558-.013-.3458-.214-.5636-.618-.5636h-.529v1.3194h-.643ZM144.634,8.9526v.9223h.706c.353,0,.529-.1922.529-.4612s-.176-.4612-.529-.4612h-.706Z"/></g></g></svg>
+    <div class="lang-switcher">
+      <button class="lang-btn active" data-lang="cs" id="btn-lang-cs">CZ</button>
+      <button class="lang-btn" data-lang="en" id="btn-lang-en">EN</button>
+    </div>
+  </header>
+
+  <!-- TAB NAVIGATION -->
+  <nav class="tab-nav" role="tablist" aria-label="Nástroje logistika">
+    <button class="tab-btn active" role="tab" data-tab="tab-4a"
+            id="tab-btn-4a" aria-selected="true" aria-controls="tab-4a" tabindex="0"
+            data-i18n="tab4a">Incoterms</button>
+    <button class="tab-btn" role="tab" data-tab="tab-4b"
+            id="tab-btn-4b" aria-selected="false" aria-controls="tab-4b" tabindex="-1"
+            data-i18n="tab4b">Lead time</button>
+    <button class="tab-btn" role="tab" data-tab="tab-4c"
+            id="tab-btn-4c" aria-selected="false" aria-controls="tab-4c" tabindex="-1"
+            data-i18n="tab4c">Safety stock</button>
+  </nav>
+
+  <!-- MAIN PANELS -->
+  <main>
+
+    <!-- ===== TAB 4a: INCOTERMS ===== -->
+    <section id="tab-4a" class="tool-panel active" role="tabpanel" aria-labelledby="tab-btn-4a">
+      <h1 data-i18n="panel4a_heading">Incoterms přehled</h1>
+
+      <div class="tool-card">
+        <h2 data-i18n="t4a_title">Incoterms 2020</h2>
+        <p class="tool-desc" data-i18n="t4a_desc">Přehled 11 Incoterms 2020. Klikněte na termín pro detail.</p>
+
+        <div class="inco-filter-bar" role="group" aria-label="Filtr Incoterms">
+          <button class="inco-filter-btn active" data-filter="all" data-i18n="t4a_filter_all">Vše</button>
+          <button class="inco-filter-btn" data-filter="sea" data-i18n="t4a_filter_sea">Pouze Sea</button>
+          <button class="inco-filter-btn" data-filter="seller_heavy" data-i18n="t4a_filter_seller_heavy">Prodávající nese víc</button>
+          <button class="inco-filter-btn" data-filter="buyer_heavy" data-i18n="t4a_filter_buyer_heavy">Kupující nese víc</button>
+        </div>
+
+        <div class="inco-table-wrap">
+          <table class="inco-table" id="inco-table">
+            <thead>
+              <tr>
+                <th data-i18n="t4a_col_code">Incoterms</th>
+                <th data-i18n="t4a_col_mode">Mód</th>
+                <th data-i18n="t4a_col_responsibility">Zodpovědnost</th>
+                <th data-i18n="t4a_col_risk">Riziko přechází v</th>
+              </tr>
+            </thead>
+            <tbody id="inco-tbody">
+              <!-- Rendered by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== TAB 4b: LEAD TIME ===== -->
+    <section id="tab-4b" class="tool-panel" role="tabpanel" aria-labelledby="tab-btn-4b">
+      <h1 data-i18n="panel4b_heading">Lead time kalkulačka</h1>
+
+      <div class="tool-card">
+        <h2 data-i18n="t4b_title">Kalkulace celkového lead time</h2>
+        <p class="tool-desc" data-i18n="t4b_desc">Zadejte dny pro každou fázi – kalkulačka zobrazí celkový lead time. Nevyplněná fáze = 0 dní.</p>
+
+        <div class="lt-phases">
+          <div class="lt-phase-row">
+            <label for="lt-production">
+              <span class="lt-phase-dot" style="background:var(--lt-color-production)"></span>
+              <span data-i18n="t4b_phase_production">Výroba (dny)</span>
+            </label>
+            <input type="text" inputmode="decimal" autocomplete="off" id="lt-production" class="input-field"
+                   aria-describedby="lt-production-err" placeholder="0">
+            <span id="lt-production-err" class="error-msg" role="alert"></span>
+          </div>
+          <div class="lt-phase-row">
+            <label for="lt-dispatch">
+              <span class="lt-phase-dot" style="background:var(--lt-color-dispatch)"></span>
+              <span data-i18n="t4b_phase_dispatch">Expedice (dny)</span>
+            </label>
+            <input type="text" inputmode="decimal" autocomplete="off" id="lt-dispatch" class="input-field"
+                   aria-describedby="lt-dispatch-err" placeholder="0">
+            <span id="lt-dispatch-err" class="error-msg" role="alert"></span>
+          </div>
+          <div class="lt-phase-row">
+            <label for="lt-transit">
+              <span class="lt-phase-dot" style="background:var(--lt-color-transit)"></span>
+              <span data-i18n="t4b_phase_transit">Tranzit (dny)</span>
+            </label>
+            <input type="text" inputmode="decimal" autocomplete="off" id="lt-transit" class="input-field"
+                   aria-describedby="lt-transit-err" placeholder="0">
+            <span id="lt-transit-err" class="error-msg" role="alert"></span>
+          </div>
+          <div class="lt-phase-row">
+            <label for="lt-customs">
+              <span class="lt-phase-dot" style="background:var(--lt-color-customs)"></span>
+              <span data-i18n="t4b_phase_customs">Celní řízení (dny)</span>
+            </label>
+            <input type="text" inputmode="decimal" autocomplete="off" id="lt-customs" class="input-field"
+                   aria-describedby="lt-customs-err" placeholder="0">
+            <span id="lt-customs-err" class="error-msg" role="alert"></span>
+          </div>
+          <div class="lt-phase-row">
+            <label for="lt-receiving">
+              <span class="lt-phase-dot" style="background:var(--lt-color-receiving)"></span>
+              <span data-i18n="t4b_phase_receiving">Přejímka (dny)</span>
+            </label>
+            <input type="text" inputmode="decimal" autocomplete="off" id="lt-receiving" class="input-field"
+                   aria-describedby="lt-receiving-err" placeholder="0">
+            <span id="lt-receiving-err" class="error-msg" role="alert"></span>
+          </div>
+        </div>
+
+        <div class="lt-bar" id="lt-bar" role="img" aria-label="Vizualizace fází lead time">
+          <div class="lt-bar-segment lt-seg-production" id="lt-seg-production" style="width:0%"></div>
+          <div class="lt-bar-segment lt-seg-dispatch"   id="lt-seg-dispatch"   style="width:0%"></div>
+          <div class="lt-bar-segment lt-seg-transit"    id="lt-seg-transit"    style="width:0%"></div>
+          <div class="lt-bar-segment lt-seg-customs"    id="lt-seg-customs"    style="width:0%"></div>
+          <div class="lt-bar-segment lt-seg-receiving"  id="lt-seg-receiving"  style="width:0%"></div>
+        </div>
+
+        <div class="lt-legend" id="lt-legend">
+          <span class="lt-legend-item"><span class="lt-legend-dot" style="background:var(--lt-color-production)"></span><span data-i18n="t4b_phase_production_short">Výroba</span></span>
+          <span class="lt-legend-item"><span class="lt-legend-dot" style="background:var(--lt-color-dispatch)"></span><span data-i18n="t4b_phase_dispatch_short">Expedice</span></span>
+          <span class="lt-legend-item"><span class="lt-legend-dot" style="background:var(--lt-color-transit)"></span><span data-i18n="t4b_phase_transit_short">Tranzit</span></span>
+          <span class="lt-legend-item"><span class="lt-legend-dot" style="background:var(--lt-color-customs)"></span><span data-i18n="t4b_phase_customs_short">Celní řízení</span></span>
+          <span class="lt-legend-item"><span class="lt-legend-dot" style="background:var(--lt-color-receiving)"></span><span data-i18n="t4b_phase_receiving_short">Přejímka</span></span>
+        </div>
+
+        <div class="result-box">
+          <div class="lt-result-total" id="lt-result-total">—</div>
+          <div class="result-label" data-i18n="t4b_result_label">Celkový lead time</div>
+          <div class="lt-result-breakdown" id="lt-result-breakdown"></div>
+        </div>
+
+        <button class="btn-reset" id="lt-reset" data-i18n="btn_reset">Resetovat</button>
+      </div>
+    </section>
+
+    <!-- ===== TAB 4c: SAFETY STOCK ===== -->
+    <section id="tab-4c" class="tool-panel" role="tabpanel" aria-labelledby="tab-btn-4c">
+      <h1 data-i18n="panel4c_heading">Safety stock kalkulačka</h1>
+
+      <div class="tool-card">
+        <h2 data-i18n="t4c_title">Výpočet bezpečnostní zásoby</h2>
+        <p class="tool-desc" data-i18n="t4c_desc">Výpočet bezpečnostní zásoby. Vyberte vzorec a zadejte vstupy.</p>
+
+        <div class="ss-mode-toggle" role="group" aria-label="Výběr vzorce">
+          <button class="ss-mode-btn active" data-mode="A" data-i18n="ss_modeA">Vzorec A (Max-Avg)</button>
+          <button class="ss-mode-btn" data-mode="B" data-i18n="ss_modeB">Vzorec B (Rezerva %)</button>
+        </div>
+
+        <!-- Vzorec A vstupy -->
+        <div class="ss-inputs-a active" id="ss-inputs-a">
+          <div class="input-group">
+            <label for="ss-avg-demand" data-i18n="t4c_avgDemand">Průměrná denní spotřeba (ks/den)</label>
+            <input type="text" inputmode="decimal" autocomplete="off" id="ss-avg-demand" class="input-field"
+                   aria-describedby="ss-avg-demand-err" placeholder="100">
+            <span id="ss-avg-demand-err" class="error-msg" role="alert"></span>
+          </div>
+          <div class="input-group">
+            <label for="ss-max-demand" data-i18n="t4c_maxDemand">Maximální denní spotřeba (ks/den)</label>
+            <input type="text" inputmode="decimal" autocomplete="off" id="ss-max-demand" class="input-field"
+                   aria-describedby="ss-max-demand-err" placeholder="130">
+            <span id="ss-max-demand-err" class="error-msg" role="alert"></span>
+          </div>
+          <div class="input-group">
+            <label for="ss-avg-lt" data-i18n="t4c_avgLT">Průměrný lead time (dny)</label>
+            <input type="text" inputmode="decimal" autocomplete="off" id="ss-avg-lt" class="input-field"
+                   aria-describedby="ss-avg-lt-err" placeholder="20">
+            <span id="ss-avg-lt-err" class="error-msg" role="alert"></span>
+          </div>
+        </div>
+
+        <!-- Vzorec B vstupy -->
+        <div class="ss-inputs-b" id="ss-inputs-b">
+          <div class="input-group">
+            <label for="ss-avg-demand-b" data-i18n="t4c_avgDemand">Průměrná denní spotřeba (ks/den)</label>
+            <input type="text" inputmode="decimal" autocomplete="off" id="ss-avg-demand-b" class="input-field"
+                   aria-describedby="ss-avg-demand-b-err" placeholder="100">
+            <span id="ss-avg-demand-b-err" class="error-msg" role="alert"></span>
+          </div>
+          <div class="input-group">
+            <label for="ss-avg-lt-b" data-i18n="t4c_avgLT">Průměrný lead time (dny)</label>
+            <input type="text" inputmode="decimal" autocomplete="off" id="ss-avg-lt-b" class="input-field"
+                   aria-describedby="ss-avg-lt-b-err" placeholder="20">
+            <span id="ss-avg-lt-b-err" class="error-msg" role="alert"></span>
+          </div>
+          <div class="input-group">
+            <label for="ss-reserve-pct" data-i18n="t4c_reservePct">Rezerva (%)</label>
+            <input type="text" inputmode="decimal" autocomplete="off" id="ss-reserve-pct" class="input-field"
+                   aria-describedby="ss-reserve-pct-err" placeholder="20">
+            <span id="ss-reserve-pct-err" class="error-msg" role="alert"></span>
+          </div>
+        </div>
+
+        <div class="ss-formula-box" id="ss-formula-box">
+          <span id="ss-formula-text"></span>
+        </div>
+
+        <!-- Vysvětlivka (T4-3, Q3): proč se zásoba zaokrouhluje nahoru -->
+        <details class="ss-howto" style="margin-top: var(--space-md); font-size: var(--font-size-sm);">
+          <summary data-i18n="t4c_howto_title">Jak počítáme a zaokrouhlujeme</summary>
+          <p class="tool-desc" data-i18n="t4c_howto_body">Pojistná zásoba (SS) je rezerva navíc ke spotřebě za dodací dobu. Vzorec A: SS = (maximální − průměrná denní spotřeba) × lead time. Vzorec B: SS = průměrná spotřeba × lead time × rezerva % / 100. Bod objednání (ROP) = průměrná spotřeba × lead time + SS. Obě čísla zaokrouhlujeme nahoru na celé kusy, aby se rezerva zaokrouhlením nezkrátila. Proto mohou vyjít o kus vyšší než při běžném zaokrouhlení.</p>
+        </details>
+
+        <div class="result-box" style="margin-top: var(--space-md);">
+          <div class="ss-result-row">
+            <div class="ss-result-item">
+              <div class="ss-result-value" id="ss-result-ss">—</div>
+              <div class="ss-result-label" id="ss-result-ss-label"><span data-i18n="t4c_result_ss">Bezpečnostní zásoba</span> (<span data-i18n="t4c_result_unit">ks</span>)</div>
+            </div>
+            <div class="ss-result-item">
+              <div class="ss-result-value" id="ss-result-rop">—</div>
+              <div class="ss-result-label"><span data-i18n="t4c_result_rop">Reorder point (ROP)</span> (<span data-i18n="t4c_result_unit">ks</span>)</div>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn-reset" id="ss-reset" data-i18n="btn_reset">Resetovat</button>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <span>Procuppa Toolbox 4 – Logistika</span>
+  </footer>
+
+  <script>
+    /* ===== i18n TEXTS ===== */
+    const TEXTS = {
+      cs: {
+        tab4a: 'Incoterms',
+        tab4b: 'Lead time',
+        tab4c: 'Safety stock',
+
+        panel4a_heading: 'Incoterms přehled',
+        t4a_title: 'Incoterms 2020',
+        t4a_desc: 'Přehled 11 Incoterms 2020. Klikněte na termín pro detail.',
+        t4a_filter_all: 'Vše',
+        t4a_filter_sea: 'Pouze Sea',
+        t4a_filter_seller_heavy: 'Prodávající nese víc',
+        t4a_filter_buyer_heavy: 'Kupující nese víc',
+        t4a_col_code: 'Incoterms',
+        t4a_col_mode: 'Mód',
+        t4a_col_responsibility: 'Zodpovědnost',
+        t4a_col_risk: 'Riziko přechází v',
+        t4a_mode_sea: 'Sea',
+        t4a_mode_any: 'Any',
+        t4a_seller_short: 'P',
+        t4a_seller_title: 'Prodávající: {level}',
+        t4a_resp_min: 'minimální',
+        t4a_resp_low: 'nízká',
+        t4a_resp_mid: 'střední',
+        t4a_resp_high: 'vysoká',
+        t4a_resp_max: 'maximální',
+        t4a_detail_transport: 'Přeprava',
+        t4a_detail_cost: 'Náklady',
+        t4a_detail_risk_transfer: 'Přechod rizika',
+        t4a_detail_risk_point: 'Bod rizika',
+
+        panel4b_heading: 'Lead time kalkulačka',
+        t4b_title: 'Kalkulace celkového lead time',
+        t4b_desc: 'Zadejte dny pro každou fázi – kalkulačka zobrazí celkový lead time. Nevyplněná fáze = 0 dní.',
+        t4b_phase_production: 'Výroba (dny)',
+        t4b_phase_dispatch: 'Expedice (dny)',
+        t4b_phase_transit: 'Tranzit (dny)',
+        t4b_phase_customs: 'Celní řízení (dny)',
+        t4b_phase_receiving: 'Přejímka (dny)',
+        t4b_phase_production_short: 'Výroba',
+        t4b_phase_dispatch_short: 'Expedice',
+        t4b_phase_transit_short: 'Tranzit',
+        t4b_phase_customs_short: 'Celní řízení',
+        t4b_phase_receiving_short: 'Přejímka',
+        t4b_result_label: 'Celkový lead time',
+        t4b_result_unit: 'dní',
+
+        panel4c_heading: 'Safety stock kalkulačka',
+        t4c_title: 'Výpočet bezpečnostní zásoby',
+        t4c_desc: 'Výpočet bezpečnostní zásoby. Vyberte vzorec a zadejte vstupy.',
+        ss_modeA: 'Vzorec A (Max-Avg)',
+        ss_modeB: 'Vzorec B (Rezerva %)',
+        t4c_avgDemand: 'Průměrná denní spotřeba (ks/den)',
+        t4c_avgLT: 'Průměrný lead time (dny)',
+        t4c_maxDemand: 'Maximální denní spotřeba (ks/den)',
+        t4c_reservePct: 'Rezerva (%)',
+        t4c_result_ss: 'Bezpečnostní zásoba',
+        t4c_result_rop: 'Reorder point (ROP)',
+        t4c_result_unit: 'ks',
+        t4c_formula_A: '<strong>Vzorec A:</strong> SS = (max. spotřeba − prům. spotřeba) × prům. LT = ({peak} − {avg}) × {lt} = {rawSS}, nahoru <strong>{ss} {unit}</strong> &nbsp;|&nbsp; ROP = prům. spotřeba × prům. LT + SS = {avg} × {lt} + {ss} = {ropRaw}, nahoru <strong>{rop} {unit}</strong>',
+        t4c_formula_B: '<strong>Vzorec B:</strong> SS = prům. spotřeba × prům. LT × rezerva % / 100 = {avg} × {lt} × {pct} / 100 = {rawSS}, nahoru <strong>{ss} {unit}</strong> &nbsp;|&nbsp; ROP = prům. spotřeba × prům. LT + SS = {avg} × {lt} + {ss} = {ropRaw}, nahoru <strong>{rop} {unit}</strong>',
+        t4c_formula_empty: 'Vyplňte všechna pole, výpočet se rozepíše zde.',
+        t4c_howto_title: 'Jak počítáme a zaokrouhlujeme',
+        t4c_howto_body: 'Pojistná zásoba (SS) je rezerva navíc ke spotřebě za dodací dobu. Vzorec A: SS = (maximální − průměrná denní spotřeba) × lead time. Vzorec B: SS = průměrná spotřeba × lead time × rezerva % / 100. Bod objednání (ROP) = průměrná spotřeba × lead time + SS. Obě čísla zaokrouhlujeme nahoru na celé kusy, aby se rezerva zaokrouhlením nezkrátila. Proto mohou vyjít o kus vyšší než při běžném zaokrouhlení.',
+        err_t4c_peakBelowAvg: 'Maximální spotřeba nemůže být nižší než průměrná.',
+
+        btn_reset: 'Resetovat',
+
+        // Čtení čísel (D1)
+        err_required: 'Pole je povinné',
+        err_nonNumeric: 'Zadejte číslo, např. 1 250,50.',
+        err_ambiguous: 'Nejednoznačný zápis čísla.',
+        err_integer: 'Zadejte celé číslo.',
+        err_min: 'Hodnota musí být alespoň {min}.',
+        err_max: 'Hodnota smí být nejvýše {max}.',
+        err_negativeNotAllowed: 'Záporná hodnota není povolena',
+        err_divByZero: 'Dělení nulou – hodnota musí být nenulová',
+        err_zeroNotAllowed: 'Hodnota musí být větší než 0',
+        numLocale: 'cs-CZ',
+      },
+      en: {
+        tab4a: 'Incoterms',
+        tab4b: 'Lead time',
+        tab4c: 'Safety stock',
+
+        panel4a_heading: 'Incoterms overview',
+        t4a_title: 'Incoterms 2020',
+        t4a_desc: 'Overview of 11 Incoterms 2020. Click on a term for details.',
+        t4a_filter_all: 'All',
+        t4a_filter_sea: 'Sea only',
+        t4a_filter_seller_heavy: 'Seller bears more',
+        t4a_filter_buyer_heavy: 'Buyer bears more',
+        t4a_col_code: 'Incoterms',
+        t4a_col_mode: 'Mode',
+        t4a_col_responsibility: 'Responsibility',
+        t4a_col_risk: 'Risk transfers at',
+        t4a_mode_sea: 'Sea',
+        t4a_mode_any: 'Any',
+        t4a_seller_short: 'S',
+        t4a_seller_title: 'Seller: {level}',
+        t4a_resp_min: 'min',
+        t4a_resp_low: 'low',
+        t4a_resp_mid: 'mid',
+        t4a_resp_high: 'high',
+        t4a_resp_max: 'max',
+        t4a_detail_transport: 'Transport',
+        t4a_detail_cost: 'Costs',
+        t4a_detail_risk_transfer: 'Risk transfer',
+        t4a_detail_risk_point: 'Risk point',
+
+        panel4b_heading: 'Lead time calculator',
+        t4b_title: 'Total lead time calculator',
+        t4b_desc: 'Enter days for each phase – the calculator will show total lead time. An empty phase counts as 0 days.',
+        t4b_phase_production: 'Production (days)',
+        t4b_phase_dispatch: 'Dispatch (days)',
+        t4b_phase_transit: 'Transit (days)',
+        t4b_phase_customs: 'Customs clearance (days)',
+        t4b_phase_receiving: 'Receiving (days)',
+        t4b_phase_production_short: 'Production',
+        t4b_phase_dispatch_short: 'Dispatch',
+        t4b_phase_transit_short: 'Transit',
+        t4b_phase_customs_short: 'Customs',
+        t4b_phase_receiving_short: 'Receiving',
+        t4b_result_label: 'Total lead time',
+        t4b_result_unit: 'days',
+
+        panel4c_heading: 'Safety stock calculator',
+        t4c_title: 'Safety stock calculation',
+        t4c_desc: 'Calculate safety stock. Choose a formula and enter inputs.',
+        ss_modeA: 'Formula A (Max-Avg)',
+        ss_modeB: 'Formula B (Reserve %)',
+        t4c_avgDemand: 'Average daily demand (units/day)',
+        t4c_avgLT: 'Average lead time (days)',
+        t4c_maxDemand: 'Maximum daily demand (units/day)',
+        t4c_reservePct: 'Reserve (%)',
+        t4c_result_ss: 'Safety stock',
+        t4c_result_rop: 'Reorder point (ROP)',
+        t4c_result_unit: 'units',
+        t4c_formula_A: '<strong>Formula A:</strong> SS = (max demand − avg demand) × avg LT = ({peak} − {avg}) × {lt} = {rawSS}, rounded up <strong>{ss} {unit}</strong> &nbsp;|&nbsp; ROP = avg demand × avg LT + SS = {avg} × {lt} + {ss} = {ropRaw}, rounded up <strong>{rop} {unit}</strong>',
+        t4c_formula_B: '<strong>Formula B:</strong> SS = avg demand × avg LT × reserve % / 100 = {avg} × {lt} × {pct} / 100 = {rawSS}, rounded up <strong>{ss} {unit}</strong> &nbsp;|&nbsp; ROP = avg demand × avg LT + SS = {avg} × {lt} + {ss} = {ropRaw}, rounded up <strong>{rop} {unit}</strong>',
+        t4c_formula_empty: 'Fill in all fields to see the calculation here.',
+        t4c_howto_title: 'How we calculate and round',
+        t4c_howto_body: 'Safety stock (SS) is a reserve on top of the demand during the lead time. Formula A: SS = (maximum − average daily demand) × lead time. Formula B: SS = average demand × lead time × reserve % / 100. Reorder point (ROP) = average demand × lead time + SS. Both numbers are rounded up to whole units so that rounding never cuts the reserve. They can therefore come out one unit higher than with ordinary rounding.',
+        err_t4c_peakBelowAvg: 'Maximum demand cannot be lower than average demand.',
+
+        btn_reset: 'Reset',
+
+        // Number input (D1)
+        err_required: 'This field is required',
+        err_nonNumeric: 'Enter a number, e.g. 1,250.50 or 1250.50.',
+        err_ambiguous: 'Ambiguous number: write 1250 or 1,250.00 for thousands, 1.25 for decimals.',
+        err_integer: 'Enter a whole number.',
+        err_min: 'Value must be at least {min}.',
+        err_max: 'Value must be at most {max}.',
+        err_negativeNotAllowed: 'Negative value is not allowed',
+        err_divByZero: 'Division by zero – value must not be zero',
+        err_zeroNotAllowed: 'Value must be greater than 0',
+        numLocale: 'en-US',
+      }
+    };
+
+    /* ===== INCOTERMS DATA ===== */
+    const INCOTERMS = [
+      {
+        code: "EXW",
+        name_cs: "Ex Works",
+        name_en: "Ex Works",
+        transport_cs: "Kupující zajišťuje veškerou přepravu od závodu prodávajícího",
+        transport_en: "Buyer arranges all transport from seller's premises",
+        cost_cs: "Kupující nese veškeré náklady od závodu",
+        cost_en: "Buyer bears all costs from seller's premises",
+        risk_transfer_cs: "Riziko přechází ve skladu / závodě prodávajícího (před nakládkou)",
+        risk_transfer_en: "Risk transfers at seller's premises (before loading)",
+        seller_responsibility: "min",
+        buyer_responsibility: "max",
+        modes: ["any"],
+        risk_point_cs: "Závod prodávajícího",
+        risk_point_en: "Seller's premises"
+      },
+      {
+        code: "FCA",
+        name_cs: "Free Carrier",
+        name_en: "Free Carrier",
+        transport_cs: "Prodávající dodá dopravci určenému kupujícím v named place",
+        transport_en: "Seller delivers to carrier named by buyer at named place",
+        cost_cs: "Prodávající: náklady po named place; Kupující: hlavní přeprava dále",
+        cost_en: "Seller: costs to named place; Buyer: main carriage onwards",
+        risk_transfer_cs: "Riziko přechází po předání dopravci v named place",
+        risk_transfer_en: "Risk transfers on delivery to carrier at named place",
+        seller_responsibility: "low",
+        buyer_responsibility: "high",
+        modes: ["any"],
+        risk_point_cs: "Named place / dopravce",
+        risk_point_en: "Named place / carrier"
+      },
+      {
+        code: "FAS",
+        name_cs: "Free Alongside Ship",
+        name_en: "Free Alongside Ship",
+        transport_cs: "Prodávající dodá k boku lodi v přístavu odeslání",
+        transport_en: "Seller delivers alongside vessel at port of shipment",
+        cost_cs: "Prodávající: do boku lodi; Kupující: nakládka, námořní přeprava, pojištění",
+        cost_en: "Seller: alongside vessel; Buyer: loading, sea freight, insurance",
+        risk_transfer_cs: "Riziko přechází, když je zboží u boku lodi v přístavu odeslání",
+        risk_transfer_en: "Risk transfers when goods are alongside vessel at port of shipment",
+        seller_responsibility: "low",
+        buyer_responsibility: "high",
+        modes: ["sea"],
+        risk_point_cs: "Bok lodi, přístav odeslání",
+        risk_point_en: "Alongside vessel, port of shipment"
+      },
+      {
+        code: "FOB",
+        name_cs: "Free On Board",
+        name_en: "Free On Board",
+        transport_cs: "Prodávající nakládá na loď v přístavu odeslání",
+        transport_en: "Seller loads goods on board vessel at port of shipment",
+        cost_cs: "Prodávající: nakládka; Kupující: námořní přeprava a pojištění",
+        cost_en: "Seller: loading on board; Buyer: sea freight and insurance",
+        risk_transfer_cs: "Riziko přechází, jakmile je zboží na palubě v přístavu odeslání",
+        risk_transfer_en: "Risk transfers when goods are on board at port of shipment",
+        seller_responsibility: "low",
+        buyer_responsibility: "high",
+        modes: ["sea"],
+        risk_point_cs: "Na palubě, přístav odeslání",
+        risk_point_en: "On board, port of shipment"
+      },
+      {
+        code: "CFR",
+        name_cs: "Cost and Freight",
+        name_en: "Cost and Freight",
+        transport_cs: "Prodávající hradí přepravu do přístavu určení; pojištění jde za kupujícím",
+        transport_en: "Seller pays freight to destination port; buyer bears insurance",
+        cost_cs: "Prodávající: námořní přeprava; Kupující: pojištění, vykládka",
+        cost_en: "Seller: sea freight; Buyer: insurance, unloading",
+        risk_transfer_cs: "Riziko přechází nakládkou na loď v přístavu odeslání",
+        risk_transfer_en: "Risk transfers when loaded on board at port of shipment",
+        seller_responsibility: "mid",
+        buyer_responsibility: "mid",
+        modes: ["sea"],
+        risk_point_cs: "Na palubě, přístav odeslání",
+        risk_point_en: "On board, port of shipment"
+      },
+      {
+        code: "CIF",
+        name_cs: "Cost, Insurance and Freight",
+        name_en: "Cost, Insurance and Freight",
+        transport_cs: "Prodávající hradí přepravu i minimální pojištění do přístavu určení",
+        transport_en: "Seller pays freight and minimum insurance to destination port",
+        cost_cs: "Prodávající: námořní přeprava + minimální pojištění; Kupující: vykládka, dovozní clo",
+        cost_en: "Seller: sea freight + minimum insurance; Buyer: unloading, import duty",
+        risk_transfer_cs: "Riziko přechází nakládkou na loď v přístavu odeslání",
+        risk_transfer_en: "Risk transfers when loaded on board at port of shipment",
+        seller_responsibility: "mid",
+        buyer_responsibility: "mid",
+        modes: ["sea"],
+        risk_point_cs: "Na palubě, přístav odeslání",
+        risk_point_en: "On board, port of shipment"
+      },
+      {
+        code: "CPT",
+        name_cs: "Carriage Paid To",
+        name_en: "Carriage Paid To",
+        transport_cs: "Prodávající hradí přepravu do named place určení; pojištění jde za kupujícím",
+        transport_en: "Seller pays carriage to named place of destination; buyer bears insurance",
+        cost_cs: "Prodávající: přeprava; Kupující: pojištění od prvního dopravce",
+        cost_en: "Seller: carriage; Buyer: insurance from first carrier",
+        risk_transfer_cs: "Riziko přechází předáním prvnímu dopravci v místě odeslání",
+        risk_transfer_en: "Risk transfers on delivery to first carrier at place of shipment",
+        seller_responsibility: "mid",
+        buyer_responsibility: "mid",
+        modes: ["any"],
+        risk_point_cs: "První dopravce, místo odeslání",
+        risk_point_en: "First carrier, place of shipment"
+      },
+      {
+        code: "CIP",
+        name_cs: "Carriage and Insurance Paid To",
+        name_en: "Carriage and Insurance Paid To",
+        transport_cs: "Prodávající hradí přepravu i pojištění (Institute Cargo A) do named place",
+        transport_en: "Seller pays carriage and full insurance (Institute Cargo A) to named place",
+        cost_cs: "Prodávající: přeprava + plné pojištění; Kupující: dovozní clo, vykládka",
+        cost_en: "Seller: carriage + full insurance; Buyer: import duty, unloading",
+        risk_transfer_cs: "Riziko přechází předáním prvnímu dopravci v místě odeslání",
+        risk_transfer_en: "Risk transfers on delivery to first carrier at place of shipment",
+        seller_responsibility: "high",
+        buyer_responsibility: "low",
+        modes: ["any"],
+        risk_point_cs: "První dopravce, místo odeslání",
+        risk_point_en: "First carrier, place of shipment"
+      },
+      {
+        code: "DAP",
+        name_cs: "Delivered at Place",
+        name_en: "Delivered at Place",
+        transport_cs: "Prodávající dodá na named place určení (nevykládá); kupující hradí clo a vykládku",
+        transport_en: "Seller delivers at named place of destination (not unloaded); buyer pays duty and unloading",
+        cost_cs: "Prodávající: veškerá přeprava; Kupující: dovozní clo, vykládka",
+        cost_en: "Seller: all transport; Buyer: import duty, unloading",
+        risk_transfer_cs: "Riziko přechází v named place určení, připraveno k vykládce",
+        risk_transfer_en: "Risk transfers at named place of destination, ready for unloading",
+        seller_responsibility: "high",
+        buyer_responsibility: "low",
+        modes: ["any"],
+        risk_point_cs: "Named place určení (před vykládkou)",
+        risk_point_en: "Named place of destination (before unloading)"
+      },
+      {
+        code: "DPU",
+        name_cs: "Delivered at Place Unloaded",
+        name_en: "Delivered at Place Unloaded",
+        transport_cs: "Prodávající dodá a vyloží v named place; kupující hradí pouze dovozní clo",
+        transport_en: "Seller delivers and unloads at named place; buyer pays import duty only",
+        cost_cs: "Prodávající: přeprava + vykládka; Kupující: dovozní clo",
+        cost_en: "Seller: transport + unloading; Buyer: import duty",
+        risk_transfer_cs: "Riziko přechází po vykládce v named place určení",
+        risk_transfer_en: "Risk transfers after unloading at named place of destination",
+        seller_responsibility: "high",
+        buyer_responsibility: "min",
+        modes: ["any"],
+        risk_point_cs: "Named place určení (po vykládce)",
+        risk_point_en: "Named place of destination (after unloading)"
+      },
+      {
+        code: "DDP",
+        name_cs: "Delivered Duty Paid",
+        name_en: "Delivered Duty Paid",
+        transport_cs: "Prodávající zajišťuje přepravu do named place určení a dovozní odbavení včetně cla. Pojistit zboží nemusí; vykládku zajišťuje kupující, pokud ji nezahrnuje přepravní smlouva prodávajícího",
+        transport_en: "Seller arranges carriage to the named place of destination and import clearance including duty. Seller has no obligation to insure; the buyer unloads unless the seller's contract of carriage includes unloading",
+        cost_cs: "Prodávající: přeprava, dovozní clo a daně; Kupující: vykládka (není-li v přepravní smlouvě prodávajícího), případné pojištění",
+        cost_en: "Seller: carriage, import duty and taxes; Buyer: unloading (unless in the seller's contract of carriage), any insurance",
+        risk_transfer_cs: "Riziko přechází v named place určení, dovozně odbavené, na příchozím dopravním prostředku připravené k vykládce",
+        risk_transfer_en: "Risk transfers at named place of destination, cleared for import, on the arriving means of transport ready for unloading",
+        seller_responsibility: "max",
+        buyer_responsibility: "min",
+        modes: ["any"],
+        risk_point_cs: "Named place určení (procleno)",
+        risk_point_en: "Named place of destination (duty paid)"
+      }
+    ];
+
+    /* ===== STATE ===== */
+    let currentLang = 'cs';
+    let currentIncoFilter = 'all';
+    let selectedIncoCode = null;
+    let currentSsMode = 'A';
+
+    /* ===== D1: ČTENÍ ČÍSEL PODLE JAZYKA =====
+       Blok mezi značkami D1-SHARED je ve všech převedených toolboxech textově shodný
+       (hlídá iter-013-gates.js). Neměnit v jednom souboru bez ostatních.
+       CZ: mezera = tisíce, čárka NEBO tečka = desetinná („1,250“ = 1,25).
+       EN: mezera nebo čárka po trojicích = tisíce, tečka = desetinná; „1,250“ bez tečky je
+       víceznačné a odmítne se. Přepnutí jazyka tak nikdy tiše nezmění číslo. */
+    // D1-SHARED-BEGIN
+    const NUM_SPACES = /[\s\u00a0\u202f]/g;
+    const NUM_PLAIN = /^[+-]?(?:\d+(?:[.,]\d*)?|[.,]\d+)$/;
+    const NUM_EN_GROUPED = /^[+-]?\d{1,3}(?:,\d{3})+\.\d*$/;
+    const NUM_EN_AMBIGUOUS = /^[+-]?[1-9]\d{0,2}(?:,\d{3})+$/;
+
+    /** → { value, canonical, error }; error ∈ null | 'empty' | 'nonNumeric' | 'ambiguous' | 'integer'.
+        canonical = zápis s desetinnou tečkou bez oddělovačů tisíců (pro přesné výpočty v setinách). */
+    function parseNumEx(str, { integer = false, lang = currentLang } = {}) {
+      const s = String(str == null ? '' : str).trim().replace(NUM_SPACES, '');
+      if (s === '') return { value: null, canonical: '', error: 'empty' };
+      let canonical;
+      if (lang === 'en') {
+        if (NUM_EN_GROUPED.test(s)) canonical = s.replace(/,/g, '');
+        else if (NUM_EN_AMBIGUOUS.test(s)) return { value: NaN, canonical: '', error: 'ambiguous' };
+        else if (s.includes(',')) return { value: NaN, canonical: '', error: 'nonNumeric' };
+        else if (NUM_PLAIN.test(s)) canonical = s;
+      } else if (NUM_PLAIN.test(s)) {
+        canonical = s.replace(',', '.');
+      }
+      if (canonical === undefined) return { value: NaN, canonical: '', error: 'nonNumeric' };
+      const n = Number(canonical);
+      if (!Number.isFinite(n)) return { value: NaN, canonical: '', error: 'nonNumeric' };
+      if (integer && !Number.isInteger(n)) return { value: NaN, canonical, error: 'integer' };
+      return { value: n, canonical, error: null };
+    }
+
+    /** Číslo, nebo NaN (prázdné i neplatné). */
+    function parseNum(str, lang = currentLang) {
+      const r = parseNumEx(str, { lang });
+      return r.error ? NaN : r.value;
+    }
+    // D1-SHARED-END
+
+    /** Kód chyby (parseNumEx) → hláška v aktuálním jazyce. */
+    function numErrorText(code) {
+      const T = TEXTS[currentLang];
+      const key = {
+        empty: 'err_required', required: 'err_required', nonNumeric: 'err_nonNumeric',
+        ambiguous: 'err_ambiguous', integer: 'err_integer', negative: 'err_negativeNotAllowed'
+      }[code];
+      return T[key] || T.err_nonNumeric;
+    }
+
+    function formatPlainNumber(n) {
+      return new Intl.NumberFormat(TEXTS[currentLang].numLocale, { maximumFractionDigits: 6 }).format(n);
+    }
+
+    /* ===== VALIDATION HELPERS ===== */
+    function showError(inputId, message) {
+      const input = document.getElementById(inputId);
+      const errEl = document.getElementById(inputId + '-err');
+      if (!input || !errEl) return;
+      input.classList.add('input-error');
+      input.setAttribute('aria-invalid', 'true');
+      errEl.textContent = message;
+      errEl.classList.add('visible');
+    }
+
+    function clearError(inputId) {
+      const input = document.getElementById(inputId);
+      const errEl = document.getElementById(inputId + '-err');
+      if (!input || !errEl) return;
+      input.classList.remove('input-error');
+      input.removeAttribute('aria-invalid');
+      errEl.textContent = '';
+      errEl.classList.remove('visible');
+    }
+
+    function validateNumeric(value, { required = true, allowNegative = false, allowZero = true,
+                                      integer = false, min = null, max = null } = {}) {
+      const T = TEXTS[currentLang];
+      const r = parseNumEx(value, { integer });
+      if (r.error === 'empty') return required ? T.err_required : null;
+      if (r.error) return numErrorText(r.error);
+      const n = r.value;
+      if (!allowNegative && n < 0) return T.err_negativeNotAllowed;
+      if (!allowZero && n === 0) return T.err_divByZero;
+      if (min !== null && n < min) return T.err_min.replace('{min}', formatPlainNumber(min));
+      if (max !== null && n > max) return T.err_max.replace('{max}', formatPlainNumber(max));
+      return null;
+    }
+
+    /**
+     * Číselné pole T4 (T4-5): prázdné → { empty: true } bez hlášky (výsledek „—“, ne tichá 0),
+     * neplatné, záporné, nad `max` nebo 0 u `positive` → hláška u pole a { error: true },
+     * jinak { value }.
+     */
+    function readNumber(id, { positive = false, max = null } = {}) {
+      const raw = document.getElementById(id).value;
+      const p = parseNumEx(raw);
+      if (p.error === 'empty') { clearError(id); return { empty: true }; }
+      let msg = validateNumeric(raw, { max });
+      if (!msg && positive && p.value === 0) msg = TEXTS[currentLang].err_zeroNotAllowed;
+      if (msg) { showError(id, msg); return { error: true }; }
+      clearError(id);
+      return { value: p.value };
+    }
+
+    /* ===== RESPONSIBILITY LEVEL → % ===== */
+    const RESP_PCT = { min: 10, low: 30, mid: 50, high: 70, max: 90 };
+
+    /* ===== i18n ===== */
+    function setLang(lang) {
+      currentLang = lang;
+      document.documentElement.lang = lang;
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (TEXTS[lang][key] !== undefined) el.textContent = TEXTS[lang][key];
+      });
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        if (TEXTS[lang][key] !== undefined) el.placeholder = TEXTS[lang][key];
+      });
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lang === lang);
+      });
+      renderIncotermsTable();
+      updateLeadTime();
+      updateSafetyStock();
+    }
+
+    /* ===== TAB NAVIGATION ===== */
+    function initTabs() {
+      const tabBtns = document.querySelectorAll('.tab-btn');
+      tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => activateTab(btn.dataset.tab));
+        btn.addEventListener('keydown', e => {
+          const tabs = Array.from(tabBtns);
+          const idx = tabs.indexOf(btn);
+          if (e.key === 'ArrowRight') { e.preventDefault(); activateTab(tabs[(idx + 1) % tabs.length].dataset.tab); }
+          if (e.key === 'ArrowLeft')  { e.preventDefault(); activateTab(tabs[(idx - 1 + tabs.length) % tabs.length].dataset.tab); }
+          if (e.key === 'Home')       { e.preventDefault(); activateTab(tabs[0].dataset.tab); }
+          if (e.key === 'End')        { e.preventDefault(); activateTab(tabs[tabs.length - 1].dataset.tab); }
+        });
+      });
+    }
+
+    function activateTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        const isActive = btn.dataset.tab === tabId;
+        btn.classList.toggle('active', isActive);
+        btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        btn.tabIndex = isActive ? 0 : -1;
+      });
+      document.querySelectorAll('.tool-panel').forEach(panel => {
+        panel.classList.toggle('active', panel.id === tabId);
+      });
+      document.getElementById('tab-btn-' + tabId.replace('tab-', '')).focus();
+    }
+
+    /* ===== 4a INCOTERMS ===== */
+    function renderIncotermsTable() {
+      const tbody = document.getElementById('inco-tbody');
+      const lang = currentLang;
+      const T = TEXTS[lang];
+      tbody.innerHTML = '';
+
+      INCOTERMS.forEach(term => {
+        // Data row
+        const tr = document.createElement('tr');
+        tr.dataset.code = term.code;
+        tr.setAttribute('tabindex', '0');
+        tr.setAttribute('role', 'button');
+        tr.setAttribute('aria-expanded', term.code === selectedIncoCode ? 'true' : 'false');
+
+        // Visibility per filter
+        const isVisible = checkIncoFilter(term, currentIncoFilter);
+        if (!isVisible) tr.classList.add('hidden');
+        if (term.code === selectedIncoCode) tr.classList.add('selected');
+
+        // Mode badge
+        const modeBadgeClass = term.modes.includes('sea') ? 'mode-badge sea' : 'mode-badge';
+        const modeLabel = term.modes.includes('sea') ? T.t4a_mode_sea : T.t4a_mode_any;
+
+        // Seller responsibility bar
+        const sellerPct = RESP_PCT[term.seller_responsibility] || 50;
+        const sellerLabel = T['t4a_resp_' + term.seller_responsibility] || term.seller_responsibility;
+
+        tr.innerHTML = `
+          <td>
+            <span class="inco-code">${term.code}</span><br>
+            <span style="font-size:var(--font-size-sm);color:var(--color-text-muted)">${term['name_' + lang]}</span>
+          </td>
+          <td><span class="${modeBadgeClass}">${modeLabel}</span></td>
+          <td>
+            <div class="resp-bar-wrap" title="${T.t4a_seller_title.replace('{level}', () => sellerLabel)}">
+              <span class="resp-label" style="color:var(--color-text-muted);font-size:0.75rem">${T.t4a_seller_short}</span>
+              <div class="resp-bar">
+                <div class="resp-bar-fill" style="width:${sellerPct}%"></div>
+              </div>
+              <span class="resp-label">${sellerLabel}</span>
+            </div>
+          </td>
+          <td style="font-size:var(--font-size-sm)">${term['risk_point_' + lang]}</td>
+        `;
+
+        tr.addEventListener('click', () => toggleIncoDetail(term.code));
+        tr.addEventListener('keydown', e => {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleIncoDetail(term.code); }
+        });
+
+        tbody.appendChild(tr);
+
+        // Detail row
+        const detailTr = document.createElement('tr');
+        detailTr.classList.add('inco-detail-row');
+        detailTr.dataset.detailFor = term.code;
+        if (term.code === selectedIncoCode) detailTr.classList.add('visible');
+
+        detailTr.innerHTML = `
+          <td class="inco-detail-cell" colspan="4">
+            <div class="inco-detail-grid">
+              <div class="inco-detail-item">
+                <strong>${T.t4a_detail_transport}</strong>
+                <span>${term['transport_' + lang]}</span>
+              </div>
+              <div class="inco-detail-item">
+                <strong>${T.t4a_detail_cost}</strong>
+                <span>${term['cost_' + lang]}</span>
+              </div>
+              <div class="inco-detail-item">
+                <strong>${T.t4a_detail_risk_transfer}</strong>
+                <span>${term['risk_transfer_' + lang]}</span>
+              </div>
+              <div class="inco-detail-item">
+                <strong>${T.t4a_detail_risk_point}</strong>
+                <span>${term['risk_point_' + lang]}</span>
+              </div>
+            </div>
+          </td>
+        `;
+
+        tbody.appendChild(detailTr);
+      });
+    }
+
+    function checkIncoFilter(term, filter) {
+      if (filter === 'all') return true;
+      if (filter === 'sea') return term.modes.includes('sea');
+      if (filter === 'seller_heavy') return ['high', 'max'].includes(term.seller_responsibility);
+      if (filter === 'buyer_heavy') return ['high', 'max'].includes(term.buyer_responsibility);
+      return true;
+    }
+
+    function toggleIncoDetail(code) {
+      if (selectedIncoCode === code) {
+        selectedIncoCode = null;
+      } else {
+        selectedIncoCode = code;
+      }
+      renderIncotermsTable();
+    }
+
+    function initIncoFilter() {
+      document.querySelectorAll('.inco-filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          currentIncoFilter = btn.dataset.filter;
+          document.querySelectorAll('.inco-filter-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          renderIncotermsTable();
+        });
+      });
+    }
+
+    /* ===== 4b LEAD TIME ===== */
+    const LT_PHASES = [
+      { id: 'lt-production', key: 'production', segId: 'lt-seg-production' },
+      { id: 'lt-dispatch',   key: 'dispatch',   segId: 'lt-seg-dispatch'   },
+      { id: 'lt-transit',    key: 'transit',     segId: 'lt-seg-transit'    },
+      { id: 'lt-customs',    key: 'customs',     segId: 'lt-seg-customs'    },
+      { id: 'lt-receiving',  key: 'receiving',   segId: 'lt-seg-receiving'  },
+    ];
+
+    /** Pole lead time: prázdná fáze = 0 dní (popisek to říká). Neplatná nebo záporná → chyba u pole.
+        Vrací hodnoty fází, nebo null (chyba, nebo není vyplněná žádná fáze). */
+    function readPhases() {
+      const vals = {};
+      let ok = true, anyFilled = false;
+      LT_PHASES.forEach(p => {
+        const r = readNumber(p.id, { max: 10000 });
+        if (r.error) ok = false;
+        else if (r.empty) vals[p.key] = 0;
+        else { vals[p.key] = r.value; anyFilled = true; }
+      });
+      return ok && anyFilled ? vals : null;
+    }
+
+    function calcLeadTime(phases) {
+      const total = phases.production + phases.dispatch + phases.transit + phases.customs + phases.receiving;
+      return { total, phases };
+    }
+
+    function phaseWidth(phaseDays, total) {
+      if (total === 0) return 0;
+      return Math.round((phaseDays / total) * 100);
+    }
+
+    function updateLeadTime() {
+      const T = TEXTS[currentLang];
+      const unitText = T.t4b_result_unit;
+      const phases = readPhases();
+
+      if (!phases) {
+        LT_PHASES.forEach(p => {
+          const seg = document.getElementById(p.segId);
+          seg.style.width = '0%';
+          seg.title = '';
+        });
+        document.getElementById('lt-result-total').textContent = '—';
+        document.getElementById('lt-result-breakdown').textContent = '';
+        return;
+      }
+
+      const { total } = calcLeadTime(phases);
+      const parts = LT_PHASES.map(p => {
+        const name = T['t4b_phase_' + p.key + '_short'];
+        const days = formatPlainNumber(phases[p.key]);
+        const w = phaseWidth(phases[p.key], total);
+        const seg = document.getElementById(p.segId);
+        seg.style.width = w + '%';
+        seg.title = `${name}: ${days} ${unitText}`;
+        return `${name}: ${days} ${unitText} (${w}%)`;
+      });
+
+      document.getElementById('lt-result-total').textContent = formatPlainNumber(total) + ' ' + unitText;
+      document.getElementById('lt-result-breakdown').textContent = parts.join(' | ');
+    }
+
+    function initLeadTime() {
+      LT_PHASES.forEach(p => {
+        document.getElementById(p.id).addEventListener('input', updateLeadTime);
+      });
+      document.getElementById('lt-reset').addEventListener('click', () => {
+        LT_PHASES.forEach(p => { document.getElementById(p.id).value = ''; });
+        updateLeadTime();
+      });
+      updateLeadTime();
+    }
+
+    /* ===== 4c SAFETY STOCK ===== */
+    /**
+     * Zaokrouhlení nahoru na celé kusy (port up() z v8 logistics-math.mjs, krok 1).
+     * Float šum se toleruje: 1,1 × 10 = 11,000000000000002 musí dát 11, ne 12.
+     * `scale` = velikost operandů, ze kterých x vzniklo. v8 bere velikost výsledku, to ale nestačí
+     * u rozdílu blízkých čísel: (4,2 − 4,1) × 10 = 1,0000000000000053 by v8 zaokrouhlila na 2.
+     */
+    function up(x, scale = x) {
+      const nearest = Math.round(x);
+      const exact = (nearest > 0 || x === 0) && Math.abs(x - nearest) <= Number.EPSILON * Math.max(1, scale) * 4;
+      return Number((exact ? nearest : Math.ceil(x)).toPrecision(15));
+    }
+
+    /**
+     * Pojistná zásoba a bod objednání (T4-1/2/3, Q3): obojí nahoru na celé kusy.
+     * method 'peak' (vzorec A): SS_raw = (peak − avg) × LT; 'percent' (vzorec B): SS_raw = avg × LT × percent / 100.
+     * ROP = avg × LT + SS (už zaokrouhlená), poté znovu nahoru. Karta i rozepsaný vzorec čtou tentýž výsledek.
+     * → { demand, rawSS, ss, rop } nebo { error, field }.
+     */
+    function safetyStock({ method, avg, leadTime, peak = null, percent = null }) {
+      const demand = avg * leadTime;
+      let rawSS, scale;
+      if (method === 'peak') {
+        if (peak < avg) return { error: 'peakBelowAvg', field: 'peak' };
+        rawSS = (peak - avg) * leadTime;
+        scale = peak * leadTime;
+      } else {
+        rawSS = demand * percent / 100;
+        scale = rawSS;
+      }
+      const ss = up(rawSS, scale);
+      const rop = up(demand + ss);
+      return { demand, rawSS, ss, rop };
+    }
+
+    const SS_FIELDS = {
+      A: { avg: 'ss-avg-demand', leadTime: 'ss-avg-lt', peak: 'ss-max-demand' },
+      B: { avg: 'ss-avg-demand-b', leadTime: 'ss-avg-lt-b', percent: 'ss-reserve-pct' },
+    };
+
+    /** Šablona s {klíč}; náhrada funkcí, aby se „$&“ apod. v hodnotě nikdy neinterpretovalo. */
+    function fillText(tpl, vals) {
+      return tpl.replace(/\{(\w+)\}/g, (m, k) => (k in vals ? String(vals[k]) : m));
+    }
+
+    function updateSafetyStock() {
+      const T = TEXTS[currentLang];
+      const ids = SS_FIELDS[currentSsMode];
+      const fields = {
+        avg: readNumber(ids.avg, { positive: true, max: 1e9 }),
+        leadTime: readNumber(ids.leadTime, { positive: true, max: 10000 }),
+      };
+      if (currentSsMode === 'A') fields.peak = readNumber(ids.peak, { max: 1e9 });
+      else fields.percent = readNumber(ids.percent, { max: 1000 });
+
+      const incomplete = Object.values(fields).some(f => f.error || f.empty);
+      let r = null;
+      if (!incomplete) {
+        const v = {};
+        for (const [k, f] of Object.entries(fields)) v[k] = f.value;
+        r = safetyStock({ method: currentSsMode === 'A' ? 'peak' : 'percent', ...v });
+        if (r.error === 'peakBelowAvg') { showError(ids.peak, T.err_t4c_peakBelowAvg); r = null; }
+      }
+      renderSafetyStock(r, fields);
+    }
+
+    /** Karta i rozepsaný vzorec z jednoho výsledku `r` (null = „—“). */
+    function renderSafetyStock(r, fields) {
+      const T = TEXTS[currentLang];
+      const fmt = formatPlainNumber;
+      document.getElementById('ss-result-ss').textContent = r ? fmt(r.ss) : '—';
+      document.getElementById('ss-result-rop').textContent = r ? fmt(r.rop) : '—';
+      const box = document.getElementById('ss-formula-text');
+      if (!r) { box.innerHTML = T.t4c_formula_empty; return; }
+      box.innerHTML = fillText(T['t4c_formula_' + currentSsMode], {
+        avg: fmt(fields.avg.value), lt: fmt(fields.leadTime.value),
+        peak: fields.peak ? fmt(fields.peak.value) : '', pct: fields.percent ? fmt(fields.percent.value) : '',
+        rawSS: fmt(r.rawSS), ss: fmt(r.ss), ropRaw: fmt(r.demand + r.ss), rop: fmt(r.rop), unit: T.t4c_result_unit,
+      });
+    }
+
+    function initSafetyStock() {
+      // Mode toggle
+      document.querySelectorAll('.ss-mode-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          currentSsMode = btn.dataset.mode;
+          document.querySelectorAll('.ss-mode-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          document.getElementById('ss-inputs-a').classList.toggle('active', currentSsMode === 'A');
+          document.getElementById('ss-inputs-b').classList.toggle('active', currentSsMode === 'B');
+          updateSafetyStock();
+        });
+      });
+
+      const allIds = [...Object.values(SS_FIELDS.A), ...Object.values(SS_FIELDS.B)];
+      allIds.forEach(id => document.getElementById(id).addEventListener('input', updateSafetyStock));
+
+      document.getElementById('ss-reset').addEventListener('click', () => {
+        allIds.forEach(id => { document.getElementById(id).value = ''; clearError(id); });
+        updateSafetyStock();
+      });
+
+      updateSafetyStock();
+    }
+
+    /* ===== LANG SWITCHER ===== */
+    function initLangSwitcher() {
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.addEventListener('click', () => setLang(btn.dataset.lang));
+      });
+    }
+
+    /* ===== INIT ===== */
+    document.addEventListener('DOMContentLoaded', () => {
+      initTabs();
+      initLangSwitcher();
+      initIncoFilter();
+      renderIncotermsTable();
+      initLeadTime();
+      initSafetyStock();
+    });
+  </script>
+</body>
+</html>

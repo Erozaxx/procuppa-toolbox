@@ -1,0 +1,2085 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Procuppa Toolbox 5 – Finance</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ===== CSS CUSTOM PROPERTIES ===== */
+    :root {
+      /* === BARVY === */
+      --color-primary:      #1A1A1A;
+      --color-accent:       #FFD956;
+      --color-success:      #16A34A;
+      --color-warning:      #D97706;
+      --color-danger:       #DC2626;
+      --color-bg:           #FAFAF8;
+      --color-surface:      #FFFFFF;
+      --color-text:         #1A1A1A;
+      --color-text-muted:   #5C6370;
+      --color-border:       #E5E3DC;
+      --color-accent-text:  #1A1A1A;
+      --color-primary-text: #FFFFFF;
+
+      /* === TYPOGRAFIE === */
+      --font-base: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+      --font-size-sm: 0.875rem;
+      --font-size-md: 1rem;
+      --font-size-lg: 1.25rem;
+      --font-size-xl: 1.5rem;
+      --font-tracking-tight: -0.01em;
+      --font-tracking-normal: 0em;
+
+      /* === SPACING === */
+      --space-xs: 0.25rem;
+      --space-sm: 0.5rem;
+      --space-md: 1rem;
+      --space-lg: 1.5rem;
+      --space-xl: 2rem;
+
+      /* === RADIUS === */
+      --radius-sm: 3px;
+      --radius-md: 6px;
+      --radius-lg: 10px;
+
+      /* === SHADOW === */
+      --shadow-card: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+
+      /* === FINANCE-SPECIFIC BARVY === */
+      --fin-color-variantA: #0891B2;
+      --fin-color-variantB: #D97706;
+      --fin-color-savings:  #16A34A;
+      --fin-color-loss:     #DC2626;
+    }
+
+    /* ===== RESET + BASE ===== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-base);
+      font-size: var(--font-size-md);
+      color: var(--color-text);
+      background: var(--color-bg);
+      line-height: 1.5;
+    }
+
+    /* ===== LAYOUT ===== */
+    header {
+      position: relative;
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      padding: var(--space-md) var(--space-xl);
+      display: flex;
+      align-items: center;
+      min-height: 60px;
+    }
+
+    #logo {
+      height: 40px;
+      width: auto;
+    }
+
+    .lang-switcher {
+      position: absolute;
+      top: var(--space-md);
+      right: var(--space-md);
+      display: flex;
+      gap: var(--space-xs);
+    }
+
+    .lang-btn {
+      background: none;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-xs) var(--space-sm);
+      font-size: var(--font-size-sm);
+      cursor: pointer;
+      color: var(--color-text-muted);
+      font-family: var(--font-base);
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+
+    .lang-btn.active,
+    .lang-btn:hover {
+      background: var(--color-primary);
+      color: var(--color-primary-text);
+      border-color: var(--color-primary);
+    }
+
+    /* ===== TAB NAVIGATION ===== */
+    .tab-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      padding: 0 var(--space-xl);
+      gap: 0;
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      padding: var(--space-md) var(--space-lg);
+      font-size: var(--font-size-md);
+      font-weight: 500;
+      font-family: var(--font-base);
+      color: var(--color-text-muted);
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover {
+      color: var(--color-primary);
+    }
+
+    .tab-btn.active {
+      color: var(--color-primary);
+      border-bottom: 3px solid var(--color-accent);
+      font-weight: 700;
+    }
+
+    .tab-btn:focus-visible {
+      outline: 2px solid var(--color-accent);
+      outline-offset: -2px;
+    }
+
+    /* ===== TOOL PANELS ===== */
+    main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: var(--space-xl) var(--space-md);
+    }
+
+    .tool-panel {
+      display: none;
+    }
+
+    .tool-panel.active {
+      display: block;
+    }
+
+    .tool-panel > h1 {
+      font-size: var(--font-size-xl);
+      font-weight: 700;
+      margin-bottom: var(--space-lg);
+      color: var(--color-text);
+    }
+
+    /* ===== TOOL CARD ===== */
+    .tool-card {
+      background: var(--color-surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+      padding: var(--space-lg);
+      margin-bottom: var(--space-lg);
+    }
+
+    .tool-card h2 {
+      font-size: var(--font-size-lg);
+      font-weight: 700;
+      color: var(--color-primary);
+      margin-bottom: var(--space-xs);
+    }
+
+    .tool-card .tool-desc {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-lg);
+    }
+
+    /* ===== INPUT GROUP ===== */
+    .input-group {
+      margin-bottom: var(--space-md);
+    }
+
+    .input-group label {
+      display: block;
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      margin-bottom: var(--space-xs);
+      color: var(--color-text);
+    }
+
+    .input-field {
+      width: 100%;
+      max-width: 300px;
+      padding: var(--space-sm) var(--space-md);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      font-size: var(--font-size-md);
+      font-family: var(--font-base);
+      color: var(--color-text);
+      background: var(--color-surface);
+      transition: border-color 0.15s;
+    }
+
+    .input-field:focus {
+      outline: 2px solid var(--color-accent);
+      outline-offset: 0;
+      border-color: var(--color-accent);
+    }
+
+    .input-field:disabled {
+      background: var(--color-bg);
+      color: var(--color-text-muted);
+      cursor: not-allowed;
+    }
+
+    .field-error {
+      font-size: var(--font-size-sm);
+      color: var(--color-danger);
+      margin-top: var(--space-xs);
+      display: none;
+    }
+
+    .field-error.visible {
+      display: block;
+    }
+
+    .input-field.input-error {
+      border-color: var(--color-danger);
+    }
+
+    /* ===== SECTION HEADING ===== */
+    .section-heading {
+      font-size: var(--font-size-sm);
+      font-weight: 700;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin: var(--space-lg) 0 var(--space-md);
+      padding-bottom: var(--space-xs);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    /* ===== RESULT BOX ===== */
+    .result-box {
+      background: var(--color-bg);
+      border-left: 4px solid var(--color-accent);
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      padding: var(--space-md);
+      margin-top: var(--space-md);
+    }
+
+    .result-value {
+      font-size: var(--font-size-xl);
+      font-weight: 700;
+      color: var(--color-primary);
+    }
+
+    .result-label {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+      margin-top: var(--space-xs);
+    }
+
+    .result-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: var(--space-xs) 0;
+      border-bottom: 1px solid var(--color-border);
+      gap: var(--space-md);
+    }
+
+    .result-row:last-child {
+      border-bottom: none;
+    }
+
+    .result-row-label {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+    }
+
+    .result-row-value {
+      font-size: var(--font-size-md);
+      font-weight: 600;
+      color: var(--color-primary);
+      white-space: nowrap;
+    }
+
+    /* ===== BTN ===== */
+    .btn {
+      background: var(--color-accent);
+      color: var(--color-accent-text);
+      border: none;
+      border-radius: var(--radius-md);
+      padding: var(--space-sm) var(--space-lg);
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      font-family: var(--font-base);
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .btn:hover {
+      background: var(--color-primary);
+      color: var(--color-primary-text);
+    }
+
+    .btn:focus-visible {
+      outline: 2px solid var(--color-accent);
+      outline-offset: 2px;
+    }
+
+    .btn-reset {
+      background: none;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-sm) var(--space-md);
+      font-size: var(--font-size-sm);
+      font-family: var(--font-base);
+      color: var(--color-text-muted);
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+
+    .btn-reset:hover {
+      background: var(--color-bg);
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+
+    .btn-group {
+      display: flex;
+      gap: var(--space-sm);
+      flex-wrap: wrap;
+      align-items: center;
+      margin-top: var(--space-md);
+    }
+
+    /* ===== WARNING ===== */
+    .warn-msg {
+      display: none;
+      background: #FEF3C7;
+      color: #92400E;
+      border-left: 3px solid var(--color-warning);
+      padding: var(--space-sm) var(--space-md);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      font-size: var(--font-size-sm);
+      margin-top: var(--space-sm);
+    }
+
+    .warn-msg.visible {
+      display: block;
+    }
+
+    /* ===== 5a CASHFLOW ===== */
+    .cf-inputs-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-md) var(--space-xl);
+    }
+
+    @media (max-width: 600px) {
+      .cf-inputs-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .cf-summary-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-md);
+      margin-top: var(--space-md);
+    }
+
+    @media (max-width: 600px) {
+      .cf-summary-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .cf-variant-card {
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      border: 2px solid var(--color-border);
+    }
+
+    .cf-variant-card.variant-a {
+      border-color: var(--fin-color-variantA);
+    }
+
+    .cf-variant-card.variant-b {
+      border-color: var(--fin-color-variantB);
+    }
+
+    .cf-variant-label {
+      font-size: var(--font-size-sm);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: var(--space-sm);
+    }
+
+    .cf-variant-label.variant-a {
+      color: var(--fin-color-variantA);
+    }
+
+    .cf-variant-label.variant-b {
+      color: var(--fin-color-variantB);
+    }
+
+    .cf-advantage-box {
+      margin-top: var(--space-md);
+      padding: var(--space-md);
+      background: var(--color-bg);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--color-border);
+      font-size: var(--font-size-sm);
+    }
+
+    .cf-advantage-value {
+      font-size: var(--font-size-lg);
+      font-weight: 700;
+    }
+
+    .cf-advantage-value.advantage-b {
+      color: var(--fin-color-variantB);
+    }
+
+    .cf-advantage-value.advantage-a {
+      color: var(--fin-color-variantA);
+    }
+
+    /* Timeline */
+    .cf-timeline {
+      margin-top: var(--space-lg);
+      padding: var(--space-md);
+      background: var(--color-bg);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--color-border);
+    }
+
+    .cf-timeline-title {
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-md);
+    }
+
+    .cf-timeline-row {
+      position: relative;
+      height: 48px;
+      margin-bottom: var(--space-md);
+    }
+
+    .cf-timeline-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .cf-timeline-axis {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--color-border);
+    }
+
+    .cf-bar-wrap {
+      position: absolute;
+      bottom: 2px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transform: translateX(-50%);
+    }
+
+    .cf-bar {
+      width: 28px;
+      border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+      min-height: 8px;
+      cursor: default;
+    }
+
+    .cf-bar.variant-a {
+      background: var(--fin-color-variantA);
+    }
+
+    .cf-bar.variant-b {
+      background: var(--fin-color-variantB);
+    }
+
+    .cf-bar-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--color-text-muted);
+      margin-top: 2px;
+      white-space: nowrap;
+    }
+
+    .cf-timeline-axis-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: var(--space-xs);
+      font-size: 0.7rem;
+      color: var(--color-text-muted);
+    }
+
+    .cf-timeline-legend {
+      display: flex;
+      gap: var(--space-lg);
+      margin-bottom: var(--space-sm);
+      flex-wrap: wrap;
+    }
+
+    .cf-legend-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+    }
+
+    .cf-legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    .cf-legend-dot.variant-a {
+      background: var(--fin-color-variantA);
+    }
+
+    .cf-legend-dot.variant-b {
+      background: var(--fin-color-variantB);
+    }
+
+    /* ===== 5b PENALTY TOGGLE ===== */
+    .penalty-type-toggle {
+      display: flex;
+      gap: var(--space-xs);
+      margin-top: var(--space-xs);
+    }
+
+    .penalty-type-btn {
+      background: none;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-xs) var(--space-md);
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      font-family: var(--font-base);
+      color: var(--color-text-muted);
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+
+    .penalty-type-btn.active,
+    .penalty-type-btn:hover {
+      background: var(--color-accent);
+      color: var(--color-accent-text);
+      border-color: var(--color-accent);
+    }
+
+    .penalty-type-btn:focus-visible {
+      outline: 2px solid var(--color-accent);
+      outline-offset: 2px;
+    }
+
+    /* ===== 5c EPR RECOMMENDATION ===== */
+    .epr-recommendation {
+      margin-top: var(--space-md);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      display: none;
+    }
+
+    .epr-recommendation.visible {
+      display: block;
+    }
+
+    .epr-rec-yes {
+      background: #DCFCE7;
+      color: #14532D;
+      border: 1px solid #86EFAC;
+    }
+
+    .epr-rec-no {
+      background: #FEE2E2;
+      color: #7F1D1D;
+      border: 1px solid #FCA5A5;
+    }
+
+    .epr-rec-neutral {
+      background: var(--color-bg);
+      color: var(--color-text);
+      border: 1px solid var(--color-border);
+    }
+
+    .epr-rec-title {
+      font-size: var(--font-size-md);
+      font-weight: 700;
+      margin-bottom: var(--space-xs);
+    }
+
+    .epr-rec-detail {
+      font-size: var(--font-size-sm);
+    }
+
+    /* ===== 5d CHECKLIST ===== */
+    .checklist-type-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: var(--space-sm);
+      margin-bottom: var(--space-lg);
+    }
+
+    .checklist-type-btn {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-sm) var(--space-md);
+      font-size: var(--font-size-sm);
+      font-weight: 500;
+      font-family: var(--font-base);
+      color: var(--color-text);
+      cursor: pointer;
+      text-align: left;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+      line-height: 1.3;
+    }
+
+    .checklist-type-btn:hover {
+      background: var(--color-accent);
+      color: var(--color-accent-text);
+      border-color: var(--color-accent);
+    }
+
+    .checklist-type-btn.active {
+      background: var(--color-primary);
+      color: var(--color-primary-text);
+      border-color: var(--color-primary);
+    }
+
+    .checklist-type-btn:focus-visible {
+      outline: 2px solid var(--color-accent);
+      outline-offset: 2px;
+    }
+
+    .checklist-detail-panel {
+      display: none;
+      background: var(--color-surface);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--color-border);
+      padding: var(--space-lg);
+    }
+
+    .checklist-detail-panel.visible {
+      display: block;
+    }
+
+    .checklist-type-title {
+      font-size: var(--font-size-lg);
+      font-weight: 700;
+      color: var(--color-primary);
+      margin-bottom: var(--space-lg);
+    }
+
+    .checklist-section {
+      margin-bottom: var(--space-md);
+      padding-bottom: var(--space-md);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .checklist-section:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    .checklist-section h4 {
+      font-size: var(--font-size-sm);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-xs);
+    }
+
+    .checklist-section p {
+      font-size: var(--font-size-sm);
+      color: var(--color-text);
+      line-height: 1.6;
+    }
+
+    .checklist-risk h4 {
+      color: #991B1B;
+    }
+
+    .checklist-impact h4 {
+      color: #92400E;
+    }
+
+    .checklist-countermeasures h4 {
+      color: #166534;
+    }
+
+    .checklist-section ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .checklist-section ul li {
+      font-size: var(--font-size-sm);
+      color: var(--color-text);
+      padding: var(--space-xs) 0 var(--space-xs) var(--space-md);
+      position: relative;
+      line-height: 1.5;
+    }
+
+    .checklist-section ul li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: var(--fin-color-savings);
+      font-weight: 700;
+    }
+
+    /* ===== HIDDEN UTILITY ===== */
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <svg id="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 148.163 28.4534" role="img" aria-label="Procuppa"><g><g><path d="M11.569,11.2632c-.6381.0075-1.0349.6975-.7216,1.2547l7.802,13.8774c.2352.4185-.0665.9357-.5458.9357h-8.9926c-.226,0-.4346-.1223-.5457-.3194L.0815,11.9215c-.2352-.4185.0665-.9357.5457-.9357h8.2121c1.1317-.0133,2.1706-.6299,2.7263-1.6178L16.6304.3604c.1251-.2227.3607-.3604.6156-.3604h8.8079c.5406,0,.8812.5838.6156,1.0559l-5.5366,9.8459c-.1251.2227-.3606.3604-.6156.3604h-8.948v.001h-.0003Z" style="fill:#fdd757;"/><path d="M34.1531,24.0212V5.1582h8.2839c2.1897,0,3.8253.6332,4.9334,1.7676,1.0552,1.0817,1.6884,2.559,1.6884,4.3003,0,3.5615-2.348,5.9622-6.3052,5.9622h-4.6432v6.8329h-3.9573ZM38.1104,8.4824v5.5929h3.9572c2.005,0,3.0603-1.108,3.0603-2.8229,0-1.7675-1.108-2.7701-3.0075-2.7701h-4.01ZM53.5891,10.4874v2.1633h.0791c.8178-1.5302,1.7412-2.3216,3.3241-2.3216.3957,0,.6332.0264.8442.1055v3.1394h-.0791c-2.348-.2374-4.0364,1.0025-4.0364,3.8518v6.5954h-3.588v-13.5338h3.4561ZM64.8788,24.417c-4.1947,0-7.0703-3.1131-7.0703-7.1495s2.8756-7.1495,7.0703-7.1495,7.0704,3.1131,7.0704,7.1495-2.8757,7.1495-7.0704,7.1495ZM64.8788,21.6733c2.1897,0,3.4297-1.7676,3.4297-4.4058s-1.24-4.4322-3.4297-4.4322c-2.216,0-3.4296,1.794-3.4296,4.4322s1.2136,4.4058,3.4296,4.4058ZM79.3682,24.417c-4.2738,0-6.9384-3.1131-6.9384-7.1495s2.6382-7.1495,6.7538-7.1495c3.5087,0,5.672,2.0314,6.1469,4.9598h-3.5088c-.2374-1.1872-1.1608-2.0842-2.4799-2.0842-2.1633,0-3.2713,1.6621-3.2713,4.2739,0,2.559,1.0289,4.2738,3.2186,4.2738,1.451,0,2.4799-.765,2.7173-2.2952h3.456c-.2374,2.8756-2.4799,5.1709-6.0942,5.1709ZM98.5035,24.0212h-3.456v-1.5829h-.0792c-.9233,1.24-1.9786,1.9523-3.8781,1.9523-3.0075,0-4.696-1.9259-4.696-4.8807v-9.0225h3.5616v8.4158c0,1.5829.7123,2.4535,2.2424,2.4535,1.6885,0,2.7174-1.2664,2.7174-3.0603v-7.809h3.5879v13.5338ZM100.297,28.4534V10.4874h3.456v1.6884h.079c.87-1.1872,2.137-2.0578,3.983-2.0578,3.588,0,5.884,2.9284,5.884,7.1495,0,4.3794-2.375,7.1495-5.857,7.1495-1.9,0-3.14-.7651-3.905-1.9259h-.052v5.9623h-3.588ZM107.077,21.4358c1.82,0,2.981-1.5037,2.981-4.0628s-.897-4.353-3.113-4.353c-2.243,0-3.14,1.9259-3.14,4.353,0,2.4535,1.135,4.0628,3.272,4.0628ZM114.841,28.4534V10.4874h3.456v1.6884h.079c.87-1.1872,2.137-2.0578,3.983-2.0578,3.588,0,5.884,2.9284,5.884,7.1495,0,4.3794-2.375,7.1495-5.857,7.1495-1.9,0-3.14-.7651-3.905-1.9259h-.052v5.9623h-3.588ZM121.621,21.4358c1.82,0,2.981-1.5037,2.981-4.0628s-.897-4.353-3.113-4.353c-2.243,0-3.14,1.9259-3.14,4.353,0,2.4535,1.135,4.0628,3.272,4.0628ZM137.906,24.0212c-.211-.2638-.343-.8969-.422-1.5037h-.053c-.686,1.0289-1.662,1.8203-3.984,1.8203-2.77,0-4.722-1.451-4.722-4.1419,0-2.9812,2.427-3.9309,5.435-4.353,2.242-.3166,3.271-.5013,3.271-1.5302,0-.9761-.765-1.6093-2.269-1.6093-1.688,0-2.506.6068-2.612,1.8995h-3.192c.106-2.3743,1.873-4.4585,5.831-4.4585,4.062,0,5.698,1.8203,5.698,4.9862v6.8856c0,1.0289.158,1.6357.475,1.8731v.1319h-3.456ZM134.318,21.8315c2.058,0,3.192-1.2663,3.192-2.5854v-2.0314c-.633.3694-1.609.5804-2.506.7915-1.873.4221-2.796.8442-2.796,2.1105s.844,1.7148,2.11,1.7148Z"/><path d="M145.163,13.1927c-1.651,0-3-1.3066-3-3.1,0-1.7806,1.349-3.1,3-3.1,1.652,0,3,1.3194,3,3.1,0,1.7934-1.348,3.1-3,3.1ZM145.163,12.7443c1.437,0,2.484-1.1144,2.484-2.6516,0-1.5244-1.047-2.6517-2.484-2.6517s-2.483,1.1273-2.483,2.6517c0,1.5372,1.046,2.6516,2.483,2.6516ZM143.991,11.6939v-3.2793h1.487c.593,0,1.021.3843,1.021.9223,0,.3715-.189.6789-.605.7814v.0128c.316.0897.467.269.505.6661.05.4612.025.807.138.8583v.0384h-.617c-.089-.0384-.126-.4099-.139-.7558-.013-.3458-.214-.5636-.618-.5636h-.529v1.3194h-.643ZM144.634,8.9526v.9223h.706c.353,0,.529-.1922.529-.4612s-.176-.4612-.529-.4612h-.706Z"/></g></g></svg>
+    <div class="lang-switcher">
+      <button class="lang-btn active" data-lang="cs" id="btn-lang-cs">CZ</button>
+      <button class="lang-btn" data-lang="en" id="btn-lang-en">EN</button>
+    </div>
+  </header>
+
+  <!-- TAB NAVIGATION -->
+  <nav class="tab-nav" role="tablist">
+    <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="tab-5a" data-tab="5a" data-i18n="tab5a">Splatnost vs cashflow</button>
+    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-5b" data-tab="5b" data-i18n="tab5b">Penále a sankce</button>
+    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-5c" data-tab="5c" data-i18n="tab5c">Early payment discount</button>
+    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-5d" data-tab="5d" data-i18n="tab5d">Smluvní dopady</button>
+  </nav>
+
+  <main>
+
+    <!-- ===== TAB 5a: Splatnost vs cashflow ===== -->
+    <section id="tab-5a" class="tool-panel active" role="tabpanel">
+      <h1 data-i18n="panel5a_heading">Splatnost vs cashflow</h1>
+      <div class="tool-card">
+        <p class="tool-desc" data-i18n="t5a_desc">Porovnejte dvě platební podmínky. Zadejte podmínky Varianty A (záloha + doplatek) a Varianty B (NET splatnost).</p>
+
+        <div class="input-group">
+          <label for="cf-amount" data-i18n="t5a_amount">Fakturovaná částka</label>
+          <input type="text" inputmode="decimal" autocomplete="off" id="cf-amount" class="input-field" aria-describedby="cf-amount-err" value="100000">
+          <span class="field-error" id="cf-amount-err" role="alert"></span>
+        </div>
+
+        <div class="input-group">
+          <label for="cf-currency" data-i18n="t5a_currency">Měna</label>
+          <select id="cf-currency" class="input-field">
+            <option value="CZK" data-i18n="currency_czk">CZK (Kč)</option>
+            <option value="EUR" data-i18n="currency_eur">EUR (€)</option>
+          </select>
+        </div>
+
+        <div class="cf-inputs-grid">
+          <div>
+            <div class="section-heading" data-i18n="t5a_varA_heading">Varianta A</div>
+            <div class="input-group">
+              <label for="cf-a-deposit-pct" data-i18n="t5a_deposit_pct">Záloha (%)</label>
+              <input type="text" inputmode="decimal" autocomplete="off" id="cf-a-deposit-pct" class="input-field" aria-describedby="cf-a-deposit-pct-err" value="30">
+              <span class="field-error" id="cf-a-deposit-pct-err" role="alert"></span>
+            </div>
+            <div class="input-group" id="cf-a-final-days-group">
+              <label for="cf-a-final-days" data-i18n="t5a_final_days">Doplatek – splatnost (dny)</label>
+              <input type="text" inputmode="numeric" autocomplete="off" id="cf-a-final-days" class="input-field" aria-describedby="cf-a-final-days-err" value="30">
+              <span class="field-error" id="cf-a-final-days-err" role="alert"></span>
+            </div>
+          </div>
+          <div>
+            <div class="section-heading" data-i18n="t5a_varB_heading">Varianta B</div>
+            <div class="input-group">
+              <label for="cf-b-net-days" data-i18n="t5a_net_days">Splatnost NET (dny)</label>
+              <input type="text" inputmode="numeric" autocomplete="off" id="cf-b-net-days" class="input-field" aria-describedby="cf-b-net-days-err" value="60">
+              <span class="field-error" id="cf-b-net-days-err" role="alert"></span>
+            </div>
+            <div class="input-group">
+              <label for="cf-alt-yield" data-i18n="t5a_alt_yield">Alternativní výnos / cost of capital (% p.a.)</label>
+              <input type="text" inputmode="decimal" autocomplete="off" id="cf-alt-yield" class="input-field" aria-describedby="cf-alt-yield-err" value="5">
+              <span class="field-error" id="cf-alt-yield-err" role="alert"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="btn-group">
+          <button class="btn" id="btn-cf-calc" onclick="calcCashflowUI()" data-i18n="t5a_btn_compare">Porovnat</button>
+          <button class="btn-reset" onclick="resetCashflow()" data-i18n="btn_reset">Resetovat</button>
+        </div>
+
+        <!-- Summary grid -->
+        <div id="cf-results" class="hidden">
+          <div class="cf-summary-grid" style="margin-top:var(--space-lg)">
+            <div class="cf-variant-card variant-a">
+              <div class="cf-variant-label variant-a" data-i18n="t5a_varA_heading">Varianta A</div>
+              <div id="cf-a-summary"></div>
+            </div>
+            <div class="cf-variant-card variant-b">
+              <div class="cf-variant-label variant-b" data-i18n="t5a_varB_heading">Varianta B</div>
+              <div id="cf-b-summary"></div>
+            </div>
+          </div>
+
+          <div class="cf-advantage-box">
+            <div id="cf-advantage-text" style="margin-bottom:var(--space-xs)"></div>
+            <div style="font-size:var(--font-size-sm);color:var(--color-text-muted)" data-i18n="t5a_result_same_total">Obě varianty = stejná celková částka</div>
+          </div>
+
+          <!-- Timeline -->
+          <div class="cf-timeline">
+            <div class="cf-timeline-title" data-i18n="t5a_timeline_title">Časová osa plateb</div>
+            <div class="cf-timeline-legend">
+              <div class="cf-legend-item"><div class="cf-legend-dot variant-a"></div><span data-i18n="t5a_varA_heading">Varianta A</span></div>
+              <div class="cf-legend-item"><div class="cf-legend-dot variant-b"></div><span data-i18n="t5a_varB_heading">Varianta B</span></div>
+            </div>
+            <div id="cf-timeline-rows"></div>
+            <div class="cf-timeline-axis-labels" id="cf-timeline-axis-labels"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== TAB 5b: Penále a sankce ===== -->
+    <section id="tab-5b" class="tool-panel" role="tabpanel">
+      <h1 data-i18n="panel5b_heading">Penále a sankce</h1>
+      <div class="tool-card">
+        <p class="tool-desc" data-i18n="t5b_desc">Výpočet penále za prodlení. Zadejte základ, sazbu a počet dní.</p>
+
+        <div class="input-group">
+          <label for="pen-base" data-i18n="t5b_base">Základ (dlužná částka)</label>
+          <input type="text" inputmode="decimal" autocomplete="off" id="pen-base" class="input-field" aria-describedby="pen-base-err" placeholder="100000" oninput="calcPenaltyUI()">
+          <span class="field-error" id="pen-base-err" role="alert"></span>
+        </div>
+
+        <div class="input-group">
+          <label data-i18n="t5b_rate_type">Typ sazby</label>
+          <div class="penalty-type-toggle">
+            <button class="penalty-type-btn active" id="pen-type-pa" data-type="pa" onclick="setPenaltyType('pa')" data-i18n="t5b_rate_pa">% p.a.</button>
+            <button class="penalty-type-btn" id="pen-type-day" data-type="day" onclick="setPenaltyType('day')" data-i18n="t5b_rate_day">% za den</button>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label for="pen-rate" data-i18n="t5b_rate">Sazba penále (%)</label>
+          <input type="text" inputmode="decimal" autocomplete="off" id="pen-rate" class="input-field" aria-describedby="pen-rate-err" placeholder="8" oninput="calcPenaltyUI()">
+          <span class="field-error" id="pen-rate-err" role="alert"></span>
+        </div>
+
+        <div class="input-group">
+          <label for="pen-days" data-i18n="t5b_days">Počet dní prodlení</label>
+          <input type="text" inputmode="numeric" autocomplete="off" id="pen-days" class="input-field" aria-describedby="pen-days-err" placeholder="30" oninput="calcPenaltyUI()">
+          <span class="field-error" id="pen-days-err" role="alert"></span>
+        </div>
+
+        <div id="pen-results" class="hidden">
+          <div class="result-box">
+            <div class="result-row">
+              <span class="result-row-label" data-i18n="t5b_result_total">Celkové penále</span>
+              <span class="result-row-value" id="pen-total"></span>
+            </div>
+            <div class="result-row">
+              <span class="result-row-label" data-i18n="t5b_result_daily">Denní penále</span>
+              <span class="result-row-value" id="pen-daily"></span>
+            </div>
+            <div class="result-row">
+              <span class="result-row-label" data-i18n="t5b_result_pct">Procentuální nárůst</span>
+              <span class="result-row-value" id="pen-pct"></span>
+            </div>
+          </div>
+          <div class="warn-msg" id="pen-warn" data-i18n="t5b_warn_exceeds_base">Penále přesáhlo základ — prověřte smluvní strop</div>
+        </div>
+
+        <button class="btn-reset" onclick="resetPenalty()" data-i18n="btn_reset">Resetovat</button>
+      </div>
+    </section>
+
+    <!-- ===== TAB 5c: Early payment discount ===== -->
+    <section id="tab-5c" class="tool-panel" role="tabpanel">
+      <h1 data-i18n="panel5c_heading">Early payment discount</h1>
+      <div class="tool-card">
+        <p class="tool-desc" data-i18n="t5c_desc">Vyplatí se zaplatit dříve za slevu? Zadejte podmínky a porovnejte APR slevy s vaším alternativním výnosem.</p>
+
+        <div class="input-group">
+          <label for="epr-amount" data-i18n="t5c_amount">Fakturovaná částka</label>
+          <input type="text" inputmode="decimal" autocomplete="off" id="epr-amount" class="input-field" aria-describedby="epr-amount-err" placeholder="100000" oninput="calcEarlyPayUI()">
+          <span class="field-error" id="epr-amount-err" role="alert"></span>
+        </div>
+
+        <div class="input-group">
+          <label for="epr-discount-pct" data-i18n="t5c_discount_pct">Sleva za včasnou platbu (%)</label>
+          <input type="text" inputmode="decimal" autocomplete="off" id="epr-discount-pct" class="input-field" aria-describedby="epr-discount-pct-err" placeholder="2" oninput="calcEarlyPayUI()">
+          <span class="field-error" id="epr-discount-pct-err" role="alert"></span>
+        </div>
+
+        <div class="input-group">
+          <label for="epr-days-early" data-i18n="t5c_days_early">Počet dní dříve</label>
+          <input type="text" inputmode="numeric" autocomplete="off" id="epr-days-early" class="input-field" aria-describedby="epr-days-early-err" placeholder="20" oninput="calcEarlyPayUI()">
+          <span class="field-error" id="epr-days-early-err" role="alert"></span>
+        </div>
+
+        <div class="input-group">
+          <label for="epr-alt-yield" data-i18n="t5c_alt_yield">Alternativní výnos / cost of capital (% p.a.)</label>
+          <input type="text" inputmode="decimal" autocomplete="off" id="epr-alt-yield" class="input-field" aria-describedby="epr-alt-yield-err" value="5" oninput="calcEarlyPayUI()">
+          <span class="field-error" id="epr-alt-yield-err" role="alert"></span>
+        </div>
+
+        <!-- Vysvětlivka (T5-1, T5-3): cena peněz ze zlevněné částky, doporučení ze znaménka -->
+        <details class="epr-howto" style="margin-top: var(--space-md); font-size: var(--font-size-sm);">
+          <summary data-i18n="t5c_howto_title">Jak počítáme skonto</summary>
+          <p class="tool-desc" data-i18n="t5c_howto_body">Sleva = fakturovaná částka × sleva %. Při platbě dříve zaplatíte jen zlevněnou částku (fakturovaná částka − sleva) a o výnos z ní přijdete na tolik dní, o kolik platíte dříve: ušlý výnos = zlevněná částka × alternativní výnos % × počet dní / 365. Čistý přínos = sleva − ušlý výnos, zaokrouhlený na haléře. Doporučení se řídí znaménkem čistého přínosu: kladný = zaplatit dříve, záporný = ponechat hotovost, 0,00 = vychází nastejno. Roční sazba skonta = sleva / (100 − sleva) × 365 / počet dní.</p>
+        </details>
+
+        <div id="epr-results" class="hidden">
+          <div class="result-box">
+            <div class="result-row">
+              <span class="result-row-label" data-i18n="t5c_result_apr">APR slevy (roční ekvivalentní sazba)</span>
+              <span class="result-row-value" id="epr-apr"></span>
+            </div>
+            <div class="result-row">
+              <span class="result-row-label" data-i18n="t5c_result_saving">Absolutní úspora</span>
+              <span class="result-row-value" id="epr-saving"></span>
+            </div>
+            <div class="result-row">
+              <span class="result-row-label" data-i18n="t5c_result_early_amount">Platba dříve (zlevněná částka)</span>
+              <span class="result-row-value" id="epr-early-amount"></span>
+            </div>
+            <div class="result-row">
+              <span class="result-row-label" data-i18n="t5c_result_alt_return">Ušlý výnos ze zlevněné částky za dané dny</span>
+              <span class="result-row-value" id="epr-alt-return"></span>
+            </div>
+            <div class="result-row">
+              <span class="result-row-label" data-i18n="t5c_result_net_benefit">Čistý přínos platby dříve</span>
+              <span class="result-row-value" id="epr-net-benefit"></span>
+            </div>
+          </div>
+
+          <div class="epr-recommendation" id="epr-rec">
+            <div class="epr-rec-title" id="epr-rec-title"></div>
+            <div class="epr-rec-detail" id="epr-rec-detail"></div>
+          </div>
+        </div>
+
+        <button class="btn-reset" onclick="resetEarlyPay()" data-i18n="btn_reset">Resetovat</button>
+      </div>
+    </section>
+
+    <!-- ===== TAB 5d: Smluvní dopady checklist ===== -->
+    <section id="tab-5d" class="tool-panel" role="tabpanel">
+      <h1 data-i18n="panel5d_heading">Smluvní dopady checklist</h1>
+      <div class="tool-card">
+        <p class="tool-desc" data-i18n="t5d_desc">Vyberte typ smluvní podmínky a zobrazte rizika, dopady a doporučená protiopatření.</p>
+
+        <div class="checklist-type-grid" id="checklist-grid">
+          <!-- Generováno JS -->
+        </div>
+
+        <div class="checklist-detail-panel" id="checklist-detail">
+          <h3 class="checklist-type-title" id="cd-title"></h3>
+          <div class="checklist-section">
+            <h4 data-i18n="c5d_sec_description">Popis podmínky</h4>
+            <p id="cd-description"></p>
+          </div>
+          <div class="checklist-section checklist-risk">
+            <h4 data-i18n="c5d_sec_risk">Riziko</h4>
+            <p id="cd-risk"></p>
+          </div>
+          <div class="checklist-section checklist-impact">
+            <h4 data-i18n="c5d_sec_impact">Dopad na nákupčího</h4>
+            <p id="cd-impact"></p>
+          </div>
+          <div class="checklist-section checklist-countermeasures">
+            <h4 data-i18n="c5d_sec_countermeasures">Doporučená protiopatření</h4>
+            <ul id="cd-countermeasures"></ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    /* ===================================================
+       TEXTS – CZ / EN
+    =================================================== */
+    const TEXTS = {
+      cs: {
+        tab5a: 'Splatnost vs cashflow',
+        tab5b: 'Penále a sankce',
+        tab5c: 'Early payment discount',
+        tab5d: 'Smluvní dopady',
+
+        panel5a_heading: 'Splatnost vs cashflow',
+        t5a_desc: 'Porovnejte dvě platební podmínky. Zadejte podmínky Varianty A (záloha + doplatek) a Varianty B (NET splatnost).',
+        t5a_amount: 'Fakturovaná částka',
+        t5a_currency: 'Měna',
+        t5a_varA_heading: 'Varianta A',
+        t5a_deposit_pct: 'Záloha (%)',
+        t5a_final_days: 'Doplatek – splatnost (dny)',
+        t5a_varB_heading: 'Varianta B',
+        t5a_net_days: 'Splatnost NET (dny)',
+        t5a_alt_yield: 'Alternativní výnos / cost of capital (% p.a.)',
+        t5a_btn_compare: 'Porovnat',
+        t5a_result_first_payment: 'První platba',
+        t5a_result_last_payment: 'Poslední platba',
+        t5a_result_total: 'Celkem',
+        t5a_result_day: 'den',
+        t5a_result_advantage: 'Finanční výhoda Varianty B',
+        t5a_result_same_total: 'Obě varianty = stejná celková částka',
+        t5a_event_deposit: 'Záloha',
+        t5a_event_balance: 'Doplatek',
+        t5a_event_full: 'Celá faktura',
+        t5a_timeline_title: 'Časová osa plateb',
+
+        panel5b_heading: 'Penále a sankce',
+        t5b_desc: 'Výpočet penále za prodlení. Zadejte základ, sazbu a počet dní.',
+        t5b_base: 'Základ (dlužná částka)',
+        t5b_rate_type: 'Typ sazby',
+        t5b_rate_pa: '% p.a.',
+        t5b_rate_day: '% za den',
+        t5b_rate: 'Sazba penále (%)',
+        t5b_days: 'Počet dní prodlení',
+        t5b_result_total: 'Celkové penále',
+        t5b_result_daily: 'Denní penále',
+        t5b_result_pct: 'Procentuální nárůst',
+        t5b_warn_exceeds_base: 'Penále přesáhlo základ — prověřte smluvní strop',
+
+        panel5c_heading: 'Early payment discount',
+        t5c_desc: 'Vyplatí se zaplatit dříve za slevu? Zadejte podmínky a porovnejte APR slevy s vaším alternativním výnosem.',
+        t5c_amount: 'Fakturovaná částka',
+        t5c_discount_pct: 'Sleva za včasnou platbu (%)',
+        t5c_days_early: 'Počet dní dříve',
+        t5c_alt_yield: 'Alternativní výnos / cost of capital (% p.a.)',
+        t5c_result_apr: 'APR slevy (roční ekvivalentní sazba)',
+        t5c_result_saving: 'Absolutní úspora',
+        t5c_result_early_amount: 'Platba dříve (zlevněná částka)',
+        t5c_result_alt_return: 'Ušlý výnos ze zlevněné částky za dané dny',
+        t5c_result_net_benefit: 'Čistý přínos platby dříve',
+        t5c_rec_pay_early: 'DOPORUČENÍ: ZAPLATIT DŘÍVE',
+        t5c_rec_keep_cash: 'DOPORUČENÍ: NEPLÝTVAT HOTOVOSTÍ',
+        t5c_rec_neutral: 'DOPORUČENÍ: VYCHÁZÍ NASTEJNO',
+        t5c_rec_pay_early_detail: 'Sleva je výhodná. Roční sazba skonta {apr} % > váš alternativní výnos {alt} %. Čistý přínos: {net}.',
+        t5c_rec_keep_cash_detail: 'Sleva se nevyplatí. Roční sazba skonta {apr} % < váš alternativní výnos {alt} %. Čistá ztráta: {net}. Lépe ponechat hotovost.',
+        t5c_rec_neutral_detail: 'Sleva a ušlý výnos se vyrovnají, čistý přínos je pod 1 haléř. Rozhodněte podle likvidity.',
+        t5c_howto_title: 'Jak počítáme skonto',
+        t5c_howto_body: 'Sleva = fakturovaná částka × sleva %. Při platbě dříve zaplatíte jen zlevněnou částku (fakturovaná částka − sleva) a o výnos z ní přijdete na tolik dní, o kolik platíte dříve: ušlý výnos = zlevněná částka × alternativní výnos % × počet dní / 365. Čistý přínos = sleva − ušlý výnos, zaokrouhlený na haléře. Doporučení se řídí znaménkem čistého přínosu: kladný = zaplatit dříve, záporný = ponechat hotovost, 0,00 = vychází nastejno. Roční sazba skonta = sleva / (100 − sleva) × 365 / počet dní.',
+        err_t5c_discount_range: 'Sleva musí být větší než 0 a menší než 100 %.',
+
+        panel5d_heading: 'Smluvní dopady checklist',
+        t5d_desc: 'Vyberte typ smluvní podmínky a zobrazte rizika, dopady a doporučená protiopatření.',
+        c5d_sec_description: 'Popis podmínky',
+        c5d_sec_risk: 'Riziko',
+        c5d_sec_impact: 'Dopad na nákupčího',
+        c5d_sec_countermeasures: 'Doporučená protiopatření',
+
+        btn_reset: 'Resetovat',
+        btn_calculate: 'Vypočítat',
+        // Čtení čísel (D1)
+        err_required: 'Pole je povinné',
+        err_nonNumeric: 'Zadejte číslo, např. 1 250,50.',
+        err_ambiguous: 'Nejednoznačný zápis čísla.',
+        err_integer: 'Zadejte celé číslo.',
+        err_min: 'Hodnota musí být alespoň {min}.',
+        err_max: 'Hodnota smí být nejvýše {max}.',
+        err_negativeNotAllowed: 'Záporná hodnota není povolena',
+        err_divByZero: 'Dělení nulou – hodnota musí být nenulová',
+        err_zeroNotAllowed: 'Hodnota musí být větší než 0',
+        numLocale: 'cs-CZ',
+        currency_czk: 'CZK (Kč)',
+        currency_eur: 'EUR (€)',
+        wapd_label: 'WAPD (vážený průměrný den platby)',
+        day_label: 'den',
+        days_label: 'dní',
+        advantage_b: 'Finanční výhoda Varianty B',
+        advantage_a: 'Finanční výhoda Varianty A',
+        advantage_none: 'Cashflow výhoda nulová (shodný průměrný den platby)',
+        opp_saving_suffix: 'při {yield}% p.a., rozdíl WAPD {diff} dní',
+      },
+      en: {
+        tab5a: 'Payment terms vs cashflow',
+        tab5b: 'Penalties',
+        tab5c: 'Early payment discount',
+        tab5d: 'Contract impacts',
+
+        panel5a_heading: 'Payment terms vs cashflow',
+        t5a_desc: 'Compare two payment conditions. Enter terms for Variant A (advance + balance) and Variant B (NET due date).',
+        t5a_amount: 'Invoice amount',
+        t5a_currency: 'Currency',
+        t5a_varA_heading: 'Variant A',
+        t5a_deposit_pct: 'Advance (%)',
+        t5a_final_days: 'Balance – due date (days)',
+        t5a_varB_heading: 'Variant B',
+        t5a_net_days: 'NET due date (days)',
+        t5a_alt_yield: 'Alternative yield / cost of capital (% p.a.)',
+        t5a_btn_compare: 'Compare',
+        t5a_result_first_payment: 'First payment',
+        t5a_result_last_payment: 'Last payment',
+        t5a_result_total: 'Total',
+        t5a_result_day: 'day',
+        t5a_result_advantage: 'Financial advantage of Variant B',
+        t5a_result_same_total: 'Both variants = same total amount',
+        t5a_event_deposit: 'Advance',
+        t5a_event_balance: 'Balance',
+        t5a_event_full: 'Full invoice',
+        t5a_timeline_title: 'Cashflow timeline',
+
+        panel5b_heading: 'Penalties & sanctions',
+        t5b_desc: 'Calculate delay penalty. Enter the base amount, rate and number of days.',
+        t5b_base: 'Base (amount due)',
+        t5b_rate_type: 'Rate type',
+        t5b_rate_pa: '% p.a.',
+        t5b_rate_day: '% per day',
+        t5b_rate: 'Penalty rate (%)',
+        t5b_days: 'Days of delay',
+        t5b_result_total: 'Total penalty',
+        t5b_result_daily: 'Daily penalty',
+        t5b_result_pct: 'Percentage increase',
+        t5b_warn_exceeds_base: 'Penalty exceeds the base — check contractual cap',
+
+        panel5c_heading: 'Early payment discount',
+        t5c_desc: 'Is early payment for a discount worthwhile? Enter the terms and compare the discount APR with your alternative yield.',
+        t5c_amount: 'Invoice amount',
+        t5c_discount_pct: 'Early payment discount (%)',
+        t5c_days_early: 'Days early',
+        t5c_alt_yield: 'Alternative yield / cost of capital (% p.a.)',
+        t5c_result_apr: 'Discount APR (annual equivalent rate)',
+        t5c_result_saving: 'Absolute saving',
+        t5c_result_early_amount: 'Early payment (discounted amount)',
+        t5c_result_alt_return: 'Forgone return on the discounted amount for given days',
+        t5c_result_net_benefit: 'Net benefit of early payment',
+        t5c_rec_pay_early: 'RECOMMENDATION: PAY EARLY',
+        t5c_rec_keep_cash: 'RECOMMENDATION: KEEP CASH',
+        t5c_rec_neutral: 'RECOMMENDATION: BREAK-EVEN',
+        t5c_rec_pay_early_detail: 'Discount is worthwhile. Discount annual rate {apr} % > your alt. yield {alt} %. Net benefit: {net}.',
+        t5c_rec_keep_cash_detail: 'Discount not worthwhile. Discount annual rate {apr} % < your alt. yield {alt} %. Net loss: {net}. Better to keep cash.',
+        t5c_rec_neutral_detail: 'Discount and forgone return offset each other, the net benefit is below 1 cent. Decide based on liquidity.',
+        t5c_howto_title: 'How we calculate the discount',
+        t5c_howto_body: 'Discount = invoice amount × discount %. Paying early, you pay only the discounted amount (invoice amount − discount) and give up the return on it for the days you pay early: forgone return = discounted amount × alternative yield % × days / 365. Net benefit = discount − forgone return, rounded to cents. The recommendation follows the sign of the net benefit: positive = pay early, negative = keep cash, 0.00 = break-even. Discount annual rate = discount / (100 − discount) × 365 / days.',
+        err_t5c_discount_range: 'Discount must be greater than 0 and less than 100 %.',
+
+        panel5d_heading: 'Contract impacts checklist',
+        t5d_desc: 'Select a contract condition type to see risks, impacts and recommended countermeasures.',
+        c5d_sec_description: 'Condition description',
+        c5d_sec_risk: 'Risk',
+        c5d_sec_impact: 'Impact on buyer',
+        c5d_sec_countermeasures: 'Recommended countermeasures',
+
+        btn_reset: 'Reset',
+        btn_calculate: 'Calculate',
+        // Number input (D1)
+        err_required: 'This field is required',
+        err_nonNumeric: 'Enter a number, e.g. 1,250.50 or 1250.50.',
+        err_ambiguous: 'Ambiguous number: write 1250 or 1,250.00 for thousands, 1.25 for decimals.',
+        err_integer: 'Enter a whole number.',
+        err_min: 'Value must be at least {min}.',
+        err_max: 'Value must be at most {max}.',
+        err_negativeNotAllowed: 'Negative value is not allowed',
+        err_divByZero: 'Division by zero – value must not be zero',
+        err_zeroNotAllowed: 'Value must be greater than 0',
+        numLocale: 'en-US',
+        currency_czk: 'CZK (Kč)',
+        currency_eur: 'EUR (€)',
+        wapd_label: 'WAPD (weighted average payment day)',
+        day_label: 'day',
+        days_label: 'days',
+        advantage_b: 'Financial advantage of Variant B',
+        advantage_a: 'Financial advantage of Variant A',
+        advantage_none: 'No cashflow advantage (same average payment day)',
+        opp_saving_suffix: 'at {yield}% p.a., WAPD diff {diff} days',
+      }
+    };
+
+    /* ===================================================
+       CONTRACT CONDITIONS DATA (5d)
+    =================================================== */
+    const CONTRACT_CONDITIONS = [
+      {
+        id: 'fixed-price',
+        label_cs: 'Fixní cena',
+        label_en: 'Fixed Price',
+        description_cs: 'Cena je smluvně fixní po celou dobu trvání smlouvy.',
+        description_en: 'The price is contractually fixed for the entire contract duration.',
+        risk_cs: 'Dodavatel může zvyšovat skryté náklady (poplatky, surcharges) nebo snižovat kvalitu při rostoucích vstupech.',
+        risk_en: 'Supplier may increase hidden costs (fees, surcharges) or reduce quality when input costs rise.',
+        impact_cs: 'Nákupčí nese riziko inflace vstupů na straně dodavatele; dodavatel hledá způsoby jak kompenzovat ztrátu marže.',
+        impact_en: 'Buyer bears input inflation risk on supplier side; supplier seeks ways to compensate lost margin.',
+        countermeasures_cs: [
+          'Definovat přesně rozsah díla – co je zahrnuto v ceně',
+          'Sjednat cenový strop s eskalační klauzulí pro komodity nad X%',
+          'Kontrolní auditní právo nákladů při překročení mezí',
+          'Ustanovení o zachování kvality specifikace bez náhrady'
+        ],
+        countermeasures_en: [
+          'Define scope of work precisely – what is included in the price',
+          'Negotiate price cap with escalation clause for commodities above X%',
+          'Audit right for costs when limits are exceeded',
+          'Provision maintaining quality specification without substitution'
+        ]
+      },
+      {
+        id: 'price-escalation',
+        label_cs: 'Eskalační klauzule',
+        label_en: 'Price Escalation Clause',
+        description_cs: 'Smlouva umožňuje dodavateli jednostranně zvýšit ceny na základě indexu (PPI, CPI, energetický index).',
+        description_en: 'Contract allows supplier to unilaterally increase prices based on an index (PPI, CPI, energy index).',
+        risk_cs: 'Nekontrolovaný růst nákladů; referenční index nemusí korelovat se skutečnými náklady dodavatele.',
+        risk_en: 'Uncontrolled cost growth; reference index may not correlate with supplier\'s actual costs.',
+        impact_cs: 'Přímý dopad na procurement budget; složité rozpočtování a forecastování.',
+        impact_en: 'Direct impact on procurement budget; complex budgeting and forecasting.',
+        countermeasures_cs: [
+          'Sjednat symetrii – eskalace i de-eskalace (collar/cap/floor)',
+          'Definovat váhový mix indexů odpovídající skutečné nákladové struktuře',
+          'Maximální roční eskalace (cap) a minimální de-eskalace (floor)',
+          'Notifikační lhůta před uplatněním eskalace (min. 30 dní)'
+        ],
+        countermeasures_en: [
+          'Negotiate symmetry – both escalation and de-escalation (collar/cap/floor)',
+          'Define index weight mix matching actual cost structure',
+          'Maximum annual escalation (cap) and minimum de-escalation (floor)',
+          'Notification period before escalation applies (min. 30 days)'
+        ]
+      },
+      {
+        id: 'force-majeure',
+        label_cs: 'Force majeure',
+        label_en: 'Force Majeure',
+        description_cs: 'Klauzule osvobozující smluvní stranu od závazků při mimořádných událostech mimo její kontrolu.',
+        description_en: 'Clause releasing a party from obligations during extraordinary events beyond their control.',
+        risk_cs: 'Příliš široká definice force majeure umožní dodavateli vyvázat se z plnění i při předvídatelných problémech.',
+        risk_en: 'Overly broad definition allows supplier to escape performance even for foreseeable problems.',
+        impact_cs: 'Výpadek dodávek bez náhrady; nákupčí nese dopad na vlastní výrobu nebo provoz.',
+        impact_en: 'Supply disruption without compensation; buyer bears impact on own production or operations.',
+        countermeasures_cs: [
+          'Přesně vyjmenovat události (ne obecná formulace „události mimo kontrolu")',
+          'Maximální délka force majeure bez práva ukončit smlouvu (např. 30/60 dní)',
+          'Notifikační povinnost do 24/48 hodin od vzniku události',
+          'Povinnost dodavatele aktivovat záložní plán (BCP)'
+        ],
+        countermeasures_en: [
+          'List specific events explicitly (not generic "events beyond control")',
+          'Maximum FM duration without right to terminate (e.g., 30/60 days)',
+          'Notification obligation within 24/48 hours of event occurrence',
+          'Supplier obligation to activate backup plan (BCP)'
+        ]
+      },
+      {
+        id: 'exclusivity',
+        label_cs: 'Výhradní dodavatel',
+        label_en: 'Exclusive Supplier',
+        description_cs: 'Nákupčí se zavazuje odebírat danou komoditu nebo službu výhradně od jednoho dodavatele.',
+        description_en: 'Buyer commits to source a given commodity or service exclusively from one supplier.',
+        risk_cs: 'Ztráta vyjednávací síly; závislost na jednom zdroji; riziko výpadku bez alternativy.',
+        risk_en: 'Loss of negotiating power; single-source dependency; risk of disruption without alternative.',
+        impact_cs: 'Obtížné renegociace; lock-in na nevýhodné podmínky; regulatorní riziko při dominanci dodavatele.',
+        impact_en: 'Difficult renegotiations; lock-in to unfavorable terms; regulatory risk with dominant supplier.',
+        countermeasures_cs: [
+          'Omezit výhradnost na jasně definovaný rozsah/kategorii, ne celý spend',
+          'Sunset klauzule – výhradnost automaticky zaniká po X letech',
+          'Právo nákupčího na dual sourcing při výpadku nebo cenové odchylce > X%',
+          'Výkonnostní podmínka – výhradnost platí pouze při dodržení SLA'
+        ],
+        countermeasures_en: [
+          'Limit exclusivity to clearly defined scope/category, not entire spend',
+          'Sunset clause – exclusivity expires automatically after X years',
+          'Buyer\'s right to dual source upon disruption or price deviation > X%',
+          'Performance condition – exclusivity valid only when SLA is met'
+        ]
+      },
+      {
+        id: 'minimum-order',
+        label_cs: 'Minimální odběr (MOQ/MVC)',
+        label_en: 'Minimum Order / Volume Commitment',
+        description_cs: 'Smlouva stanovuje minimální objednané množství nebo hodnotu za období.',
+        description_en: 'Contract sets a minimum order quantity or value per period.',
+        risk_cs: 'Nákupčí zavázán k odběru i při poklesu poptávky; riziko přebytečných zásob nebo sankcí.',
+        risk_en: 'Buyer committed to purchase even when demand falls; risk of excess inventory or penalties.',
+        impact_cs: 'Vázání kapitálu v zásobách; platba sankcí při nedodržení objemu; cashflow tlak.',
+        impact_en: 'Capital tied up in inventory; penalty payments for volume shortfall; cash flow pressure.',
+        countermeasures_cs: [
+          'Sjednat flexibilní objem s pásmem (např. ±20% od plánu bez sankce)',
+          'Take-or-pay klauzule – definovat přesné podmínky a výši kompenzace',
+          'Mechanismus přenosu do příštího období (rollover) nevyužitého objemu',
+          'Force majeure / demand downturn výjimka snižující závazek'
+        ],
+        countermeasures_en: [
+          'Negotiate flexible volume with band (e.g., ±20% from plan without penalty)',
+          'Take-or-pay clause – define precise conditions and compensation amount',
+          'Carryover mechanism for unused volume into next period',
+          'Force majeure / demand downturn exception reducing commitment'
+        ]
+      },
+      {
+        id: 'delay-penalty',
+        label_cs: 'Penále za zpoždění dodávky',
+        label_en: 'Delivery Delay Penalty',
+        description_cs: 'Dodavatel platí penále za každý den zpoždění oproti sjednanému termínu dodání.',
+        description_en: 'Supplier pays a penalty for each day of delay vs. agreed delivery date.',
+        risk_cs: 'Příliš nízká sazba penále nemotivuje dodavatele k dodržení termínu; příliš vysoká vede k odmítnutí smlouvy.',
+        risk_en: 'Too low penalty rate does not motivate supplier to meet schedule; too high leads to contract refusal.',
+        impact_cs: 'Výpadky výroby, ztráta zákazníků, vícenáklady na náhradní zdroje – penále nemusí pokrýt skutečnou škodu.',
+        impact_en: 'Production disruptions, customer losses, extra costs for alternative sourcing – penalty may not cover actual damage.',
+        countermeasures_cs: [
+          'Sazbu penále navázat na skutečnou škodu (consequential damages clause)',
+          'Sjednat eskalující sazbu penále (první týden X%, poté Y%)',
+          'Cap na celkové penále (např. max 10% hodnoty smlouvy)',
+          'Právo na ukončení smlouvy při překročení maximálního zpoždění'
+        ],
+        countermeasures_en: [
+          'Link penalty rate to actual damage (consequential damages clause)',
+          'Negotiate escalating penalty rate (first week X%, then Y%)',
+          'Cap on total penalty (e.g., max 10% of contract value)',
+          'Right to terminate at maximum delay threshold'
+        ]
+      },
+      {
+        id: 'payment-terms-supplier',
+        label_cs: 'Platební podmínky',
+        label_en: 'Payment Terms',
+        description_cs: 'Ujednání o splatnosti faktur, zálohách, platebních metodách a měnách.',
+        description_en: 'Agreement on invoice due dates, advance payments, payment methods, and currencies.',
+        risk_cs: 'Nevhodné platební podmínky (příliš krátká splatnost) zatěžují cashflow nákupčího; zálohy vytváří platební riziko.',
+        risk_en: 'Unfavorable payment terms (too short due date) strain buyer\'s cash flow; advances create payment risk.',
+        impact_cs: 'Cashflow tlak; riziko ztráty zálohy při insolvenci dodavatele; kurzové riziko u cizí měny.',
+        impact_en: 'Cash flow pressure; risk of losing advance upon supplier insolvency; FX risk with foreign currency.',
+        countermeasures_cs: [
+          'Zálohy zajistit bankovní zárukou nebo akreditivem',
+          'Sjednat NET 60–90 místo NET 30 nebo zálohy',
+          'DPH z CZK faktur – nekombinovat s cizí měnou bez kurzové doložky',
+          'Reverse factoring / supply chain finance jako alternativa k záloze'
+        ],
+        countermeasures_en: [
+          'Secure advances with bank guarantee or letter of credit',
+          'Negotiate NET 60–90 instead of NET 30 or advances',
+          'VAT on CZK invoices – do not mix with foreign currency without FX clause',
+          'Reverse factoring / supply chain finance as alternative to advance'
+        ]
+      },
+      {
+        id: 'ip-ownership',
+        label_cs: 'Duševní vlastnictví',
+        label_en: 'Intellectual Property',
+        description_cs: 'Klauzule definující, kdo vlastní výstupy, know-how, design a software vzniklé při plnění smlouvy.',
+        description_en: 'Clause defining who owns outputs, know-how, designs, and software created during contract performance.',
+        risk_cs: 'Dodavatel si ponechá vlastnictví DV k nástrojům, výrobní dokumentaci nebo SW – nákupčí závislý i po ukončení smlouvy.',
+        risk_en: 'Supplier retains IP ownership for tooling, production documentation or SW – buyer dependent even after termination.',
+        impact_cs: 'Nemožnost přejít na jiného dodavatele bez duplicitních vývojových nákladů; lock-in.',
+        impact_en: 'Inability to switch supplier without duplicate development costs; lock-in.',
+        countermeasures_cs: [
+          'Sjednat převod DV k zakázkovým výstupům na nákupčího',
+          'Licence na use DV dodavatele pro případ ukončení smlouvy',
+          'Escrow SW kódu u třetí strany pro případ insolvence dodavatele',
+          'Jasná definice: background IP (dodavatelův) vs foreground IP (vznikl ze smlouvy)'
+        ],
+        countermeasures_en: [
+          'Negotiate transfer of IP for custom outputs to buyer',
+          'License to use supplier\'s IP in case of termination',
+          'SW code escrow with third party in case of supplier insolvency',
+          'Clear definition: background IP (supplier\'s) vs foreground IP (created under contract)'
+        ]
+      },
+      {
+        id: 'termination',
+        label_cs: 'Výpovědní podmínky',
+        label_en: 'Termination Conditions',
+        description_cs: 'Podmínky, za kterých může být smlouva vypovězena jednou nebo oběma stranami.',
+        description_en: 'Conditions under which the contract may be terminated by one or both parties.',
+        risk_cs: 'Jednostranná výpověď dodavatele bez odškodnění; dlouhé výpovědní lhůty blokující přechod na alternativu.',
+        risk_en: 'Unilateral supplier termination without compensation; long notice periods blocking transition to alternative.',
+        impact_cs: 'Výpadek dodávek; vícenáklady na rychlé nalezení alternativy; risk poškození operací.',
+        impact_en: 'Supply disruption; extra costs for quickly finding alternative; risk of operational damage.',
+        countermeasures_cs: [
+          'Symetrické výpovědní lhůty pro obě strany',
+          'Odškodnění za předčasné ukončení ze strany dodavatele',
+          'Transition assistance obligation – dodavatel musí pomoci s přechodem po dobu X měsíců',
+          'Ukončení for cause (porušení smlouvy) bez výpovědní lhůty'
+        ],
+        countermeasures_en: [
+          'Symmetric notice periods for both parties',
+          'Compensation for early termination by supplier',
+          'Transition assistance obligation – supplier must support transition for X months',
+          'Termination for cause (contract breach) without notice period'
+        ]
+      },
+      {
+        id: 'liability-cap',
+        label_cs: 'Omezení odpovědnosti',
+        label_en: 'Liability Cap',
+        description_cs: 'Smluvní strop na maximální výši škody, za kterou dodavatel odpovídá.',
+        description_en: 'Contractual cap on the maximum damage amount for which the supplier is liable.',
+        risk_cs: 'Příliš nízký cap nezajistí pokrytí skutečné škody při závažném selhání dodavatele.',
+        risk_en: 'Too low cap will not cover actual damage in case of serious supplier failure.',
+        impact_cs: 'Nákupčí nese vícenáklady přesahující cap; selhání dodavatele = přímá ztráta pro nákupčího.',
+        impact_en: 'Buyer bears extra costs exceeding the cap; supplier failure = direct loss for buyer.',
+        countermeasures_cs: [
+          'Cap nastavit na násobek roční hodnoty smlouvy (min. 1× hodnota za rok)',
+          'Vyloučit cap pro úmyslné porušení a hrubou nedbalost',
+          'Pojistné krytí dodavatele jako podmínka smlouvy (PI, PL pojištění)',
+          'Uncapped odpovědnost pro porušení GDPR, IP práv a data breach'
+        ],
+        countermeasures_en: [
+          'Set cap at multiple of annual contract value (min. 1× annual value)',
+          'Exclude cap for willful breach and gross negligence',
+          'Supplier insurance coverage as contract condition (PI, PL insurance)',
+          'Uncapped liability for GDPR breach, IP rights violation and data breach'
+        ]
+      }
+    ];
+
+    /* ===================================================
+       STATE
+    =================================================== */
+    let currentLang = 'cs';
+    let penaltyType = 'pa'; // 'pa' | 'day'
+    let checklistCurrentId = null;
+
+    /* ===================================================
+       HELPERS
+    =================================================== */
+    function fmt(num, currency) {
+      const c = currency || document.getElementById('cf-currency')?.value || 'CZK';
+      const symbol = c === 'EUR' ? '€' : 'Kč';
+      const val = Math.abs(num);
+      const formatted = val.toLocaleString('cs-CZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      return formatted + '\u00a0' + symbol;
+    }
+
+    function fmtNum(num, decimals) {
+      return num.toLocaleString('cs-CZ', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+    }
+
+    /* ===== D1: ČTENÍ ČÍSEL PODLE JAZYKA =====
+       Blok mezi značkami D1-SHARED je ve všech převedených toolboxech textově shodný
+       (hlídá iter-013-gates.js). Neměnit v jednom souboru bez ostatních.
+       CZ: mezera = tisíce, čárka NEBO tečka = desetinná („1,250“ = 1,25).
+       EN: mezera nebo čárka po trojicích = tisíce, tečka = desetinná; „1,250“ bez tečky je
+       víceznačné a odmítne se. Přepnutí jazyka tak nikdy tiše nezmění číslo. */
+    // D1-SHARED-BEGIN
+    const NUM_SPACES = /[\s\u00a0\u202f]/g;
+    const NUM_PLAIN = /^[+-]?(?:\d+(?:[.,]\d*)?|[.,]\d+)$/;
+    const NUM_EN_GROUPED = /^[+-]?\d{1,3}(?:,\d{3})+\.\d*$/;
+    const NUM_EN_AMBIGUOUS = /^[+-]?[1-9]\d{0,2}(?:,\d{3})+$/;
+
+    /** → { value, canonical, error }; error ∈ null | 'empty' | 'nonNumeric' | 'ambiguous' | 'integer'.
+        canonical = zápis s desetinnou tečkou bez oddělovačů tisíců (pro přesné výpočty v setinách). */
+    function parseNumEx(str, { integer = false, lang = currentLang } = {}) {
+      const s = String(str == null ? '' : str).trim().replace(NUM_SPACES, '');
+      if (s === '') return { value: null, canonical: '', error: 'empty' };
+      let canonical;
+      if (lang === 'en') {
+        if (NUM_EN_GROUPED.test(s)) canonical = s.replace(/,/g, '');
+        else if (NUM_EN_AMBIGUOUS.test(s)) return { value: NaN, canonical: '', error: 'ambiguous' };
+        else if (s.includes(',')) return { value: NaN, canonical: '', error: 'nonNumeric' };
+        else if (NUM_PLAIN.test(s)) canonical = s;
+      } else if (NUM_PLAIN.test(s)) {
+        canonical = s.replace(',', '.');
+      }
+      if (canonical === undefined) return { value: NaN, canonical: '', error: 'nonNumeric' };
+      const n = Number(canonical);
+      if (!Number.isFinite(n)) return { value: NaN, canonical: '', error: 'nonNumeric' };
+      if (integer && !Number.isInteger(n)) return { value: NaN, canonical, error: 'integer' };
+      return { value: n, canonical, error: null };
+    }
+
+    /** Číslo, nebo NaN (prázdné i neplatné). */
+    function parseNum(str, lang = currentLang) {
+      const r = parseNumEx(str, { lang });
+      return r.error ? NaN : r.value;
+    }
+    // D1-SHARED-END
+
+    /** Kód chyby (parseNumEx) → hláška v aktuálním jazyce. */
+    function numErrorText(code) {
+      const T = TEXTS[currentLang];
+      const key = {
+        empty: 'err_required', required: 'err_required', nonNumeric: 'err_nonNumeric',
+        ambiguous: 'err_ambiguous', integer: 'err_integer', negative: 'err_negativeNotAllowed'
+      }[code];
+      return T[key] || T.err_nonNumeric;
+    }
+
+    function formatPlainNumber(n) {
+      return new Intl.NumberFormat(TEXTS[currentLang].numLocale, { maximumFractionDigits: 6 }).format(n);
+    }
+
+    function validateNumeric(value, { required = true, allowNegative = false, allowZero = true,
+                                      integer = false, min = null, max = null } = {}) {
+      const T = TEXTS[currentLang];
+      const r = parseNumEx(value, { integer });
+      if (r.error === 'empty') return required ? T.err_required : null;
+      if (r.error) return numErrorText(r.error);
+      const n = r.value;
+      if (!allowNegative && n < 0) return T.err_negativeNotAllowed;
+      if (!allowZero && n === 0) return T.err_divByZero;
+      if (min !== null && n < min) return T.err_min.replace('{min}', formatPlainNumber(min));
+      if (max !== null && n > max) return T.err_max.replace('{max}', formatPlainNumber(max));
+      return null;
+    }
+
+    /* ===== VALIDATION HELPERS ===== */
+    function showError(inputId, message) {
+      const input = document.getElementById(inputId);
+      const errEl = document.getElementById(inputId + '-err');
+      if (!input || !errEl) return;
+      input.classList.add('input-error');
+      input.setAttribute('aria-invalid', 'true');
+      errEl.textContent = message;
+      errEl.classList.add('visible');
+    }
+
+    function clearError(inputId) {
+      const input = document.getElementById(inputId);
+      const errEl = document.getElementById(inputId + '-err');
+      if (!input || !errEl) return;
+      input.classList.remove('input-error');
+      input.removeAttribute('aria-invalid');
+      errEl.textContent = '';
+      errEl.classList.remove('visible');
+    }
+
+    /** Pole podle ID → { raw, value, canonical, error } (D1). Náhrada dřívějšího parseNum(id), který vracel null. */
+    function readNum(id, { integer = false } = {}) {
+      const raw = document.getElementById(id).value;
+      return { raw, ...parseNumEx(raw, { integer }) };
+    }
+
+    /**
+     * Povinné číselné pole: přečte, ověří (validateNumeric, `positive` = 0 je chyba, `check` = vlastní pravidlo)
+     * a hlášku ukáže u pole. Vrací { value, canonical }, nebo null při chybě.
+     */
+    function readField(id, { integer = false, positive = false, min = null, max = null, check = null } = {}) {
+      const r = readNum(id, { integer });
+      const T = TEXTS[currentLang];
+      let msg = validateNumeric(r.raw, { integer, min, max });
+      if (!msg && positive && r.value === 0) msg = T.err_zeroNotAllowed;
+      if (!msg && check) msg = check(r.value, T);
+      if (msg) { showError(id, msg); return null; }
+      clearError(id);
+      return { value: r.value, canonical: r.canonical };
+    }
+
+    /* ===================================================
+       LANG SWITCHER
+    =================================================== */
+    function setLang(lang) {
+      currentLang = lang;
+      document.documentElement.lang = lang;
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (TEXTS[lang][key] !== undefined) el.textContent = TEXTS[lang][key];
+      });
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        if (TEXTS[lang][key] !== undefined) el.placeholder = TEXTS[lang][key];
+      });
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lang === lang);
+      });
+      // Update currency select options
+      document.querySelectorAll('#cf-currency option').forEach(opt => {
+        const key = opt.getAttribute('data-i18n');
+        if (key && TEXTS[lang][key]) opt.textContent = TEXTS[lang][key];
+      });
+      // Hook: re-render checklist detail if open
+      renderChecklistDetailCurrent();
+      // Zobrazené výsledky a hlášky přepočítat v novém jazyce (texty doporučení, hlášky u polí)
+      [['cf-results', calcCashflowUI], ['pen-results', calcPenaltyUI], ['epr-results', calcEarlyPayUI]].forEach(([id, calc]) => {
+        if (!document.getElementById(id).classList.contains('hidden')) calc();
+      });
+    }
+
+    document.getElementById('btn-lang-cs').addEventListener('click', () => setLang('cs'));
+    document.getElementById('btn-lang-en').addEventListener('click', () => setLang('en'));
+
+    /* ===================================================
+       TAB NAVIGATION
+    =================================================== */
+    function initTabs() {
+      const tabBtns = document.querySelectorAll('.tab-btn');
+      tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => activateTab(btn.dataset.tab));
+      });
+      // Keyboard navigation
+      const nav = document.querySelector('.tab-nav');
+      nav.addEventListener('keydown', (e) => {
+        const btns = [...document.querySelectorAll('.tab-btn')];
+        const activeIdx = btns.findIndex(b => b.classList.contains('active'));
+        if (e.key === 'ArrowRight') {
+          const next = btns[(activeIdx + 1) % btns.length];
+          activateTab(next.dataset.tab);
+          next.focus();
+        } else if (e.key === 'ArrowLeft') {
+          const prev = btns[(activeIdx - 1 + btns.length) % btns.length];
+          activateTab(prev.dataset.tab);
+          prev.focus();
+        } else if (e.key === 'Home') {
+          activateTab(btns[0].dataset.tab);
+          btns[0].focus();
+        } else if (e.key === 'End') {
+          activateTab(btns[btns.length - 1].dataset.tab);
+          btns[btns.length - 1].focus();
+        }
+      });
+      activateTab('5a');
+    }
+
+    function activateTab(id) {
+      document.querySelectorAll('.tab-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.tab === id);
+        b.setAttribute('aria-selected', b.dataset.tab === id ? 'true' : 'false');
+      });
+      document.querySelectorAll('.tool-panel').forEach(p => {
+        p.classList.toggle('active', p.id === `tab-${id}`);
+      });
+    }
+
+    /* ===================================================
+       5a – CASHFLOW CALCULATOR
+    =================================================== */
+    function calcCashflow({ amount, depositPct, finalDaysA, netDaysB, altYieldPa }) {
+      const depositA = amount * (depositPct / 100);
+      const finalA = amount - depositA;
+
+      const eventsA = [];
+      const T = TEXTS[currentLang];
+      if (depositA > 0) eventsA.push({ day: 0, amount: depositA, label: T.t5a_event_deposit });
+      if (finalA > 0)   eventsA.push({ day: finalDaysA, amount: finalA, label: T.t5a_event_balance });
+      if (depositPct === 100) {
+        // full advance — override eventsA to single entry at day 0
+      }
+
+      const eventsB = [{ day: netDaysB, amount: amount, label: T.t5a_event_full }];
+
+      const maxDay = Math.max(finalDaysA, netDaysB, 1);
+
+      // WAPD – Weighted Average Payment Day
+      const wapdA = (depositA * 0 + finalA * finalDaysA) / amount; // = (1 - depositPct/100) × finalDaysA
+      const wapdB = netDaysB;
+      const daysDiff = wapdB - wapdA;
+
+      // Opportunity saving
+      const opportunitySaving = amount * (altYieldPa / 100 / 365) * daysDiff;
+
+      return { eventsA, eventsB, maxDay, wapdA, wapdB, daysDiff, opportunitySaving, depositA, finalA };
+    }
+
+    function calcCashflowUI() {
+      const amountF = readField('cf-amount', { positive: true, max: 1e12 });
+      const depositF = readField('cf-a-deposit-pct', { max: 100 });
+      // Při záloze 100 % se doplatek neplatí a pole dní je vypnuté.
+      const fullAdvance = depositF !== null && depositF.value === 100;
+      const finalF = fullAdvance ? (clearError('cf-a-final-days'), { value: 0 }) : readField('cf-a-final-days', { integer: true, max: 36500 });
+      const netF = readField('cf-b-net-days', { integer: true, max: 36500 });
+      const yieldF = readField('cf-alt-yield', { max: 1000 });
+      const currency = document.getElementById('cf-currency').value;
+
+      if ([amountF, depositF, finalF, netF, yieldF].some(f => f === null)) {
+        document.getElementById('cf-results').classList.add('hidden');
+        return;
+      }
+
+      const amount = amountF.value, depositPct = depositF.value, netDaysB = netF.value, altYieldPa = yieldF.value;
+      const effectiveFinalDaysA = finalF.value;
+      const result = calcCashflow({ amount, depositPct, finalDaysA: effectiveFinalDaysA, netDaysB, altYieldPa });
+
+      renderCashflowResults(result, amount, depositPct, effectiveFinalDaysA, netDaysB, altYieldPa, currency);
+      document.getElementById('cf-results').classList.remove('hidden');
+    }
+
+    function renderCashflowResults(r, amount, depositPct, finalDaysA, netDaysB, altYieldPa, currency) {
+      const T = TEXTS[currentLang];
+      const sym = currency === 'EUR' ? '€' : 'Kč';
+      const fmtC = (v) => Math.abs(v).toLocaleString('cs-CZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '\u00a0' + sym;
+
+      // Variant A summary
+      const aEl = document.getElementById('cf-a-summary');
+      let aHtml = '';
+      if (r.depositA > 0) {
+        aHtml += `<div class="result-row"><span class="result-row-label">${T.t5a_deposit_pct}</span><span class="result-row-value">${fmtC(r.depositA)} (${fmtNum(depositPct, 0)}%) – ${T.t5a_result_day} 0</span></div>`;
+      }
+      if (r.finalA > 0) {
+        aHtml += `<div class="result-row"><span class="result-row-label">${T.t5a_event_balance}</span><span class="result-row-value">${fmtC(r.finalA)} – ${T.t5a_result_day} ${finalDaysA}</span></div>`;
+      }
+      aHtml += `<div class="result-row"><span class="result-row-label">${T.t5a_result_total}</span><span class="result-row-value">${fmtC(amount)}</span></div>`;
+      aHtml += `<div class="result-row"><span class="result-row-label">WAPD</span><span class="result-row-value">${T.t5a_result_day} ${fmtNum(r.wapdA, 1)}</span></div>`;
+      aEl.innerHTML = aHtml;
+
+      // Variant B summary
+      const bEl = document.getElementById('cf-b-summary');
+      let bHtml = '';
+      bHtml += `<div class="result-row"><span class="result-row-label">${T.t5a_result_first_payment}</span><span class="result-row-value">${T.t5a_result_day} ${netDaysB}</span></div>`;
+      bHtml += `<div class="result-row"><span class="result-row-label">${T.t5a_result_total}</span><span class="result-row-value">${fmtC(amount)}</span></div>`;
+      bHtml += `<div class="result-row"><span class="result-row-label">WAPD</span><span class="result-row-value">${T.t5a_result_day} ${fmtNum(r.wapdB, 1)}</span></div>`;
+      bEl.innerHTML = bHtml;
+
+      // Advantage box
+      const advEl = document.getElementById('cf-advantage-text');
+      if (Math.abs(r.daysDiff) < 0.01) {
+        advEl.innerHTML = `<span style="color:var(--color-text-muted);font-size:var(--font-size-sm)">${T.advantage_none}</span>`;
+      } else {
+        const isAdvB = r.opportunitySaving > 0;
+        const label = isAdvB ? T.advantage_b : T.advantage_a;
+        const cssClass = isAdvB ? 'advantage-b' : 'advantage-a';
+        const suffix = T.opp_saving_suffix
+          .replace('{yield}', fmtNum(altYieldPa, 1))
+          .replace('{diff}', fmtNum(Math.abs(r.daysDiff), 1));
+        advEl.innerHTML = `
+          <div style="font-size:var(--font-size-sm);color:var(--color-text-muted);margin-bottom:4px">${label}</div>
+          <div class="cf-advantage-value ${cssClass}">${fmtC(Math.abs(r.opportunitySaving))}</div>
+          <div style="font-size:var(--font-size-sm);color:var(--color-text-muted);margin-top:4px">${suffix}</div>
+        `;
+      }
+
+      // Timeline
+      renderTimeline(r, finalDaysA, netDaysB, amount);
+    }
+
+    function renderTimeline(r, finalDaysA, netDaysB, amount) {
+      const maxDay = Math.max(finalDaysA, netDaysB, 1);
+      const container = document.getElementById('cf-timeline-rows');
+      container.innerHTML = '';
+
+      // Row A
+      const rowA = document.createElement('div');
+      rowA.className = 'cf-timeline-row';
+      const axisA = document.createElement('div');
+      axisA.className = 'cf-timeline-axis';
+      rowA.appendChild(axisA);
+
+      r.eventsA.forEach(ev => {
+        const pct = maxDay > 0 ? (ev.day / maxDay) * 100 : 0;
+        const heightPct = (ev.amount / amount) * 36 + 8; // 8–44px range
+        const wrap = document.createElement('div');
+        wrap.className = 'cf-bar-wrap';
+        wrap.style.left = pct + '%';
+        const bar = document.createElement('div');
+        bar.className = 'cf-bar variant-a';
+        bar.style.height = heightPct + 'px';
+        bar.title = `${ev.label}: ${ev.amount.toLocaleString('cs-CZ', { maximumFractionDigits: 0 })} – ${TEXTS[currentLang].day_label} ${ev.day}`;
+        const lbl = document.createElement('div');
+        lbl.className = 'cf-bar-label';
+        lbl.textContent = `d${ev.day}`;
+        wrap.appendChild(bar);
+        wrap.appendChild(lbl);
+        rowA.appendChild(wrap);
+      });
+      container.appendChild(rowA);
+
+      // Row B
+      const rowB = document.createElement('div');
+      rowB.className = 'cf-timeline-row';
+      const axisB = document.createElement('div');
+      axisB.className = 'cf-timeline-axis';
+      rowB.appendChild(axisB);
+
+      r.eventsB.forEach(ev => {
+        const pct = maxDay > 0 ? (ev.day / maxDay) * 100 : 0;
+        const wrap = document.createElement('div');
+        wrap.className = 'cf-bar-wrap';
+        wrap.style.left = pct + '%';
+        const bar = document.createElement('div');
+        bar.className = 'cf-bar variant-b';
+        bar.style.height = '44px';
+        bar.title = `${ev.label}: ${ev.amount.toLocaleString('cs-CZ', { maximumFractionDigits: 0 })} – ${TEXTS[currentLang].day_label} ${ev.day}`;
+        const lbl = document.createElement('div');
+        lbl.className = 'cf-bar-label';
+        lbl.textContent = `d${ev.day}`;
+        wrap.appendChild(bar);
+        wrap.appendChild(lbl);
+        rowB.appendChild(wrap);
+      });
+      container.appendChild(rowB);
+
+      // Axis labels
+      const axisLabels = document.getElementById('cf-timeline-axis-labels');
+      axisLabels.innerHTML = `<span>0</span><span>${TEXTS[currentLang].day_label} ${maxDay}</span>`;
+    }
+
+    function resetCashflow() {
+      document.getElementById('cf-amount').value = '100000';
+      document.getElementById('cf-a-deposit-pct').value = '30';
+      document.getElementById('cf-a-final-days').value = '30';
+      document.getElementById('cf-b-net-days').value = '60';
+      document.getElementById('cf-alt-yield').value = '5';
+      document.getElementById('cf-results').classList.add('hidden');
+      ['cf-amount', 'cf-a-deposit-pct', 'cf-a-final-days', 'cf-b-net-days', 'cf-alt-yield'].forEach(clearError);
+      // Re-enable final days field
+      document.getElementById('cf-a-final-days').disabled = false;
+      document.getElementById('cf-a-final-days-group').style.opacity = '1';
+    }
+
+    // Edge case: depositPct = 100 → disable doplatek field
+    document.getElementById('cf-a-deposit-pct').addEventListener('input', function() {
+      const val = parseNum(this.value);
+      const finalGroup = document.getElementById('cf-a-final-days-group');
+      const finalInput = document.getElementById('cf-a-final-days');
+      if (val === 100) {
+        finalInput.disabled = true;
+        finalInput.value = '0';
+        finalGroup.style.opacity = '0.5';
+      } else {
+        finalInput.disabled = false;
+        finalGroup.style.opacity = '1';
+      }
+    });
+
+    /* ===================================================
+       5b – PENALTY CALCULATOR
+    =================================================== */
+    function setPenaltyType(type) {
+      penaltyType = type;
+      document.querySelectorAll('.penalty-type-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.type === type);
+      });
+      calcPenaltyUI();
+    }
+
+    function calcPenalty({ base, rate, days, type }) {
+      let totalPenalty, dailyPenalty;
+      if (type === 'pa') {
+        dailyPenalty = base * (rate / 100 / 365);
+        totalPenalty = dailyPenalty * days;
+      } else {
+        dailyPenalty = base * (rate / 100);
+        totalPenalty = dailyPenalty * days;
+      }
+      const percentIncrease = (totalPenalty / base) * 100;
+      return {
+        totalPenalty: Math.round(totalPenalty * 100) / 100,
+        dailyPenalty: Math.round(dailyPenalty * 100) / 100,
+        percentIncrease: Math.round(percentIncrease * 100) / 100
+      };
+    }
+
+    function calcPenaltyUI() {
+      const baseF = readField('pen-base', { positive: true, max: 1e12 });
+      const rateF = readField('pen-rate', { positive: true, max: 1000 });
+      const daysF = readField('pen-days', { integer: true, positive: true, max: 36500 });
+
+      if (!baseF || !rateF || !daysF) {
+        document.getElementById('pen-results').classList.add('hidden');
+        return;
+      }
+      const base = baseF.value, rate = rateF.value, days = daysF.value;
+
+      const currency = 'CZK'; // 5b uses CZK as default (no currency selector)
+      const sym = 'Kč';
+      const fmtC = (v) => Math.abs(v).toLocaleString('cs-CZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '\u00a0' + sym;
+
+      const result = calcPenalty({ base, rate, days, type: penaltyType });
+
+      document.getElementById('pen-total').textContent = fmtC(result.totalPenalty);
+      document.getElementById('pen-daily').textContent = fmtC(result.dailyPenalty);
+      document.getElementById('pen-pct').textContent = fmtNum(result.percentIncrease, 2) + '\u00a0%';
+
+      const warnEl = document.getElementById('pen-warn');
+      if (result.totalPenalty > base) {
+        warnEl.classList.add('visible');
+      } else {
+        warnEl.classList.remove('visible');
+      }
+
+      document.getElementById('pen-results').classList.remove('hidden');
+    }
+
+    function resetPenalty() {
+      document.getElementById('pen-base').value = '';
+      document.getElementById('pen-rate').value = '';
+      document.getElementById('pen-days').value = '';
+      document.getElementById('pen-results').classList.add('hidden');
+      document.getElementById('pen-warn').classList.remove('visible');
+      ['pen-base', 'pen-rate', 'pen-days'].forEach(clearError);
+      setPenaltyType('pa');
+    }
+
+    /* ===================================================
+       5c – EARLY PAYMENT APR
+    =================================================== */
+    /** Desetinný zápis (kanonický z parseNumEx, např. „1250.5“ nebo „.5“) → přesný zlomek { n, d } v BigInt. */
+    function decFraction(str) {
+      const m = /^([+-]?)(\d*)(?:\.(\d*))?$/.exec(String(str));
+      if (!m || (m[2] === '' && !m[3])) throw new Error('decFraction: neplatný zápis ' + str);
+      const frac = m[3] || '';
+      return { n: BigInt(m[1] + (m[2] || '0') + frac), d: 10n ** BigInt(frac.length) };
+    }
+
+    /** n / d zaokrouhlené na celé, polovina od nuly (d > 0). */
+    function roundHalfAway(n, d) {
+      const neg = n < 0n, a = neg ? -n : n;
+      const q = (2n * a + d) / (2n * d);
+      return Number(neg ? -q : q);
+    }
+
+    /**
+     * Skonto (T5-1, T5-3). Vstupy jsou kanonické desetinné zápisy (parseNumEx): částka F, sleva d %, počet dní
+     * dříve Δ, alternativní výnos r % p.a. Počítá se přesně ve zlomcích a výsledek se zaokrouhlí na haléře:
+     *   sleva          = F · d
+     *   platba dříve   = F · (1 − d)
+     *   ušlý výnos     = F · (1 − d) · r · Δ / 365     (cena peněz ze skutečně dřív placené, zlevněné částky)
+     *   čistý přínos   = sleva − ušlý výnos
+     * Doporučení plyne ze znaménka čistého přínosu v haléřích: > 0 zaplatit dříve, < 0 ponechat hotovost,
+     * 0 (|přínos| < 0,005) vychází nastejno. Roční sazba skonta d / (1 − d) · 365 / Δ je jen informativní.
+     * → { savingH, earlyAmountH, altReturnH, netH, aprPct, recommend }
+     */
+    function earlyPay({ amount, discountPct, daysEarly, altYieldPa }) {
+      const F = decFraction(amount), D = decFraction(discountPct), R = decFraction(altYieldPa);
+      const days = BigInt(Number(daysEarly));
+      const restN = 100n * D.d - D.n;                       // (100 − d) · D.d
+      // v haléřích: F · d% · 100 = F · D
+      const savN = F.n * D.n, savD = F.d * D.d;
+      // F · (100 − d)/100 · 100 = F · (100 − d)
+      const earlyN = F.n * restN, earlyD = F.d * D.d;
+      // F · (100 − d)/100 · r/100 · Δ/365 · 100
+      const altN = F.n * restN * R.n * days, altD = F.d * D.d * R.d * 36500n;
+      const netH = roundHalfAway(savN * altD - altN * savD, savD * altD);
+      const recommend = netH > 0 ? 'pay_early' : netH < 0 ? 'keep_cash' : 'neutral';
+      const d = Number(discountPct) / 100;
+      return {
+        savingH: roundHalfAway(savN, savD),
+        earlyAmountH: roundHalfAway(earlyN, earlyD),
+        altReturnH: roundHalfAway(altN, altD),
+        netH,
+        aprPct: d / (1 - d) * (365 / Number(daysEarly)) * 100,
+        recommend,
+      };
+    }
+
+    function calcEarlyPayUI() {
+      const amountF = readField('epr-amount', { positive: true, max: 1e12 });
+      const discountF = readField('epr-discount-pct', { check: (v, T) => (v > 0 && v < 100 ? null : T.err_t5c_discount_range) });
+      const daysF = readField('epr-days-early', { integer: true, positive: true, max: 36500 });
+      const yieldF = readField('epr-alt-yield', { max: 1000 });
+
+      if (!amountF || !discountF || !daysF || !yieldF) {
+        document.getElementById('epr-results').classList.add('hidden');
+        return;
+      }
+
+      const T = TEXTS[currentLang];
+      const sym = 'Kč';
+      const fmtH = h => (h / 100).toLocaleString('cs-CZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ' + sym;
+
+      const r = earlyPay({ amount: amountF.canonical, discountPct: discountF.canonical,
+        daysEarly: daysF.canonical, altYieldPa: yieldF.canonical });
+
+      document.getElementById('epr-apr').textContent = fmtNum(r.aprPct, 2) + ' %';
+      document.getElementById('epr-saving').textContent = fmtH(r.savingH);
+      document.getElementById('epr-early-amount').textContent = fmtH(r.earlyAmountH);
+      document.getElementById('epr-alt-return').textContent = fmtH(r.altReturnH);
+
+      const netEl = document.getElementById('epr-net-benefit');
+      netEl.textContent = fmtH(r.netH);
+      netEl.style.color = r.netH > 0 ? 'var(--fin-color-savings)' : r.netH < 0 ? 'var(--fin-color-loss)' : 'var(--color-text)';
+
+      // Doporučení ze znaménka čistého přínosu (T5-3)
+      const recEl = document.getElementById('epr-rec');
+      const key = { pay_early: 't5c_rec_pay_early', keep_cash: 't5c_rec_keep_cash', neutral: 't5c_rec_neutral' }[r.recommend];
+      const cls = { pay_early: 'epr-rec-yes', keep_cash: 'epr-rec-no', neutral: 'epr-rec-neutral' }[r.recommend];
+      recEl.className = 'epr-recommendation visible';
+      recEl.classList.add(cls);
+      const vals = { apr: fmtNum(r.aprPct, 2), alt: fmtNum(yieldF.value, 2), net: fmtH(Math.abs(r.netH)) };
+      document.getElementById('epr-rec-title').textContent = T[key];
+      document.getElementById('epr-rec-detail').textContent = T[key + '_detail'].replace(/\{(\w+)\}/g, (m, k) => (k in vals ? vals[k] : m));
+
+      document.getElementById('epr-results').classList.remove('hidden');
+    }
+
+    function resetEarlyPay() {
+      document.getElementById('epr-amount').value = '';
+      document.getElementById('epr-discount-pct').value = '';
+      document.getElementById('epr-days-early').value = '';
+      document.getElementById('epr-alt-yield').value = '5';
+      document.getElementById('epr-results').classList.add('hidden');
+      ['epr-amount', 'epr-discount-pct', 'epr-days-early', 'epr-alt-yield'].forEach(clearError);
+    }
+
+    /* ===================================================
+       5d – CHECKLIST
+    =================================================== */
+    function renderChecklistGrid() {
+      const grid = document.getElementById('checklist-grid');
+      grid.innerHTML = '';
+      CONTRACT_CONDITIONS.forEach(item => {
+        const btn = document.createElement('button');
+        btn.className = 'checklist-type-btn';
+        btn.dataset.id = item.id;
+        btn.textContent = item[`label_${currentLang}`];
+        btn.addEventListener('click', () => {
+          checklistCurrentId = item.id;
+          renderChecklistDetail(item.id);
+        });
+        grid.appendChild(btn);
+      });
+    }
+
+    function renderChecklistDetail(id) {
+      const item = CONTRACT_CONDITIONS.find(c => c.id === id);
+      if (!item) return;
+      const lang = currentLang;
+
+      document.getElementById('cd-title').textContent = item[`label_${lang}`];
+      document.getElementById('cd-description').textContent = item[`description_${lang}`];
+      document.getElementById('cd-risk').textContent = item[`risk_${lang}`];
+      document.getElementById('cd-impact').textContent = item[`impact_${lang}`];
+
+      const ul = document.getElementById('cd-countermeasures');
+      ul.innerHTML = item[`countermeasures_${lang}`].map(m => `<li>${m}</li>`).join('');
+
+      // i18n section headers
+      const T = TEXTS[lang];
+      document.querySelector('#checklist-detail [data-i18n="c5d_sec_description"]').textContent = T.c5d_sec_description;
+      document.querySelector('#checklist-detail [data-i18n="c5d_sec_risk"]').textContent = T.c5d_sec_risk;
+      document.querySelector('#checklist-detail [data-i18n="c5d_sec_impact"]').textContent = T.c5d_sec_impact;
+      document.querySelector('#checklist-detail [data-i18n="c5d_sec_countermeasures"]').textContent = T.c5d_sec_countermeasures;
+
+      const panel = document.getElementById('checklist-detail');
+      panel.classList.add('visible');
+
+      // Mark active button
+      document.querySelectorAll('.checklist-type-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.id === id);
+      });
+    }
+
+    function renderChecklistDetailCurrent() {
+      // Re-render grid labels on lang change
+      document.querySelectorAll('.checklist-type-btn').forEach(btn => {
+        const item = CONTRACT_CONDITIONS.find(c => c.id === btn.dataset.id);
+        if (item) btn.textContent = item[`label_${currentLang}`];
+      });
+      if (checklistCurrentId) {
+        renderChecklistDetail(checklistCurrentId);
+      }
+    }
+
+    /* ===================================================
+       INIT
+    =================================================== */
+    initTabs();
+    renderChecklistGrid();
+  </script>
+</body>
+</html>

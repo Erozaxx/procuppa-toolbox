@@ -1,0 +1,2467 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Procuppa Toolbox 3 – Dodavatelé &amp; rizika</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ===== CSS CUSTOM PROPERTIES ===== */
+    :root {
+      /* === BARVY === */
+
+      /* Primární: deep charcoal místo modré – profesionální, neutrální */
+      --color-primary:      #1A1A1A;
+
+      /* Accent: Procuppa žlutá – POUZE jako bg prvku nebo dekorativní border */
+      /* NIKDY jako barva textu na bílém/světlém bg (WCAG ratio 1.37) */
+      --color-accent:       #FFD956;
+
+      /* Stavové barvy – zachovány (nezávislé na brand) */
+      --color-success:      #16A34A;
+      --color-warning:      #D97706;
+      --color-danger:       #DC2626;
+
+      /* Povrchy – warm off-white místo studené modré */
+      --color-bg:           #FAFAF8;
+      --color-surface:      #FFFFFF;
+
+      /* Texty */
+      --color-text:         #1A1A1A;   /* kontrast 17.4:1 na bílé ✓ WCAG AAA */
+
+      /* color-text-muted: POUZE pro sekundární/pomocné texty */
+      /* Pro výsledkové texty (.result-label, .result-value atd.) použít --color-text */
+      --color-text-muted:   #5C6370;
+
+      /* Border – teplý, ne studený modrý */
+      --color-border:       #E5E3DC;
+
+      /* Companion text colors pro barevná pozadí */
+      /* Text NA --color-accent pozadí (#FFD956): kontrast 12.69:1 ✓ WCAG AAA */
+      --color-accent-text:  #1A1A1A;
+
+      /* Text NA --color-primary pozadí (#1A1A1A): kontrast 17.4:1 ✓ WCAG AAA */
+      --color-primary-text: #FFFFFF;
+
+      /* Chart paleta */
+      --color-chart-6:      #7C3AED;
+      --color-chart-7:      #0891B2;
+      --color-chart-8:      #DB2777;
+
+      /* === TYPOGRAFIE === */
+      --font-base: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+      --font-size-sm: 0.875rem;
+      --font-size-md: 1rem;
+      --font-size-lg: 1.25rem;
+      --font-size-xl: 1.5rem;
+      --font-tracking-tight: -0.01em;
+      --font-tracking-normal: 0em;
+
+      /* === SPACING – beze změny === */
+      --space-xs: 0.25rem;
+      --space-sm: 0.5rem;
+      --space-md: 1rem;
+      --space-lg: 1.5rem;
+      --space-xl: 2rem;
+
+      /* === RADIUS – ostřejší, corporate styl === */
+      --radius-sm: 3px;
+      --radius-md: 6px;
+      --radius-lg: 10px;
+
+      /* === SHADOW – zachováno === */
+      --shadow-card: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+    }
+
+    /* ===== RESET + BASE ===== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-base);
+      font-size: var(--font-size-md);
+      color: var(--color-text);
+      background: var(--color-bg);
+      line-height: 1.5;
+    }
+
+    /* ===== LAYOUT / HEADER ===== */
+    header {
+      position: relative;
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      padding: var(--space-md) var(--space-xl);
+      display: flex;
+      align-items: center;
+      min-height: 60px;
+    }
+
+    #logo {
+      height: 40px;
+      width: auto;
+    }
+
+    .lang-switcher {
+      position: absolute;
+      top: var(--space-md);
+      right: var(--space-md);
+      display: flex;
+      gap: var(--space-xs);
+    }
+
+    .lang-btn {
+      background: none;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-xs) var(--space-sm);
+      font-size: var(--font-size-sm);
+      cursor: pointer;
+      color: var(--color-text-muted);
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+
+    .lang-btn.active,
+    .lang-btn:hover {
+      background: var(--color-primary);
+      color: var(--color-primary-text);
+      border-color: var(--color-primary);
+    }
+
+    /* ===== CURRENCY SWITCHER ===== */
+    .currency-switcher {
+      position: absolute;
+      top: var(--space-md);
+      right: 6rem;
+      display: flex;
+      gap: var(--space-xs);
+      align-items: center;
+    }
+
+    .btn-currency {
+      background: none;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-xs) var(--space-sm);
+      font-size: var(--font-size-sm);
+      cursor: pointer;
+      color: var(--color-text-muted);
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+
+    .btn-currency.active,
+    .btn-currency:hover {
+      background: var(--color-primary);
+      color: var(--color-primary-text);
+      border-color: var(--color-primary);
+    }
+
+    .currency-dropdown {
+      background: none;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-xs) var(--space-sm);
+      font-size: var(--font-size-sm);
+      cursor: pointer;
+      color: var(--color-text-muted);
+      font-family: var(--font-base);
+      transition: border-color 0.15s;
+    }
+
+    .currency-dropdown:focus {
+      outline: 2px solid var(--color-accent);
+      outline-offset: 0;
+      border-color: var(--color-accent);
+    }
+
+    /* ===== TAB NAVIGATION ===== */
+    .tab-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      padding: 0 var(--space-xl);
+      gap: 0;
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      padding: var(--space-md) var(--space-lg);
+      font-size: var(--font-size-md);
+      font-weight: 500;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover {
+      color: var(--color-primary);
+    }
+
+    .tab-btn.active {
+      color: var(--color-primary);
+      border-bottom: 3px solid var(--color-accent);
+      font-weight: 700;
+    }
+
+    .tab-btn:focus-visible {
+      outline: 2px solid var(--color-accent);
+      outline-offset: -2px;
+    }
+
+    /* ===== TOOL PANELS ===== */
+    main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: var(--space-xl) var(--space-md);
+    }
+
+    .tool-panel {
+      display: none;
+    }
+
+    .tool-panel.active {
+      display: block;
+    }
+
+    /* ===== TOOL CARD ===== */
+    .tool-card {
+      background: var(--color-surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+      padding: var(--space-lg);
+      margin-bottom: var(--space-lg);
+    }
+
+    .tool-card h2 {
+      font-size: var(--font-size-lg);
+      font-weight: 700;
+      color: var(--color-primary);
+      margin-bottom: var(--space-xs);
+    }
+
+    .tool-card .tool-desc {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-lg);
+    }
+
+    .tool-panel > h1 {
+      font-size: var(--font-size-xl);
+      font-weight: 700;
+      margin-bottom: var(--space-lg);
+      color: var(--color-text);
+    }
+
+    /* ===== INPUT GROUP ===== */
+    .input-group {
+      margin-bottom: var(--space-md);
+    }
+
+    .input-group label {
+      display: block;
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      margin-bottom: var(--space-xs);
+      color: var(--color-text);
+    }
+
+    .input-field {
+      width: 100%;
+      max-width: 300px;
+      padding: var(--space-sm) var(--space-md);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      font-size: var(--font-size-md);
+      font-family: var(--font-base);
+      color: var(--color-text);
+      background: var(--color-surface);
+      transition: border-color 0.15s;
+    }
+
+    .input-field:focus {
+      outline: 2px solid var(--color-accent);
+      outline-offset: 0;
+      border-color: var(--color-accent);
+    }
+
+    .input-field.input-error {
+      border-color: var(--color-danger);
+    }
+
+    /* ===== SELECT FIELD ===== */
+    .select-field {
+      width: 100%;
+      max-width: 300px;
+      padding: var(--space-sm) var(--space-md);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      font-size: var(--font-size-md);
+      font-family: var(--font-base);
+      color: var(--color-text);
+      background: var(--color-surface);
+      cursor: pointer;
+      transition: border-color 0.15s;
+      appearance: auto;
+    }
+
+    .select-field:focus {
+      outline: 2px solid var(--color-accent);
+      outline-offset: 0;
+      border-color: var(--color-accent);
+    }
+
+    /* ===== ERROR MESSAGE ===== */
+    .error-msg {
+      display: none;
+      color: var(--color-danger);
+      font-size: var(--font-size-sm);
+      margin-top: var(--space-xs);
+    }
+
+    .error-msg.visible {
+      display: block;
+    }
+
+    /* ===== RESULT BOX ===== */
+    .result-box {
+      display: none;
+      background: var(--color-bg);
+      border-left: 4px solid var(--color-accent);
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      padding: var(--space-md);
+      margin-top: var(--space-md);
+    }
+
+    .result-value {
+      font-size: var(--font-size-xl);
+      font-weight: 700;
+      color: var(--color-primary);
+    }
+
+    .result-label {
+      font-size: var(--font-size-sm);
+      color: var(--color-text);
+      margin-top: var(--space-xs);
+    }
+
+    .result-interpretation {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+      margin-top: var(--space-sm);
+      font-style: italic;
+    }
+
+    /* ===== RISK BADGE ===== */
+    .risk-badge {
+      display: inline-block;
+      padding: var(--space-xs) var(--space-md);
+      border-radius: 999px;
+      font-size: var(--font-size-sm);
+      font-weight: 700;
+      margin-bottom: var(--space-sm);
+    }
+
+    .risk-badge.success {
+      background: #DCFCE7;
+      color: #166534;
+    }
+
+    .risk-badge.warning {
+      background: #FEF9C3;
+      color: #92400E;
+    }
+
+    .risk-badge.danger {
+      background: #FEE2E2;
+      color: #991B1B;
+    }
+
+    /* ===== SCORE SLIDER ROW ===== */
+    .score-slider-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      margin-bottom: var(--space-sm);
+      flex-wrap: wrap;
+    }
+
+    .score-slider-row .criterion-label {
+      min-width: 130px;
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      color: var(--color-text);
+    }
+
+    .score-slider-row input[type="range"] {
+      flex: 1;
+      min-width: 120px;
+      max-width: 200px;
+      accent-color: var(--color-primary);
+      cursor: pointer;
+    }
+
+    .score-slider-row .score-value {
+      min-width: 28px;
+      text-align: center;
+      font-weight: 700;
+      color: var(--color-primary);
+      font-size: var(--font-size-md);
+    }
+
+    .score-slider-row .weight-group {
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+
+    .score-slider-row .weight-group label {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+      white-space: nowrap;
+    }
+
+    .weight-input {
+      width: 60px;
+      padding: 0.25rem var(--space-sm);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      font-size: var(--font-size-sm);
+      font-family: var(--font-base);
+      color: var(--color-text);
+      background: var(--color-surface);
+      text-align: center;
+      transition: border-color 0.15s;
+    }
+
+    .weight-input:focus {
+      outline: 2px solid var(--color-accent);
+      outline-offset: 0;
+      border-color: var(--color-accent);
+    }
+
+    /* ===== CRITERIA GRID ===== */
+    .criteria-grid {
+      background: var(--color-bg);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      border: 1px solid var(--color-border);
+      margin-bottom: var(--space-md);
+    }
+
+    .criteria-grid-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      margin-bottom: var(--space-sm);
+      flex-wrap: wrap;
+    }
+
+    .criteria-grid-header .col-criterion {
+      min-width: 130px;
+      font-size: var(--font-size-sm);
+      font-weight: 700;
+      color: var(--color-text-muted);
+    }
+
+    .criteria-grid-header .col-score {
+      flex: 1;
+      min-width: 120px;
+      max-width: 200px;
+      font-size: var(--font-size-sm);
+      font-weight: 700;
+      color: var(--color-text-muted);
+      text-align: center;
+    }
+
+    .criteria-grid-header .col-val {
+      min-width: 28px;
+    }
+
+    .criteria-grid-header .col-weight {
+      font-size: var(--font-size-sm);
+      font-weight: 700;
+      color: var(--color-text-muted);
+      white-space: nowrap;
+    }
+
+    /* ===== RADAR CHART CONTAINER ===== */
+    .chart-container {
+      position: relative;
+      margin-top: var(--space-md);
+      height: 320px;
+    }
+
+    /* ===== SCORECARD RESULTS ===== */
+    .scorecard-result-grid {
+      display: grid;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-sm);
+    }
+
+    .result-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: var(--space-sm);
+    }
+
+    .result-row .result-row-label {
+      font-size: var(--font-size-sm);
+      color: var(--color-text);
+    }
+
+    .result-row .result-row-value {
+      font-size: var(--font-size-md);
+      font-weight: 700;
+      color: var(--color-primary);
+      white-space: nowrap;
+    }
+
+    /* ===== BTN RESET ===== */
+    .btn-reset {
+      background: none;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-sm) var(--space-md);
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+      cursor: pointer;
+      margin-top: var(--space-md);
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .btn-reset:hover {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+
+    /* ===== PROGRESS BAR ===== */
+    .progress-bar-container {
+      background: var(--color-border);
+      border-radius: 999px;
+      height: 16px;
+      overflow: hidden;
+      margin: var(--space-sm) 0;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.3s ease, background 0.3s ease;
+      min-width: 0;
+    }
+
+    .progress-bar-fill.success {
+      background: var(--color-success);
+    }
+
+    .progress-bar-fill.warning {
+      background: var(--color-warning);
+    }
+
+    .progress-bar-fill.danger {
+      background: var(--color-danger);
+    }
+
+    /* ===== RED FLAGS LIST ===== */
+    .red-flags-list {
+      list-style: none;
+      margin: var(--space-xs) 0 var(--space-sm);
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+
+    .red-flags-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-xs);
+      font-size: var(--font-size-sm);
+      color: var(--color-danger);
+    }
+
+    .red-flags-list li::before {
+      content: '⚑';
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .red-flags-empty {
+      font-size: var(--font-size-sm);
+      color: var(--color-success);
+      font-style: italic;
+    }
+
+    /* ===== RECOMMENDATION BOX ===== */
+    .recommendation-box {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-sm) var(--space-md);
+      font-size: var(--font-size-sm);
+      color: var(--color-text);
+      margin-top: var(--space-sm);
+    }
+
+    /* ===== PLACEHOLDER PANEL ===== */
+    .placeholder-panel {
+      background: var(--color-surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+      padding: var(--space-xl);
+      text-align: center;
+      color: var(--color-text-muted);
+      font-size: var(--font-size-lg);
+    }
+
+    /* ===== SECTION SEPARATOR ===== */
+    .section-divider {
+      margin: var(--space-md) 0;
+      border-top: 1px solid var(--color-border);
+    }
+
+    /* ===== PARTIAL SCORES LIST ===== */
+    .partial-scores-list {
+      display: grid;
+      gap: var(--space-xs);
+      margin-top: var(--space-sm);
+      margin-bottom: var(--space-sm);
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+      .tab-nav {
+        overflow-x: auto;
+        white-space: nowrap;
+        padding: 0 var(--space-md);
+        scrollbar-width: none;
+      }
+
+      .tab-nav::-webkit-scrollbar {
+        display: none;
+      }
+
+      .tab-btn {
+        min-width: 80px;
+        padding: var(--space-sm) var(--space-md);
+        font-size: var(--font-size-sm);
+      }
+
+      main {
+        padding: var(--space-md) var(--space-sm);
+      }
+
+      .tool-card {
+        padding: var(--space-md);
+      }
+
+      .input-field {
+        max-width: 100%;
+      }
+
+      .score-slider-row input[type="range"] {
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <svg id="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 148.163 28.4534" role="img" aria-label="Procuppa"><g><g><path d="M11.569,11.2632c-.6381.0075-1.0349.6975-.7216,1.2547l7.802,13.8774c.2352.4185-.0665.9357-.5458.9357h-8.9926c-.226,0-.4346-.1223-.5457-.3194L.0815,11.9215c-.2352-.4185.0665-.9357.5457-.9357h8.2121c1.1317-.0133,2.1706-.6299,2.7263-1.6178L16.6304.3604c.1251-.2227.3607-.3604.6156-.3604h8.8079c.5406,0,.8812.5838.6156,1.0559l-5.5366,9.8459c-.1251.2227-.3606.3604-.6156.3604h-8.948v.001h-.0003Z" style="fill:#fdd757;"/><path d="M34.1531,24.0212V5.1582h8.2839c2.1897,0,3.8253.6332,4.9334,1.7676,1.0552,1.0817,1.6884,2.559,1.6884,4.3003,0,3.5615-2.348,5.9622-6.3052,5.9622h-4.6432v6.8329h-3.9573ZM38.1104,8.4824v5.5929h3.9572c2.005,0,3.0603-1.108,3.0603-2.8229,0-1.7675-1.108-2.7701-3.0075-2.7701h-4.01ZM53.5891,10.4874v2.1633h.0791c.8178-1.5302,1.7412-2.3216,3.3241-2.3216.3957,0,.6332.0264.8442.1055v3.1394h-.0791c-2.348-.2374-4.0364,1.0025-4.0364,3.8518v6.5954h-3.588v-13.5338h3.4561ZM64.8788,24.417c-4.1947,0-7.0703-3.1131-7.0703-7.1495s2.8756-7.1495,7.0703-7.1495,7.0704,3.1131,7.0704,7.1495-2.8757,7.1495-7.0704,7.1495ZM64.8788,21.6733c2.1897,0,3.4297-1.7676,3.4297-4.4058s-1.24-4.4322-3.4297-4.4322c-2.216,0-3.4296,1.794-3.4296,4.4322s1.2136,4.4058,3.4296,4.4058ZM79.3682,24.417c-4.2738,0-6.9384-3.1131-6.9384-7.1495s2.6382-7.1495,6.7538-7.1495c3.5087,0,5.672,2.0314,6.1469,4.9598h-3.5088c-.2374-1.1872-1.1608-2.0842-2.4799-2.0842-2.1633,0-3.2713,1.6621-3.2713,4.2739,0,2.559,1.0289,4.2738,3.2186,4.2738,1.451,0,2.4799-.765,2.7173-2.2952h3.456c-.2374,2.8756-2.4799,5.1709-6.0942,5.1709ZM98.5035,24.0212h-3.456v-1.5829h-.0792c-.9233,1.24-1.9786,1.9523-3.8781,1.9523-3.0075,0-4.696-1.9259-4.696-4.8807v-9.0225h3.5616v8.4158c0,1.5829.7123,2.4535,2.2424,2.4535,1.6885,0,2.7174-1.2664,2.7174-3.0603v-7.809h3.5879v13.5338ZM100.297,28.4534V10.4874h3.456v1.6884h.079c.87-1.1872,2.137-2.0578,3.983-2.0578,3.588,0,5.884,2.9284,5.884,7.1495,0,4.3794-2.375,7.1495-5.857,7.1495-1.9,0-3.14-.7651-3.905-1.9259h-.052v5.9623h-3.588ZM107.077,21.4358c1.82,0,2.981-1.5037,2.981-4.0628s-.897-4.353-3.113-4.353c-2.243,0-3.14,1.9259-3.14,4.353,0,2.4535,1.135,4.0628,3.272,4.0628ZM114.841,28.4534V10.4874h3.456v1.6884h.079c.87-1.1872,2.137-2.0578,3.983-2.0578,3.588,0,5.884,2.9284,5.884,7.1495,0,4.3794-2.375,7.1495-5.857,7.1495-1.9,0-3.14-.7651-3.905-1.9259h-.052v5.9623h-3.588ZM121.621,21.4358c1.82,0,2.981-1.5037,2.981-4.0628s-.897-4.353-3.113-4.353c-2.243,0-3.14,1.9259-3.14,4.353,0,2.4535,1.135,4.0628,3.272,4.0628ZM137.906,24.0212c-.211-.2638-.343-.8969-.422-1.5037h-.053c-.686,1.0289-1.662,1.8203-3.984,1.8203-2.77,0-4.722-1.451-4.722-4.1419,0-2.9812,2.427-3.9309,5.435-4.353,2.242-.3166,3.271-.5013,3.271-1.5302,0-.9761-.765-1.6093-2.269-1.6093-1.688,0-2.506.6068-2.612,1.8995h-3.192c.106-2.3743,1.873-4.4585,5.831-4.4585,4.062,0,5.698,1.8203,5.698,4.9862v6.8856c0,1.0289.158,1.6357.475,1.8731v.1319h-3.456ZM134.318,21.8315c2.058,0,3.192-1.2663,3.192-2.5854v-2.0314c-.633.3694-1.609.5804-2.506.7915-1.873.4221-2.796.8442-2.796,2.1105s.844,1.7148,2.11,1.7148Z"/><path d="M145.163,13.1927c-1.651,0-3-1.3066-3-3.1,0-1.7806,1.349-3.1,3-3.1,1.652,0,3,1.3194,3,3.1,0,1.7934-1.348,3.1-3,3.1ZM145.163,12.7443c1.437,0,2.484-1.1144,2.484-2.6516,0-1.5244-1.047-2.6517-2.484-2.6517s-2.483,1.1273-2.483,2.6517c0,1.5372,1.046,2.6516,2.483,2.6516ZM143.991,11.6939v-3.2793h1.487c.593,0,1.021.3843,1.021.9223,0,.3715-.189.6789-.605.7814v.0128c.316.0897.467.269.505.6661.05.4612.025.807.138.8583v.0384h-.617c-.089-.0384-.126-.4099-.139-.7558-.013-.3458-.214-.5636-.618-.5636h-.529v1.3194h-.643ZM144.634,8.9526v.9223h.706c.353,0,.529-.1922.529-.4612s-.176-.4612-.529-.4612h-.706Z"/></g></g></svg>
+    <div class="currency-switcher">
+      <button onclick="setCurrency('CZK')" class="btn-currency active" data-currency="CZK">Kč</button>
+      <button onclick="setCurrency('EUR')" class="btn-currency" data-currency="EUR">EUR</button>
+      <button onclick="setCurrency('USD')" class="btn-currency" data-currency="USD">USD</button>
+      <select onchange="setCurrency(this.value); this.value=''" class="currency-dropdown" aria-label="Další měny">
+        <option value="">Další…</option>
+        <option value="GBP">GBP £</option>
+        <option value="CHF">CHF Fr</option>
+        <option value="JPY">JPY ¥</option>
+        <option value="PLN">PLN zł</option>
+      </select>
+    </div>
+    <div class="lang-switcher">
+      <button class="lang-btn active" data-lang="cs" id="btn-lang-cs">CZ</button>
+      <button class="lang-btn" data-lang="en" id="btn-lang-en">EN</button>
+    </div>
+  </header>
+
+  <!-- TAB NAVIGATION -->
+  <nav class="tab-nav" role="tablist" aria-label="Nástroje dodavatelé">
+    <button class="tab-btn active" role="tab" data-tab="tab-3a"
+            id="tab-btn-3a" aria-selected="true" aria-controls="tab-3a" tabindex="0"
+            data-i18n="tab3a">Scorecard</button>
+    <button class="tab-btn" role="tab" data-tab="tab-3b"
+            id="tab-btn-3b" aria-selected="false" aria-controls="tab-3b" tabindex="-1"
+            data-i18n="tab3b">Risk checker</button>
+    <button class="tab-btn" role="tab" data-tab="tab-3c"
+            id="tab-btn-3c" aria-selected="false" aria-controls="tab-3c" tabindex="-1"
+            data-i18n="tab3c">Závislost</button>
+    <button class="tab-btn" role="tab" data-tab="tab-3d"
+            id="tab-btn-3d" aria-selected="false" aria-controls="tab-3d" tabindex="-1"
+            data-i18n="tab3d">Dual sourcing</button>
+  </nav>
+
+  <!-- MAIN PANELS -->
+  <main>
+
+    <!-- ===== TAB 3a: SCORECARD ===== -->
+    <section id="tab-3a" class="tool-panel active" role="tabpanel" aria-labelledby="tab-btn-3a">
+      <h1 data-i18n="panel3a_heading">Scorecard hodnocení dodavatelů</h1>
+
+      <div class="tool-card">
+        <h2 data-i18n="t3a_title">Hodnocení dodavatele</h2>
+        <p class="tool-desc" data-i18n="t3a_desc">
+          Ohodnoťte dodavatele v 5 kritériích (skóre 1–5, nebo ponechte „neověřeno“) a nastavte váhy (1–3, váha 0 kritérium vyřadí). Celkové skóre a verdikt se ukážou, až když jsou ohodnocena všechna kritéria s kladnou vahou.
+        </p>
+
+        <!-- Criteria grid header -->
+        <div class="criteria-grid">
+          <div class="criteria-grid-header">
+            <span class="col-criterion" data-i18n="t3a_col_criterion">Kritérium</span>
+            <span class="col-score" data-i18n="t3a_col_score">Skóre (1–5)</span>
+            <span class="col-val"></span>
+            <span class="col-weight" data-i18n="t3a_col_weight">Váha (1–3)</span>
+          </div>
+
+          <!-- Kritérium 1: Cena -->
+          <div class="score-slider-row">
+            <span class="criterion-label" data-i18n="t3a_crit_price">Cena</span>
+            <select id="t3a-score-0" class="select-field score-select" style="flex:1; min-width:120px; max-width:200px;"
+                    aria-label="Skóre – Cena" onchange="calcScorecard()">
+              <option value="" data-i18n="t3a_opt_unverified">— neověřeno —</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+            </select>
+            <div class="weight-group">
+              <label for="t3a-weight-0" data-i18n="t3a_weight_label">váha</label>
+              <input type="text" inputmode="decimal" autocomplete="off" id="t3a-weight-0" class="weight-input" value="2"
+                     aria-describedby="t3a-weight-0-err"
+                     oninput="calcScorecard()"
+                     aria-label="Váha – Cena">
+              <span id="t3a-weight-0-err" class="error-msg" role="alert"></span>
+            </div>
+          </div>
+
+          <!-- Kritérium 2: Kvalita -->
+          <div class="score-slider-row">
+            <span class="criterion-label" data-i18n="t3a_crit_quality">Kvalita</span>
+            <select id="t3a-score-1" class="select-field score-select" style="flex:1; min-width:120px; max-width:200px;"
+                    aria-label="Skóre – Kvalita" onchange="calcScorecard()">
+              <option value="" data-i18n="t3a_opt_unverified">— neověřeno —</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+            </select>
+            <div class="weight-group">
+              <label for="t3a-weight-1" data-i18n="t3a_weight_label">váha</label>
+              <input type="text" inputmode="decimal" autocomplete="off" id="t3a-weight-1" class="weight-input" value="3"
+                     aria-describedby="t3a-weight-1-err"
+                     oninput="calcScorecard()"
+                     aria-label="Váha – Kvalita">
+              <span id="t3a-weight-1-err" class="error-msg" role="alert"></span>
+            </div>
+          </div>
+
+          <!-- Kritérium 3: Dodávky -->
+          <div class="score-slider-row">
+            <span class="criterion-label" data-i18n="t3a_crit_delivery">Dodávky</span>
+            <select id="t3a-score-2" class="select-field score-select" style="flex:1; min-width:120px; max-width:200px;"
+                    aria-label="Skóre – Dodávky" onchange="calcScorecard()">
+              <option value="" data-i18n="t3a_opt_unverified">— neověřeno —</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+            </select>
+            <div class="weight-group">
+              <label for="t3a-weight-2" data-i18n="t3a_weight_label">váha</label>
+              <input type="text" inputmode="decimal" autocomplete="off" id="t3a-weight-2" class="weight-input" value="2"
+                     aria-describedby="t3a-weight-2-err"
+                     oninput="calcScorecard()"
+                     aria-label="Váha – Dodávky">
+              <span id="t3a-weight-2-err" class="error-msg" role="alert"></span>
+            </div>
+          </div>
+
+          <!-- Kritérium 4: Komunikace -->
+          <div class="score-slider-row">
+            <span class="criterion-label" data-i18n="t3a_crit_comm">Komunikace</span>
+            <select id="t3a-score-3" class="select-field score-select" style="flex:1; min-width:120px; max-width:200px;"
+                    aria-label="Skóre – Komunikace" onchange="calcScorecard()">
+              <option value="" data-i18n="t3a_opt_unverified">— neověřeno —</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+            </select>
+            <div class="weight-group">
+              <label for="t3a-weight-3" data-i18n="t3a_weight_label">váha</label>
+              <input type="text" inputmode="decimal" autocomplete="off" id="t3a-weight-3" class="weight-input" value="1"
+                     aria-describedby="t3a-weight-3-err"
+                     oninput="calcScorecard()"
+                     aria-label="Váha – Komunikace">
+              <span id="t3a-weight-3-err" class="error-msg" role="alert"></span>
+            </div>
+          </div>
+
+          <!-- Kritérium 5: Flexibilita -->
+          <div class="score-slider-row">
+            <span class="criterion-label" data-i18n="t3a_crit_flex">Flexibilita</span>
+            <select id="t3a-score-4" class="select-field score-select" style="flex:1; min-width:120px; max-width:200px;"
+                    aria-label="Skóre – Flexibilita" onchange="calcScorecard()">
+              <option value="" data-i18n="t3a_opt_unverified">— neověřeno —</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+            </select>
+            <div class="weight-group">
+              <label for="t3a-weight-4" data-i18n="t3a_weight_label">váha</label>
+              <input type="text" inputmode="decimal" autocomplete="off" id="t3a-weight-4" class="weight-input" value="1"
+                     aria-describedby="t3a-weight-4-err"
+                     oninput="calcScorecard()"
+                     aria-label="Váha – Flexibilita">
+              <span id="t3a-weight-4-err" class="error-msg" role="alert"></span>
+            </div>
+          </div>
+        </div><!-- /criteria-grid -->
+
+        <!-- Error: totalWeight = 0 -->
+        <span id="t3a-weight-err" class="error-msg" role="alert"></span>
+
+        <!-- Result box -->
+        <div class="result-box" id="t3a-result">
+          <!-- Celkové skóre + badge -->
+          <div style="display:flex; align-items:center; gap:var(--space-md); flex-wrap:wrap; margin-bottom:var(--space-sm);">
+            <div>
+              <div class="result-value" id="t3a-overall-score">–</div>
+              <div class="result-label" data-i18n="t3a_result_overall">Celkové vážené skóre (0–100)</div>
+            </div>
+            <span class="risk-badge" id="t3a-verdict-badge"></span>
+          </div>
+          <div class="result-interpretation" id="t3a-note"></div>
+
+          <div class="section-divider"></div>
+
+          <!-- Dílčí skóre -->
+          <div style="font-size:var(--font-size-sm); font-weight:600; margin:var(--space-sm) 0 var(--space-xs);"
+               data-i18n="t3a_partial_heading">Dílčí skóre (0–100)</div>
+          <div class="partial-scores-list" id="t3a-partial-scores"></div>
+
+          <!-- Radar chart -->
+          <div class="chart-container">
+            <canvas id="chart-3a-radar" aria-label="Radar chart – dílčí skóre dodavatele"></canvas>
+          </div>
+        </div><!-- /result-box -->
+
+        <button class="btn-reset" id="t3a-reset" data-i18n="btn_reset">Resetovat</button>
+      </div>
+    </section>
+
+    <!-- ===== TAB 3b: RISK CHECKER ===== -->
+    <section id="tab-3b" class="tool-panel" role="tabpanel" aria-labelledby="tab-btn-3b" hidden>
+      <h1 data-i18n="panel3b_heading">Risk checker</h1>
+
+      <div class="tool-card">
+        <h2 data-i18n="t3b_title">Hodnocení rizika dodavatele</h2>
+        <p class="tool-desc" data-i18n="t3b_desc">
+          Vyberte hodnoty pro 5 rizikových faktorů. Skóre (0–100), úroveň rizika a doporučení se ukážou po zodpovězení všech pěti otázek; neověřený údaj se nepočítá jako nízké riziko.
+        </p>
+
+        <!-- Faktor 1: Počet dodavatelů -->
+        <div class="input-group">
+          <label for="t3b-suppliers" data-i18n="t3b_lbl_suppliers">Počet dodavatelů</label>
+          <select id="t3b-suppliers" class="select-field"
+                  onchange="calcRisk()" aria-label="Počet dodavatelů">
+            <option value="" data-i18n="t3b_opt_unverified" selected>— neověřeno —</option>
+            <option value="30" data-i18n="t3b_opt_suppliers_1">1 (jediný)</option>
+            <option value="15" data-i18n="t3b_opt_suppliers_2_3">2–3</option>
+            <option value="0"  data-i18n="t3b_opt_suppliers_4plus">4 a více</option>
+          </select>
+        </div>
+
+        <!-- Faktor 2: Region -->
+        <div class="input-group">
+          <label for="t3b-region" data-i18n="t3b_lbl_region">Region dodavatelů</label>
+          <select id="t3b-region" class="select-field"
+                  onchange="calcRisk()" aria-label="Region dodavatelů">
+            <option value="" data-i18n="t3b_opt_unverified" selected>— neověřeno —</option>
+            <option value="0"  data-i18n="t3b_opt_region_low">Nízké riziko (stabilní, ověřený region)</option>
+            <option value="12" data-i18n="t3b_opt_region_mid">Střední riziko (zvýšené geopolitické nebo logistické riziko)</option>
+            <option value="25" data-i18n="t3b_opt_region_high">Vysoké riziko (nestabilní region)</option>
+          </select>
+        </div>
+
+        <!-- Faktor 3: Kritičnost komodity -->
+        <div class="input-group">
+          <label for="t3b-criticality" data-i18n="t3b_lbl_criticality">Kritičnost komodity (1–5)</label>
+          <select id="t3b-criticality" class="select-field"
+                  onchange="calcRisk()" aria-label="Kritičnost komodity">
+            <option value="" data-i18n="t3b_opt_unverified" selected>— neověřeno —</option>
+            <option value="0"  data-i18n="t3b_opt_crit_1">1 – Nekritická</option>
+            <option value="5"  data-i18n="t3b_opt_crit_2">2</option>
+            <option value="10" data-i18n="t3b_opt_crit_3">3 – Střední</option>
+            <option value="15" data-i18n="t3b_opt_crit_4">4</option>
+            <option value="20" data-i18n="t3b_opt_crit_5">5 – Kritická</option>
+          </select>
+        </div>
+
+        <!-- Faktor 4: Logistická náročnost -->
+        <div class="input-group">
+          <label for="t3b-logistics" data-i18n="t3b_lbl_logistics">Logistická náročnost</label>
+          <select id="t3b-logistics" class="select-field"
+                  onchange="calcRisk()" aria-label="Logistická náročnost">
+            <option value="" data-i18n="t3b_opt_unverified" selected>— neověřeno —</option>
+            <option value="0"  data-i18n="t3b_opt_log_low">Nízká</option>
+            <option value="8"  data-i18n="t3b_opt_log_mid">Střední</option>
+            <option value="15" data-i18n="t3b_opt_log_high">Vysoká</option>
+          </select>
+        </div>
+
+        <!-- Faktor 5: Závislost na jednom zdroji -->
+        <div class="input-group">
+          <label for="t3b-singlesource" data-i18n="t3b_lbl_singlesource">Závislost na jednom zdroji</label>
+          <select id="t3b-singlesource" class="select-field"
+                  onchange="calcRisk()" aria-label="Závislost na jednom zdroji">
+            <option value="" data-i18n="t3b_opt_unverified" selected>— neověřeno —</option>
+            <option value="0"  data-i18n="t3b_opt_ss_no">Ne</option>
+            <option value="10" data-i18n="t3b_opt_ss_yes">Ano</option>
+          </select>
+        </div>
+
+        <!-- Result box -->
+        <div class="result-box" id="t3b-result" style="display:none;">
+
+          <!-- Badge + skóre -->
+          <div style="display:flex; align-items:center; gap:var(--space-md); flex-wrap:wrap; margin-bottom:var(--space-sm);">
+            <div>
+              <div class="result-value" id="t3b-score-value">–</div>
+              <div class="result-label" data-i18n="t3b_result_score_label">Celkové rizikové skóre (0–100)</div>
+            </div>
+            <span class="risk-badge" id="t3b-risk-badge"></span>
+          </div>
+
+          <!-- Progress bar -->
+          <div class="progress-bar-container" aria-hidden="true">
+            <div class="progress-bar-fill" id="t3b-progress-bar" style="width:0%"></div>
+          </div>
+
+          <div class="section-divider"></div>
+
+          <!-- Red flags -->
+          <div style="font-size:var(--font-size-sm); font-weight:600; margin:var(--space-sm) 0 var(--space-xs);"
+               data-i18n="t3b_red_flags_heading">Red flags</div>
+          <div id="t3b-red-flags-container"></div>
+
+          <div class="section-divider"></div>
+
+          <!-- Doporučení -->
+          <div style="font-size:var(--font-size-sm); font-weight:600; margin:var(--space-sm) 0 var(--space-xs);"
+               data-i18n="t3b_recommendation_heading">Doporučení</div>
+          <div class="recommendation-box" id="t3b-recommendation"></div>
+
+        </div><!-- /result-box -->
+
+        <button class="btn-reset" id="t3b-reset" data-i18n="btn_reset">Resetovat</button>
+      </div>
+    </section>
+
+    <!-- ===== TAB 3c: ZÁVISLOST NA DODAVATELI ===== -->
+    <section id="tab-3c" class="tool-panel" role="tabpanel" aria-labelledby="tab-btn-3c" hidden>
+      <h1 data-i18n="panel3c_heading">Závislost na dodavateli</h1>
+
+      <div class="tool-card">
+        <h2 data-i18n="t3c_title">Míra závislosti na dodavateli</h2>
+        <p class="tool-desc" data-i18n="t3c_desc">
+          Zadejte 4 parametry. Nástroj vypočítá kompozitní index závislosti (0–100) a doporučení pro diverzifikaci.
+        </p>
+
+        <!-- Vstup 1: Podíl spendu (%) -->
+        <div class="input-group">
+          <label for="t3c-spend" data-i18n="t3c_lbl_spend">Podíl nákupu u tohoto dodavatele (%)</label>
+          <input type="text" inputmode="decimal" autocomplete="off" id="t3c-spend" class="input-field"
+                 aria-describedby="t3c-spend-err" placeholder="0–100"
+                 oninput="calcDependency()"
+                 aria-label="Podíl spendu v procentech">
+          <span id="t3c-spend-err" class="error-msg" role="alert"></span>
+        </div>
+
+        <!-- Vstup 2: Počet alternativ -->
+        <div class="input-group">
+          <label for="t3c-alts" data-i18n="t3c_lbl_alts">Počet alternativních dodavatelů</label>
+          <input type="text" inputmode="numeric" autocomplete="off" id="t3c-alts" class="input-field"
+                 aria-describedby="t3c-alts-err" placeholder="0, 1, 2, …"
+                 oninput="calcDependency()"
+                 aria-label="Počet alternativních dodavatelů">
+          <span id="t3c-alts-err" class="error-msg" role="alert"></span>
+        </div>
+
+        <!-- Vstup 3: Doba náhrady (týdny) -->
+        <div class="input-group">
+          <label for="t3c-weeks" data-i18n="t3c_lbl_weeks">Odhadovaná doba náhrady (týdny)</label>
+          <input type="text" inputmode="decimal" autocomplete="off" id="t3c-weeks" class="input-field"
+                 aria-describedby="t3c-weeks-err" placeholder="1, 4, 12, …"
+                 oninput="calcDependency()"
+                 aria-label="Doba náhrady v týdnech">
+          <span id="t3c-weeks-err" class="error-msg" role="alert"></span>
+        </div>
+
+        <!-- Vstup 4: Kritičnost položky (1–5) -->
+        <div class="input-group">
+          <label for="t3c-criticality" data-i18n="t3c_lbl_criticality">Kritičnost položky (1–5)</label>
+          <input type="text" inputmode="numeric" autocomplete="off" id="t3c-criticality" class="input-field"
+                 aria-describedby="t3c-criticality-err" placeholder="1–5"
+                 oninput="calcDependency()"
+                 aria-label="Kritičnost položky 1 až 5">
+          <span id="t3c-criticality-err" class="error-msg" role="alert"></span>
+        </div>
+
+        <!-- Result box -->
+        <div class="result-box" id="t3c-result" style="display:none;">
+
+          <!-- Badge + index -->
+          <div style="display:flex; align-items:center; gap:var(--space-md); flex-wrap:wrap; margin-bottom:var(--space-sm);">
+            <div>
+              <div class="result-value" id="t3c-index-value">–</div>
+              <div class="result-label" data-i18n="t3c_result_index_label">Index závislosti (0–100)</div>
+            </div>
+            <span class="risk-badge" id="t3c-dep-badge"></span>
+          </div>
+
+          <!-- Progress bar -->
+          <div class="progress-bar-container" aria-hidden="true">
+            <div class="progress-bar-fill" id="t3c-progress-bar" style="width:0%"></div>
+          </div>
+
+          <div class="section-divider"></div>
+
+          <!-- Složky indexu -->
+          <div style="font-size:var(--font-size-sm); font-weight:600; margin:var(--space-sm) 0 var(--space-xs);"
+               data-i18n="t3c_components_heading">Složky indexu</div>
+          <div class="partial-scores-list" id="t3c-components"></div>
+
+          <div class="section-divider"></div>
+
+          <!-- Interpretace -->
+          <div id="t3c-interpretation" class="result-interpretation"></div>
+
+          <!-- Doporučení -->
+          <div class="recommendation-box" id="t3c-recommendation" style="margin-top:var(--space-sm);"></div>
+
+        </div><!-- /result-box -->
+
+        <button class="btn-reset" id="t3c-reset" data-i18n="btn_reset">Resetovat</button>
+      </div>
+    </section>
+
+    <!-- ===== TAB 3d: DUAL SOURCING ===== -->
+    <section id="tab-3d" class="tool-panel" role="tabpanel" aria-labelledby="tab-btn-3d" hidden>
+      <h1 data-i18n="panel3d_heading">Dual sourcing</h1>
+
+      <div class="tool-card">
+        <h2 data-i18n="t3d_title">Srovnání nákladů – dual vs. single sourcing</h2>
+        <p class="tool-desc" data-i18n="t3d_desc">
+          Zadejte ceny obou dodavatelů, celkový objem a podíl dodavatele A. Nástroj zobrazí celkové náklady a srovnání s alternativami single sourcingu.
+        </p>
+
+        <!-- Vstup 1: Cena dodavatele A -->
+        <div class="input-group">
+          <label for="t3d-priceA">
+            <span data-i18n="t3d_lbl_priceA">Cena/ks – dodavatel A</span>
+            (<span data-currency-label>Kč</span>)
+          </label>
+          <input type="text" inputmode="decimal" autocomplete="off" id="t3d-priceA" class="input-field"
+                 aria-describedby="t3d-priceA-err" placeholder="0"
+                 oninput="calcDualSourcing()"
+                 aria-label="Cena za kus – dodavatel A">
+          <span id="t3d-priceA-err" class="error-msg" role="alert"></span>
+        </div>
+
+        <!-- Vstup 2: Cena dodavatele B -->
+        <div class="input-group">
+          <label for="t3d-priceB">
+            <span data-i18n="t3d_lbl_priceB">Cena/ks – dodavatel B</span>
+            (<span data-currency-label>Kč</span>)
+          </label>
+          <input type="text" inputmode="decimal" autocomplete="off" id="t3d-priceB" class="input-field"
+                 aria-describedby="t3d-priceB-err" placeholder="0"
+                 oninput="calcDualSourcing()"
+                 aria-label="Cena za kus – dodavatel B">
+          <span id="t3d-priceB-err" class="error-msg" role="alert"></span>
+        </div>
+
+        <!-- Vstup 3: Celkový objem -->
+        <div class="input-group">
+          <label for="t3d-volume" data-i18n="t3d_lbl_volume">Celkový objem (ks)</label>
+          <input type="text" inputmode="decimal" autocomplete="off" id="t3d-volume" class="input-field"
+                 aria-describedby="t3d-volume-err" placeholder="1000"
+                 oninput="calcDualSourcing()"
+                 aria-label="Celkový objem v kusech">
+          <span id="t3d-volume-err" class="error-msg" role="alert"></span>
+        </div>
+
+        <!-- Vstup 4: Podíl dodavatele A (slider 1–99) -->
+        <div class="input-group">
+          <label for="t3d-splitA" data-i18n="t3d_lbl_splitA">Podíl dodavatele A (%)</label>
+          <div class="score-slider-row" style="margin-bottom:0;">
+            <input type="range" id="t3d-splitA" min="1" max="99" step="1" value="50"
+                   aria-label="Podíl dodavatele A v procentech"
+                   oninput="document.getElementById('t3d-splitA-val').textContent=this.value+'%'; calcDualSourcing()">
+            <span class="score-value" id="t3d-splitA-val">50%</span>
+          </div>
+          <!-- Inline varování pro edge case split=0/100 (ošetření pro přímé JS zadání) -->
+          <span id="t3d-split-warn" class="error-msg" style="color:var(--color-warning);" role="alert"></span>
+          <span id="t3d-splitA-err" class="error-msg" role="alert"></span>
+        </div>
+
+        <!-- Result box -->
+        <div class="result-box" id="t3d-result" style="display:none;">
+
+          <!-- Celkové náklady dual sourcing -->
+          <div style="display:flex; align-items:center; gap:var(--space-md); flex-wrap:wrap; margin-bottom:var(--space-sm);">
+            <div>
+              <div class="result-value" id="t3d-total-dual">–</div>
+              <div class="result-label" data-i18n="t3d_result_total_dual">Celkové náklady – Dual sourcing</div>
+            </div>
+          </div>
+
+          <div class="section-divider"></div>
+
+          <!-- Detailní rozpad nákladů -->
+          <div style="font-size:var(--font-size-sm); font-weight:600; margin:var(--space-sm) 0 var(--space-xs);"
+               data-i18n="t3d_result_breakdown">Rozpad nákladů</div>
+          <div class="partial-scores-list" id="t3d-breakdown"></div>
+
+          <div class="section-divider"></div>
+
+          <!-- Srovnání se single sourcingem -->
+          <div style="font-size:var(--font-size-sm); font-weight:600; margin:var(--space-sm) 0 var(--space-xs);"
+               data-i18n="t3d_result_comparison">Srovnání se single sourcingem</div>
+          <div class="partial-scores-list" id="t3d-comparison"></div>
+
+          <div class="section-divider"></div>
+
+          <!-- Interpretace -->
+          <div id="t3d-interpretation" class="result-interpretation"></div>
+
+          <!-- Bar chart -->
+          <div class="chart-container">
+            <canvas id="chart-3d-dual" aria-label="Sloupcový graf – srovnání nákladů single A / single B / dual sourcing"></canvas>
+          </div>
+
+        </div><!-- /result-box -->
+
+        <button class="btn-reset" id="t3d-reset" data-i18n="btn_reset">Resetovat</button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Chart.js 4.4.4 – stejná verze jako toolbox-1/2 -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+
+  <script>
+    /* ===== i18n TEXTS ===== */
+    const TEXTS = {
+      cs: {
+        // Tab labels
+        tab3a: 'Scorecard',
+        tab3b: 'Risk checker',
+        tab3c: 'Závislost',
+        tab3d: 'Dual sourcing',
+
+        // Panel headings
+        panel3a_heading: 'Scorecard hodnocení dodavatelů',
+        panel3b_heading: 'Risk checker',
+        panel3c_heading: 'Závislost na dodavateli',
+        panel3d_heading: 'Dual sourcing',
+
+        // Shared
+        btn_reset: 'Resetovat',
+
+        // Placeholders
+        placeholder_3b: 'Bude doplněno v T-006',
+        placeholder_3c: 'Bude doplněno v T-006',
+        placeholder_3d: 'Bude doplněno v T-007',
+
+        // Nástroj 3a: Scorecard
+        t3a_title:          'Hodnocení dodavatele',
+        t3a_desc:           'Ohodnoťte dodavatele v 5 kritériích (skóre 1–5, nebo ponechte „neověřeno“) a nastavte váhy (1–3, váha 0 kritérium vyřadí). Celkové skóre a verdikt se ukážou, až když jsou ohodnocena všechna kritéria s kladnou vahou.',
+        t3a_opt_unverified: '— neověřeno —',
+        t3a_unverified:     'neověřeno',
+        t3a_incomplete:     'Pokryto {pct} % vah',
+        t3a_incomplete_hint:'Skóre ani verdikt nevzniknou, dokud nejsou ohodnocena všechna kritéria s kladnou vahou. Kritérium, které hodnotit nechcete, vyřaďte vahou 0.',
+        t3a_col_criterion:  'Kritérium',
+        t3a_col_score:      'Skóre (1–5)',
+        t3a_col_weight:     'Váha (1–3)',
+        t3a_weight_label:   'váha',
+
+        t3a_crit_price:    'Cena',
+        t3a_crit_quality:  'Kvalita',
+        t3a_crit_delivery: 'Dodávky',
+        t3a_crit_comm:     'Komunikace',
+        t3a_crit_flex:     'Flexibilita',
+
+        t3a_result_overall:  'Celkové vážené skóre (0–100)',
+        t3a_partial_heading: 'Dílčí skóre (0–100)',
+
+        // Verdikt thresholds (dle architektury: výborný ≥70, přijatelný ≥40, rizikový <40)
+        t3a_verdict_excellent:    'Výborný',
+        t3a_verdict_acceptable:   'Přijatelný',
+        t3a_verdict_risky:        'Rizikový',
+
+        // Chyby
+        err_t3a_weight_zero: 'Alespoň jedna váha musí být větší než 0',
+        err_t3a_weight_invalid: 'Váha musí být nezáporné číslo',
+
+        // Chart label
+        t3a_chart_label: 'Skóre',
+
+        // Nástroj 3b: Risk checker
+        t3b_title:  'Hodnocení rizika dodavatele',
+        t3b_desc:   'Vyberte hodnoty pro 5 rizikových faktorů. Skóre (0–100), úroveň rizika a doporučení se ukážou po zodpovězení všech pěti otázek; neověřený údaj se nepočítá jako nízké riziko.',
+        t3b_opt_unverified:   '— neověřeno —',
+        t3b_incomplete_badge: 'Neúplné údaje',
+        t3b_incomplete:       'Zodpovězeno {n} z 5. Skóre a úroveň rizika se ukážou po zodpovězení všech otázek.',
+        t3b_red_flags_none_partial: 'Z vyplněných odpovědí zatím žádné red flags.',
+
+        t3b_lbl_suppliers:    'Počet dodavatelů',
+        t3b_opt_suppliers_1:  '1 (jediný)',
+        t3b_opt_suppliers_2_3:'2–3',
+        t3b_opt_suppliers_4plus:'4 a více',
+
+        t3b_lbl_region:       'Region dodavatelů',
+        t3b_opt_region_low:   'Nízké riziko (stabilní, ověřený region)',
+        t3b_opt_region_mid:   'Střední riziko (zvýšené geopolitické nebo logistické riziko)',
+        t3b_opt_region_high:  'Vysoké riziko (nestabilní region)',
+
+        t3b_lbl_criticality:  'Kritičnost komodity (1–5)',
+        t3b_opt_crit_1:       '1 – Nekritická',
+        t3b_opt_crit_2:       '2',
+        t3b_opt_crit_3:       '3 – Střední',
+        t3b_opt_crit_4:       '4',
+        t3b_opt_crit_5:       '5 – Kritická',
+
+        t3b_lbl_logistics:    'Logistická náročnost',
+        t3b_opt_log_low:      'Nízká',
+        t3b_opt_log_mid:      'Střední',
+        t3b_opt_log_high:     'Vysoká',
+
+        t3b_lbl_singlesource: 'Závislost na jednom zdroji',
+        t3b_opt_ss_no:        'Ne',
+        t3b_opt_ss_yes:       'Ano',
+
+        t3b_result_score_label:     'Celkové rizikové skóre (0–100)',
+        t3b_red_flags_heading:      'Red flags',
+        t3b_red_flags_none:         'Žádné red flags – riziko je pod kontrolou.',
+        t3b_recommendation_heading: 'Doporučení',
+
+        t3b_risk_low:     'Nízké riziko',
+        t3b_risk_mid:     'Střední riziko',
+        t3b_risk_high:    'Vysoké riziko',
+
+        t3b_recom_low:    'Riziko je pod kontrolou. Pravidelně monitorujte.',
+        t3b_recom_mid:    'Doporučujeme přijmout opatření: zvýšit počet dodavatelů, prověřit logistiku.',
+        t3b_recom_high:   'Okamžitě proveďte audit dodavatelského řetězce a identifikujte alternativy.',
+
+        // Red flag labels pro každý faktor
+        t3b_flag_suppliers:   'Jediný dodavatel nebo malý počet (vysoká koncentrace)',
+        t3b_flag_region:      'Region s vyšším geopolitickým nebo logistickým rizikem',
+        t3b_flag_criticality: 'Vysoká kritičnost komodity pro výrobu nebo provoz',
+        t3b_flag_logistics:   'Náročná logistika zvyšuje pravděpodobnost výpadku',
+        t3b_flag_singlesource:'Přímá závislost na jednom zdroji bez alternativy',
+
+        // Nástroj 3c: Závislost na dodavateli
+        t3c_title: 'Míra závislosti na dodavateli',
+        t3c_desc:  'Zadejte 4 parametry. Nástroj vypočítá kompozitní index závislosti (0–100) a doporučení pro diverzifikaci.',
+
+        t3c_lbl_spend:        'Podíl nákupu u tohoto dodavatele (%)',
+        t3c_lbl_alts:         'Počet alternativních dodavatelů',
+        t3c_lbl_weeks:        'Odhadovaná doba náhrady (týdny)',
+        t3c_lbl_criticality:  'Kritičnost položky (1–5)',
+
+        t3c_result_index_label: 'Index závislosti (0–100)',
+        t3c_components_heading: 'Složky indexu',
+
+        t3c_comp_spend:       'Podíl spendu',
+        t3c_comp_alts:        'Dostupnost alternativ',
+        t3c_comp_replacement: 'Doba náhrady',
+        t3c_comp_criticality: 'Kritičnost',
+
+        t3c_dep_low:   'Nízká závislost',
+        t3c_dep_mid:   'Střední závislost',
+        t3c_dep_high:  'Vysoká závislost',
+
+        t3c_recom_low:  'Závislost je přijatelná. Udržujte aktuální seznam alternativ.',
+        t3c_recom_mid:  'Zvažte rozšíření základny dodavatelů. Podíl {spend}% je nad doporučenou úrovní.',
+        t3c_recom_high: 'Závislost je kritická. Okamžitě diverzifikujte: hledejte min. 2 alternativy, snižte podíl spendu pod 40 %.',
+
+        t3c_interp: 'Index závislosti {index}/100 — {level}.',
+
+        // Validační chyby 3c
+        err_t3c_spend:       'Zadejte hodnotu v rozsahu 0–100 %',
+        err_t3c_alts:        'Zadejte nezáporné celé číslo',
+        err_t3c_weeks:       'Zadejte kladné číslo (týdny)',
+        err_t3c_criticality: 'Zadejte hodnotu v rozsahu 1–5',
+        err_t3c_alts_weeks:  'Bez alternativy nemůže být náhrada okamžitá. Zadejte odhad doby nalezení a kvalifikace nového zdroje.',
+
+        // Čtení čísel (D1)
+        err_required:          'Toto pole je povinné',
+        err_nonNumeric:        'Zadejte číslo, např. 1 250,50.',
+        err_ambiguous:         'Nejednoznačný zápis čísla.',
+        err_integer:           'Zadejte celé číslo.',
+        err_min:               'Hodnota musí být alespoň {min}.',
+        err_max:               'Hodnota smí být nejvýše {max}.',
+        err_negativeNotAllowed:'Záporná hodnota není povolena',
+        err_divByZero:         'Dělení nulou – hodnota musí být nenulová',
+        numLocale:             'cs-CZ',
+
+        // Nástroj 3d: Dual sourcing
+        t3d_title: 'Srovnání nákladů – dual vs. single sourcing',
+        t3d_desc:  'Zadejte ceny obou dodavatelů, celkový objem a podíl dodavatele A. Nástroj zobrazí celkové náklady a srovnání s alternativami single sourcingu.',
+
+        t3d_lbl_priceA:  'Cena/ks – dodavatel A',
+        t3d_lbl_priceB:  'Cena/ks – dodavatel B',
+        t3d_lbl_volume:  'Celkový objem (ks)',
+        t3d_lbl_splitA:  'Podíl dodavatele A (%)',
+
+        t3d_result_total_dual: 'Celkové náklady – Dual sourcing',
+        t3d_result_breakdown:  'Rozpad nákladů',
+        t3d_result_comparison: 'Srovnání se single sourcingem',
+
+        t3d_breakdown_costA:    'Náklady dodavatel A (část)',
+        t3d_breakdown_costB:    'Náklady dodavatel B (část)',
+        t3d_breakdown_avgPrice: 'Průměrná cena/ks (dual)',
+
+        t3d_single_a:     'Single sourcing – pouze A',
+        t3d_single_b:     'Single sourcing – pouze B',
+        t3d_diff_cheaper: 'Příplatek oproti levnějšímu single sourcingu',
+
+        t3d_interp_dual_costlier:  'Dual sourcing je o {diff} dražší než nejlevnější single sourcing (dodavatel {who}).',
+        t3d_interp_dual_equal:     'Dual sourcing má stejné náklady jako nejlevnější single sourcing.',
+        t3d_interp_dual_cheaper:   'Dual sourcing je o {diff} levnější než dražší single sourcing (dodavatel {who}).',
+
+        t3d_warn_single_source: 'Hodnota 0 % nebo 100 % odpovídá single sourcingu — zadejte podíl v rozsahu 1–99 %.',
+
+        // Validační chyby 3d
+        err_t3d_priceA:  'Zadejte kladné číslo (cena dodavatele A)',
+        err_t3d_priceB:  'Zadejte kladné číslo (cena dodavatele B)',
+        err_t3d_volume:  'Zadejte kladné celé číslo (objem)',
+        err_t3d_splitA:  'Zadejte podíl v rozsahu 1–99 %',
+
+        // Chart labels
+        t3d_chart_label_a:    'Single A',
+        t3d_chart_label_b:    'Single B',
+        t3d_chart_label_dual: 'Dual sourcing',
+      },
+      en: {
+        // Tab labels
+        tab3a: 'Scorecard',
+        tab3b: 'Risk checker',
+        tab3c: 'Dependency',
+        tab3d: 'Dual sourcing',
+
+        // Panel headings
+        panel3a_heading: 'Supplier scorecard',
+        panel3b_heading: 'Risk checker',
+        panel3c_heading: 'Supplier dependency',
+        panel3d_heading: 'Dual sourcing',
+
+        // Shared
+        btn_reset: 'Reset',
+
+        // Placeholders
+        placeholder_3b: 'Will be added in T-006',
+        placeholder_3c: 'Will be added in T-006',
+        placeholder_3d: 'Will be added in T-007',
+
+        // Tool 3a: Scorecard
+        t3a_title:          'Supplier evaluation',
+        t3a_desc:           'Score the supplier on 5 criteria (1–5, or leave "not verified") and set weights (1–3, weight 0 excludes a criterion). The overall score and verdict appear once every criterion with a positive weight is scored.',
+        t3a_opt_unverified: '— not verified —',
+        t3a_unverified:     'not verified',
+        t3a_incomplete:     '{pct} % of weight covered',
+        t3a_incomplete_hint:'No score or verdict until every criterion with a positive weight is scored. Set the weight to 0 to exclude a criterion you do not want to score.',
+        t3a_col_criterion:  'Criterion',
+        t3a_col_score:      'Score (1–5)',
+        t3a_col_weight:     'Weight (1–3)',
+        t3a_weight_label:   'weight',
+
+        t3a_crit_price:    'Price',
+        t3a_crit_quality:  'Quality',
+        t3a_crit_delivery: 'Delivery',
+        t3a_crit_comm:     'Communication',
+        t3a_crit_flex:     'Flexibility',
+
+        t3a_result_overall:  'Weighted overall score (0–100)',
+        t3a_partial_heading: 'Partial scores (0–100)',
+
+        t3a_verdict_excellent:    'Excellent',
+        t3a_verdict_acceptable:   'Acceptable',
+        t3a_verdict_risky:        'At risk',
+
+        err_t3a_weight_zero:    'At least one weight must be greater than 0',
+        err_t3a_weight_invalid: 'Weight must be a non-negative number',
+
+        t3a_chart_label: 'Score',
+
+        // Tool 3b: Risk checker
+        t3b_title:  'Supplier risk assessment',
+        t3b_desc:   'Select values for 5 risk factors. The score (0–100), risk level and recommendation appear once all five questions are answered; an unverified answer never counts as low risk.',
+        t3b_opt_unverified:   '— not verified —',
+        t3b_incomplete_badge: 'Incomplete data',
+        t3b_incomplete:       '{n} of 5 answered. The score and risk level appear once all questions are answered.',
+        t3b_red_flags_none_partial: 'No red flags in the answers given so far.',
+
+        t3b_lbl_suppliers:     'Number of suppliers',
+        t3b_opt_suppliers_1:   '1 (sole source)',
+        t3b_opt_suppliers_2_3: '2–3',
+        t3b_opt_suppliers_4plus:'4 or more',
+
+        t3b_lbl_region:       'Supplier region',
+        t3b_opt_region_low:   'Low risk (stable, verified region)',
+        t3b_opt_region_mid:   'Medium risk (elevated geopolitical or logistics risk)',
+        t3b_opt_region_high:  'High risk (unstable region)',
+
+        t3b_lbl_criticality:  'Commodity criticality (1–5)',
+        t3b_opt_crit_1:       '1 – Non-critical',
+        t3b_opt_crit_2:       '2',
+        t3b_opt_crit_3:       '3 – Medium',
+        t3b_opt_crit_4:       '4',
+        t3b_opt_crit_5:       '5 – Critical',
+
+        t3b_lbl_logistics:    'Logistics complexity',
+        t3b_opt_log_low:      'Low',
+        t3b_opt_log_mid:      'Medium',
+        t3b_opt_log_high:     'High',
+
+        t3b_lbl_singlesource: 'Single-source dependency',
+        t3b_opt_ss_no:        'No',
+        t3b_opt_ss_yes:       'Yes',
+
+        t3b_result_score_label:     'Overall risk score (0–100)',
+        t3b_red_flags_heading:      'Red flags',
+        t3b_red_flags_none:         'No red flags – risk is under control.',
+        t3b_recommendation_heading: 'Recommendation',
+
+        t3b_risk_low:  'Low risk',
+        t3b_risk_mid:  'Medium risk',
+        t3b_risk_high: 'High risk',
+
+        t3b_recom_low:  'Risk is under control. Monitor regularly.',
+        t3b_recom_mid:  'Recommended actions: increase number of suppliers, review logistics.',
+        t3b_recom_high: 'Immediately audit your supply chain and identify alternatives.',
+
+        t3b_flag_suppliers:   'Sole or very few suppliers (high concentration)',
+        t3b_flag_region:      'Region with elevated geopolitical or logistics risk',
+        t3b_flag_criticality: 'High commodity criticality for production or operations',
+        t3b_flag_logistics:   'Complex logistics increases likelihood of disruption',
+        t3b_flag_singlesource:'Direct single-source dependency with no alternative',
+
+        // Tool 3c: Supplier dependency
+        t3c_title: 'Supplier dependency score',
+        t3c_desc:  'Enter 4 parameters. The tool calculates a composite dependency index (0–100) and diversification recommendations.',
+
+        t3c_lbl_spend:        'Spend share with this supplier (%)',
+        t3c_lbl_alts:         'Number of alternative suppliers',
+        t3c_lbl_weeks:        'Estimated replacement lead time (weeks)',
+        t3c_lbl_criticality:  'Item criticality (1–5)',
+
+        t3c_result_index_label: 'Dependency index (0–100)',
+        t3c_components_heading: 'Index components',
+
+        t3c_comp_spend:       'Spend share',
+        t3c_comp_alts:        'Availability of alternatives',
+        t3c_comp_replacement: 'Replacement lead time',
+        t3c_comp_criticality: 'Criticality',
+
+        t3c_dep_low:  'Low dependency',
+        t3c_dep_mid:  'Medium dependency',
+        t3c_dep_high: 'High dependency',
+
+        t3c_recom_low:  'Dependency is acceptable. Keep an up-to-date list of alternatives.',
+        t3c_recom_mid:  'Consider expanding the supplier base. A share of {spend}% is above the recommended level.',
+        t3c_recom_high: 'Dependency is critical. Diversify immediately: find at least 2 alternatives and reduce spend share below 40 %.',
+
+        t3c_interp: 'Dependency index {index}/100 — {level}.',
+
+        err_t3c_spend:       'Enter a value between 0 and 100 %',
+        err_t3c_alts:        'Enter a non-negative integer',
+        err_t3c_weeks:       'Enter a positive number (weeks)',
+        err_t3c_criticality: 'Enter a value between 1 and 5',
+        err_t3c_alts_weeks:  'With no alternative the replacement cannot be immediate. Enter an estimate of how long it takes to find and qualify a new source.',
+
+        // Number input (D1)
+        err_required:          'This field is required',
+        err_nonNumeric:        'Enter a number, e.g. 1,250.50 or 1250.50.',
+        err_ambiguous:         'Ambiguous number: write 1250 or 1,250.00 for thousands, 1.25 for decimals.',
+        err_integer:           'Enter a whole number.',
+        err_min:               'Value must be at least {min}.',
+        err_max:               'Value must be at most {max}.',
+        err_negativeNotAllowed:'Negative value is not allowed',
+        err_divByZero:         'Division by zero – value must not be zero',
+        numLocale:             'en-US',
+
+        // Tool 3d: Dual sourcing
+        t3d_title: 'Cost comparison – dual vs. single sourcing',
+        t3d_desc:  'Enter both supplier prices, total volume and the share for supplier A. The tool shows total costs and a comparison with single sourcing alternatives.',
+
+        t3d_lbl_priceA:  'Unit price – supplier A',
+        t3d_lbl_priceB:  'Unit price – supplier B',
+        t3d_lbl_volume:  'Total volume (units)',
+        t3d_lbl_splitA:  'Share of supplier A (%)',
+
+        t3d_result_total_dual: 'Total cost – Dual sourcing',
+        t3d_result_breakdown:  'Cost breakdown',
+        t3d_result_comparison: 'Comparison with single sourcing',
+
+        t3d_breakdown_costA:    'Supplier A cost (portion)',
+        t3d_breakdown_costB:    'Supplier B cost (portion)',
+        t3d_breakdown_avgPrice: 'Average unit price (dual)',
+
+        t3d_single_a:     'Single sourcing – A only',
+        t3d_single_b:     'Single sourcing – B only',
+        t3d_diff_cheaper: 'Premium over cheapest single sourcing',
+
+        t3d_interp_dual_costlier:  'Dual sourcing costs {diff} more than the cheapest single sourcing (supplier {who}).',
+        t3d_interp_dual_equal:     'Dual sourcing has the same cost as the cheapest single sourcing.',
+        t3d_interp_dual_cheaper:   'Dual sourcing costs {diff} less than the more expensive single sourcing (supplier {who}).',
+
+        t3d_warn_single_source: 'A value of 0 % or 100 % is equivalent to single sourcing — enter a share between 1 and 99 %.',
+
+        // Validation errors 3d
+        err_t3d_priceA:  'Enter a positive number (supplier A price)',
+        err_t3d_priceB:  'Enter a positive number (supplier B price)',
+        err_t3d_volume:  'Enter a positive integer (volume)',
+        err_t3d_splitA:  'Enter a share between 1 and 99 %',
+
+        // Chart labels
+        t3d_chart_label_a:    'Single A',
+        t3d_chart_label_b:    'Single B',
+        t3d_chart_label_dual: 'Dual sourcing',
+      }
+    };
+
+    let currentLang = 'cs';
+
+    /* ===== CURRENCY STATE ===== */
+    let currentCurrency = 'CZK';
+
+    const CURRENCY_CONFIG = {
+      CZK: { symbol: 'Kč',  locale: 'cs-CZ' },
+      EUR: { symbol: '€',   locale: 'de-DE' },
+      USD: { symbol: '$',   locale: 'en-US' },
+      GBP: { symbol: '£',   locale: 'en-GB' },
+      CHF: { symbol: 'Fr',  locale: 'de-CH' },
+      JPY: { symbol: '¥',   locale: 'ja-JP' },
+      PLN: { symbol: 'zł',  locale: 'pl-PL' },
+    };
+
+    /* ===== CHART INSTANCE REFS ===== */
+    let chartScorecard = null; // nástroj 3a
+    let chartDual      = null; // nástroj 3d
+
+    /* ===== UTILITY FUNCTIONS ===== */
+    function formatCurrency(value, decimals = 2) {
+      const cfg = CURRENCY_CONFIG[currentCurrency] || CURRENCY_CONFIG['CZK'];
+      return new Intl.NumberFormat(cfg.locale, {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals
+      }).format(value);
+    }
+
+    /* ===== D1: ČTENÍ ČÍSEL PODLE JAZYKA =====
+       Blok mezi značkami D1-SHARED je ve všech převedených toolboxech textově shodný
+       (hlídá iter-013-gates.js). Neměnit v jednom souboru bez ostatních.
+       CZ: mezera = tisíce, čárka NEBO tečka = desetinná („1,250“ = 1,25).
+       EN: mezera nebo čárka po trojicích = tisíce, tečka = desetinná; „1,250“ bez tečky je
+       víceznačné a odmítne se. Přepnutí jazyka tak nikdy tiše nezmění číslo. */
+    // D1-SHARED-BEGIN
+    const NUM_SPACES = /[\s\u00a0\u202f]/g;
+    const NUM_PLAIN = /^[+-]?(?:\d+(?:[.,]\d*)?|[.,]\d+)$/;
+    const NUM_EN_GROUPED = /^[+-]?\d{1,3}(?:,\d{3})+\.\d*$/;
+    const NUM_EN_AMBIGUOUS = /^[+-]?[1-9]\d{0,2}(?:,\d{3})+$/;
+
+    /** → { value, canonical, error }; error ∈ null | 'empty' | 'nonNumeric' | 'ambiguous' | 'integer'.
+        canonical = zápis s desetinnou tečkou bez oddělovačů tisíců (pro přesné výpočty v setinách). */
+    function parseNumEx(str, { integer = false, lang = currentLang } = {}) {
+      const s = String(str == null ? '' : str).trim().replace(NUM_SPACES, '');
+      if (s === '') return { value: null, canonical: '', error: 'empty' };
+      let canonical;
+      if (lang === 'en') {
+        if (NUM_EN_GROUPED.test(s)) canonical = s.replace(/,/g, '');
+        else if (NUM_EN_AMBIGUOUS.test(s)) return { value: NaN, canonical: '', error: 'ambiguous' };
+        else if (s.includes(',')) return { value: NaN, canonical: '', error: 'nonNumeric' };
+        else if (NUM_PLAIN.test(s)) canonical = s;
+      } else if (NUM_PLAIN.test(s)) {
+        canonical = s.replace(',', '.');
+      }
+      if (canonical === undefined) return { value: NaN, canonical: '', error: 'nonNumeric' };
+      const n = Number(canonical);
+      if (!Number.isFinite(n)) return { value: NaN, canonical: '', error: 'nonNumeric' };
+      if (integer && !Number.isInteger(n)) return { value: NaN, canonical, error: 'integer' };
+      return { value: n, canonical, error: null };
+    }
+
+    /** Číslo, nebo NaN (prázdné i neplatné). */
+    function parseNum(str, lang = currentLang) {
+      const r = parseNumEx(str, { lang });
+      return r.error ? NaN : r.value;
+    }
+    // D1-SHARED-END
+
+    /** Kód chyby (parseNumEx, vatSplit) → hláška v aktuálním jazyce. */
+    function numErrorText(code) {
+      const T = TEXTS[currentLang];
+      const key = {
+        empty: 'err_required', required: 'err_required', nonNumeric: 'err_nonNumeric',
+        ambiguous: 'err_ambiguous', integer: 'err_integer', negative: 'err_negativeNotAllowed',
+        rateRange: 'err_rateRange', maxTwoDecimals: 'err_maxTwoDecimals', tooLarge: 'err_tooLarge'
+      }[code];
+      return T[key] || T.err_nonNumeric;
+    }
+
+    function formatPlainNumber(n) {
+      return new Intl.NumberFormat(TEXTS[currentLang].numLocale, { maximumFractionDigits: 6 }).format(n);
+    }
+
+    function safeNum(str) {
+      const v = parseNum(str);
+      return isNaN(v) ? 0 : v;
+    }
+
+    /* ===== VALIDATION HELPERS ===== */
+    function showError(inputId, message) {
+      const input = document.getElementById(inputId);
+      const errEl = document.getElementById(inputId + '-err');
+      if (!input || !errEl) return;
+      input.classList.add('input-error');
+      input.setAttribute('aria-invalid', 'true');
+      errEl.textContent = message;
+      errEl.classList.add('visible');
+    }
+
+    function clearError(inputId) {
+      const input = document.getElementById(inputId);
+      const errEl = document.getElementById(inputId + '-err');
+      if (!input || !errEl) return;
+      input.classList.remove('input-error');
+      input.removeAttribute('aria-invalid');
+      errEl.textContent = '';
+      errEl.classList.remove('visible');
+    }
+
+    function validateNumeric(value, { required = true, allowNegative = false, allowZero = true,
+                                      integer = false, min = null, max = null } = {}) {
+      const T = TEXTS[currentLang];
+      const r = parseNumEx(value, { integer });
+      if (r.error === 'empty') return required ? T.err_required : null;
+      if (r.error) return numErrorText(r.error);
+      const n = r.value;
+      if (!allowNegative && n < 0) return T.err_negativeNotAllowed;
+      if (!allowZero && n === 0) return T.err_divByZero;
+      if (min !== null && n < min) return T.err_min.replace('{min}', formatPlainNumber(min));
+      if (max !== null && n > max) return T.err_max.replace('{max}', formatPlainNumber(max));
+      return null;
+    }
+
+    /**
+     * Povinné číselné pole s vlastní hláškou pro prázdnou hodnotu a rozsah.
+     * Formát čísla (nonNumeric, ambiguous, integer) hlásí obecně podle D1.
+     * Vrací číslo, nebo null při chybě (chyba je zobrazená u pole).
+     */
+    function readRequiredNumber(id, { integer = false, inRange }, rangeMsg) {
+      const p = parseNumEx(document.getElementById(id).value, { integer });
+      let msg = null;
+      if (p.error === 'empty') msg = rangeMsg;
+      else if (p.error) msg = numErrorText(p.error);
+      else if (!inRange(p.value)) msg = rangeMsg;
+      if (msg) { showError(id, msg); return null; }
+      clearError(id);
+      return p.value;
+    }
+
+    function showErrorEl(elId, message) {
+      const errEl = document.getElementById(elId);
+      if (!errEl) return;
+      errEl.textContent = message;
+      errEl.classList.add('visible');
+    }
+
+    function clearErrorEl(elId) {
+      const errEl = document.getElementById(elId);
+      if (!errEl) return;
+      errEl.textContent = '';
+      errEl.classList.remove('visible');
+    }
+
+    /* ===== Destroy-on-reset utility (pattern z toolbox-2) ===== */
+    function destroyChart(chartRef) {
+      if (chartRef) { chartRef.destroy(); }
+      return null;
+    }
+
+    /* ===== XSS helper ===== */
+    function escHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    /* ===== I18N ENGINE ===== */
+    function setLang(lang) {
+      currentLang = lang;
+      document.documentElement.lang = lang;
+
+      const currSym = CURRENCY_CONFIG[currentCurrency]
+        ? CURRENCY_CONFIG[currentCurrency].symbol
+        : 'Kč';
+
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (TEXTS[lang] && TEXTS[lang][key] !== undefined) {
+          el.textContent = TEXTS[lang][key].replace(/\{currency\}/g, currSym);
+        }
+      });
+
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        if (TEXTS[lang] && TEXTS[lang][key] !== undefined) {
+          el.placeholder = TEXTS[lang][key].replace(/\{currency\}/g, currSym);
+        }
+      });
+
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lang === lang);
+      });
+    }
+
+    /* ===== CURRENCY FUNCTIONS ===== */
+    function updateCurrencyLabels() {
+      const sym = CURRENCY_CONFIG[currentCurrency].symbol;
+      document.querySelectorAll('[data-currency-label]').forEach(el => {
+        el.textContent = sym;
+      });
+    }
+
+    function setCurrency(code) {
+      if (!CURRENCY_CONFIG[code]) return;
+      currentCurrency = code;
+
+      document.querySelectorAll('.btn-currency').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.currency === code);
+      });
+
+      updateCurrencyLabels();
+      setLang(currentLang);
+      // 3a is dimensionless – no re-render needed for currency change
+      // 3d: re-run calculation + redraw chart with new currency symbol
+      calcDualSourcing();
+    }
+
+    /* ===== TAB NAVIGATION ===== */
+    function initTabs() {
+      const nav     = document.querySelector('.tab-nav');
+      const panels  = document.querySelectorAll('.tool-panel');
+      const buttons = Array.from(nav.querySelectorAll('.tab-btn'));
+
+      nav.addEventListener('click', (e) => {
+        const btn = e.target.closest('.tab-btn');
+        if (!btn) return;
+        activateTab(btn, buttons, panels);
+      });
+
+      nav.addEventListener('keydown', (e) => {
+        const btn = e.target.closest('.tab-btn');
+        if (!btn) return;
+        const currentIndex = buttons.indexOf(btn);
+        let targetIndex = -1;
+
+        if (e.key === 'ArrowRight') {
+          targetIndex = (currentIndex + 1) % buttons.length;
+        } else if (e.key === 'ArrowLeft') {
+          targetIndex = (currentIndex - 1 + buttons.length) % buttons.length;
+        } else if (e.key === 'Home') {
+          targetIndex = 0;
+        } else if (e.key === 'End') {
+          targetIndex = buttons.length - 1;
+        }
+
+        if (targetIndex >= 0) {
+          e.preventDefault();
+          buttons[targetIndex].focus();
+          activateTab(buttons[targetIndex], buttons, panels);
+        }
+      });
+    }
+
+    function activateTab(btn, buttons, panels) {
+      buttons.forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-selected', 'false');
+        b.setAttribute('tabindex', '-1');
+      });
+      panels.forEach(p => {
+        p.classList.remove('active');
+        p.setAttribute('hidden', '');
+      });
+
+      btn.classList.add('active');
+      btn.setAttribute('aria-selected', 'true');
+      btn.setAttribute('tabindex', '0');
+      const targetId = btn.dataset.tab;
+      const panel = document.getElementById(targetId);
+      if (panel) {
+        panel.classList.add('active');
+        panel.removeAttribute('hidden');
+      }
+    }
+
+    /* ===== LANG SWITCHER ===== */
+    function initLangSwitcher() {
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          setLang(btn.dataset.lang);
+        });
+      });
+    }
+
+    /* ===================================================
+       NÁSTROJ 3a: SCORECARD HODNOCENÍ DODAVATELŮ
+       =================================================== */
+
+    // Konfigurace 5 kritérií (index odpovídá pořadí HTML prvků)
+    const CRITERIA_KEYS = [
+      't3a_crit_price',
+      't3a_crit_quality',
+      't3a_crit_delivery',
+      't3a_crit_comm',
+      't3a_crit_flex',
+    ];
+
+    /**
+     * T3-2: scorecard jako čistá funkce.
+     *  scores:  [1–5 | null] (null = neověřeno), weights: [≥ 0]
+     * Kritérium s vahou 0 se vyřadí. Skóre a verdikt vzniknou jen tehdy, když jsou ohodnocena všechna
+     * kritéria s kladnou vahou; jinak score = null a coverage = podíl vah ohodnocených kritérií (%).
+     * Vrací { partial: [0–100 | null], complete, coverage, score } nebo { error: 'weightZero' }.
+     */
+    function scorecard({ scores, weights }) {
+      const totalWeight = weights.reduce((sum, w) => sum + w, 0);
+      if (!(totalWeight > 0)) return { error: 'weightZero' };
+      const partial = scores.map(s => (s === null ? null : (s - 1) / 4 * 100));
+      const complete = weights.every((w, i) => w === 0 || scores[i] !== null);
+      const coveredWeight = weights.reduce((sum, w, i) => sum + (scores[i] === null ? 0 : w), 0);
+      const coverage = coveredWeight / totalWeight * 100;
+      if (!complete) return { partial, complete, coverage, score: null };
+      const score = weights.reduce((sum, w, i) => sum + (w === 0 ? 0 : w / totalWeight * partial[i]), 0);
+      return { partial, complete, coverage, score };
+    }
+
+    function calcScorecard() {
+      const T = TEXTS[currentLang];
+      const resultEl = document.getElementById('t3a-result');
+
+      // Váhy: povinné nezáporné číslo, parser podle jazyka
+      clearErrorEl('t3a-weight-err');
+      let hasWeightError = false;
+      const weights = [];
+      const scores = [];
+      for (let i = 0; i < 5; i++) {
+        const id = 't3a-weight-' + i;
+        clearError(id);
+        const err = validateNumeric(document.getElementById(id).value, { required: true, allowNegative: false });
+        if (err) { showError(id, err); hasWeightError = true; }
+        weights.push(err ? 0 : parseNum(document.getElementById(id).value));
+        const raw = document.getElementById('t3a-score-' + i).value;
+        scores.push(raw === '' ? null : Number(raw));
+      }
+      if (hasWeightError) {
+        showErrorEl('t3a-weight-err', T.err_t3a_weight_invalid);
+        resultEl.style.display = 'none';
+        return;
+      }
+
+      const res = scorecard({ scores, weights });
+      if (res.error) {
+        showErrorEl('t3a-weight-err', T.err_t3a_weight_zero);
+        resultEl.style.display = 'none';
+        return;
+      }
+      // Nic ohodnoceno → zatím nic k zobrazení
+      if (scores.every(x => x === null)) {
+        resultEl.style.display = 'none';
+        chartScorecard = destroyChart(chartScorecard);
+        return;
+      }
+
+      const badge = document.getElementById('t3a-verdict-badge');
+      const note = document.getElementById('t3a-note');
+      if (res.complete) {
+        // Thresholds (dle architektury: výborný ≥70, přijatelný ≥40, rizikový <40)
+        let verdictKey, badgeClass;
+        if (res.score >= 70) {
+          verdictKey = 't3a_verdict_excellent'; badgeClass = 'success';
+        } else if (res.score >= 40) {
+          verdictKey = 't3a_verdict_acceptable'; badgeClass = 'warning';
+        } else {
+          verdictKey = 't3a_verdict_risky'; badgeClass = 'danger';
+        }
+        document.getElementById('t3a-overall-score').textContent = res.score.toFixed(1);
+        badge.textContent = T[verdictKey];
+        badge.className = 'risk-badge ' + badgeClass;
+        note.textContent = '';
+      } else {
+        document.getElementById('t3a-overall-score').textContent = '—';
+        badge.textContent = T.t3a_incomplete.replace('{pct}', formatPlainNumber(Math.round(res.coverage * 10) / 10));
+        badge.className = 'risk-badge';
+        note.textContent = T.t3a_incomplete_hint;
+      }
+
+      // Dílčí skóre seznam (neověřené kritérium = „neověřeno“, ne 0)
+      const partialContainer = document.getElementById('t3a-partial-scores');
+      partialContainer.innerHTML = '';
+      for (let i = 0; i < 5; i++) {
+        const row = document.createElement('div');
+        row.className = 'result-row';
+        row.innerHTML =
+          '<span class="result-row-label">' + escHtml(T[CRITERIA_KEYS[i]]) + '</span>' +
+          '<span class="result-row-value">' + (res.partial[i] === null ? escHtml(T.t3a_unverified) : res.partial[i].toFixed(1)) + '</span>';
+        partialContainer.appendChild(row);
+      }
+
+      resultEl.style.display = 'block';
+
+      // Radar chart – neověřené kritérium jako null (bod chybí, nekreslí se jako 0)
+      renderScorecardChart(res.partial);
+    }
+
+    function renderScorecardChart(partialScores) {
+      const T = TEXTS[currentLang];
+      const canvas = document.getElementById('chart-3a-radar');
+      const ctx = canvas.getContext('2d');
+
+      const labels = CRITERIA_KEYS.map(k => T[k]);
+      const data = partialScores.map(v => (v === null ? null : Math.round(v * 10) / 10));
+
+      const primaryColor = '#1E40AF';
+      const accentColor  = '#3B82F6';
+
+      if (chartScorecard) {
+        chartScorecard.data.labels = labels;
+        chartScorecard.data.datasets[0].data = data;
+        chartScorecard.data.datasets[0].label = T.t3a_chart_label;
+        chartScorecard.update();
+        return;
+      }
+
+      // Create new instance (destroy pattern z toolbox-2 – MINOR-1)
+      chartScorecard = destroyChart(chartScorecard);
+      chartScorecard = new Chart(ctx, {
+        type: 'radar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: T.t3a_chart_label,
+            data: data,
+            backgroundColor: accentColor + '33',
+            borderColor: primaryColor,
+            borderWidth: 2,
+            pointBackgroundColor: primaryColor,
+            pointRadius: 4,
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: ctx2 => ' ' + (ctx2.parsed.r === null ? T.t3a_unverified : ctx2.parsed.r.toFixed(1))
+              }
+            }
+          },
+          scales: {
+            r: {
+              min: 0,
+              max: 100,
+              ticks: {
+                stepSize: 20,
+                font: { size: 11 }
+              },
+              pointLabels: {
+                font: { size: 12 }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function resetScorecard() {
+      // Reset hodnocení na „neověřeno“
+      for (let i = 0; i < 5; i++) {
+        document.getElementById('t3a-score-' + i).value = '';
+      }
+      // Reset weights to defaults
+      const defaultWeights = [2, 3, 2, 1, 1];
+      for (let i = 0; i < 5; i++) {
+        document.getElementById('t3a-weight-' + i).value = defaultWeights[i];
+      }
+      // Clear errors
+      clearErrorEl('t3a-weight-err');
+      for (let i = 0; i < 5; i++) clearError('t3a-weight-' + i);
+      // Hide result box + destroy chart
+      document.getElementById('t3a-result').style.display = 'none';
+      chartScorecard = destroyChart(chartScorecard);
+    }
+
+    // Event listener for reset button
+    document.getElementById('t3a-reset').addEventListener('click', resetScorecard);
+
+    /* ===========================================================
+       NÁSTROJ 3b: RISK CHECKER
+       =========================================================== */
+
+    // Lookup tabulka: bodové hodnoty dle architektury sekce 4.2
+    // Každý faktor: { elementId, flagKey, getValue }
+    // getValue vrací { points, flagKey } – nebo null pokud flag není aktivní
+
+    const RISK_FACTORS = [
+      { id: 't3b-suppliers',    flagKey: 't3b_flag_suppliers'    },
+      { id: 't3b-region',       flagKey: 't3b_flag_region'       },
+      { id: 't3b-criticality',  flagKey: 't3b_flag_criticality'  },
+      { id: 't3b-logistics',    flagKey: 't3b_flag_logistics'    },
+      { id: 't3b-singlesource', flagKey: 't3b_flag_singlesource' },
+    ];
+
+    /**
+     * Q1 (a), T3-5: Risk checker jako čistá funkce. points: [body | null] v pořadí RISK_FACTORS, null = neověřeno.
+     * Skóre a úroveň vzniknou jen při 5/5 zodpovězených; neověřená odpověď se nikdy nepočítá jako 0 bodů.
+     * Vrací { answered, complete, score (null při neúplných), level ('low'|'mid'|'high'|null) }.
+     */
+    function riskStatus(points) {
+      const answered = points.filter(p => p !== null).length;
+      if (answered < points.length) return { answered, complete: false, score: null, level: null };
+      const score = points.reduce((sum, p) => sum + p, 0);
+      const level = score >= 60 ? 'high' : score >= 30 ? 'mid' : 'low';
+      return { answered, complete: true, score, level };
+    }
+
+    function calcRisk() {
+      const T = TEXTS[currentLang];
+      const points = RISK_FACTORS.map(f => {
+        const raw = document.getElementById(f.id).value;
+        return raw === '' ? null : Number(raw);
+      });
+      const res = riskStatus(points);
+
+      if (res.answered === 0) {
+        document.getElementById('t3b-result').style.display = 'none';
+        return;
+      }
+
+      const LEVELS = {
+        high: { label: T.t3b_risk_high, badgeClass: 'danger',  recomKey: 't3b_recom_high' },
+        mid:  { label: T.t3b_risk_mid,  badgeClass: 'warning', recomKey: 't3b_recom_mid'  },
+        low:  { label: T.t3b_risk_low,  badgeClass: 'success', recomKey: 't3b_recom_low'  },
+      };
+      const badge = document.getElementById('t3b-risk-badge');
+      const bar = document.getElementById('t3b-progress-bar');
+      if (res.complete) {
+        const lv = LEVELS[res.level];
+        document.getElementById('t3b-score-value').textContent = res.score;
+        badge.textContent = lv.label;
+        badge.className = 'risk-badge ' + lv.badgeClass;
+        bar.style.width = res.score + '%';
+        bar.className = 'progress-bar-fill ' + lv.badgeClass;
+        document.getElementById('t3b-recommendation').textContent = T[lv.recomKey];
+      } else {
+        document.getElementById('t3b-score-value').textContent = '—';
+        badge.textContent = T.t3b_incomplete_badge;
+        badge.className = 'risk-badge';
+        bar.style.width = '0%';
+        bar.className = 'progress-bar-fill';
+        document.getElementById('t3b-recommendation').textContent = T.t3b_incomplete.replace('{n}', res.answered);
+      }
+
+      // Red flags: zodpovězené faktory s body > 0, seřazené sestupně dle bodů
+      const activeFlags = RISK_FACTORS
+        .map((f, i) => ({ points: points[i], flagKey: f.flagKey }))
+        .filter(f => f.points !== null && f.points > 0)
+        .sort((a, b) => b.points - a.points);
+
+      const flagsContainer = document.getElementById('t3b-red-flags-container');
+      if (activeFlags.length === 0) {
+        // MINOR-3: fallback text při prázdném seznamu; u neúplných dat neříká „pod kontrolou“
+        const emptyText = res.complete ? T.t3b_red_flags_none : T.t3b_red_flags_none_partial;
+        flagsContainer.innerHTML = '<p class="red-flags-empty">' + escHtml(emptyText) + '</p>';
+      } else {
+        const ul = document.createElement('ul');
+        ul.className = 'red-flags-list';
+        activeFlags.forEach(f => {
+          const li = document.createElement('li');
+          li.textContent = T[f.flagKey] || f.flagKey;
+          ul.appendChild(li);
+        });
+        flagsContainer.innerHTML = '';
+        flagsContainer.appendChild(ul);
+      }
+
+      // Zobraz result box
+      document.getElementById('t3b-result').style.display = 'block';
+    }
+
+    function resetRisk() {
+      // Reset všech selectů na první volbu „— neověřeno —“
+      RISK_FACTORS.forEach(f => { document.getElementById(f.id).value = ''; });
+      // Skryj result box
+      document.getElementById('t3b-result').style.display = 'none';
+    }
+
+    document.getElementById('t3b-reset').addEventListener('click', resetRisk);
+
+    /* ===========================================================
+       NÁSTROJ 3c: ZÁVISLOST NA DODAVATELI
+       =========================================================== */
+
+    /**
+     * Index závislosti (vzorec beze změny, architecture_iter-005.md sekce 4.3) jako čistá funkce.
+     * T3-8: 0 alternativ a náhrada 0 týdnů si odporují → { error: 'altsWeeks', field: 'weeks' }.
+     */
+    function dependencyIndex({ spend, alts, weeks, criticality }) {
+      if (alts === 0 && weeks === 0) return { error: 'altsWeeks', field: 'weeks' };
+      const spendComponent       = Math.min(spend, 100) / 100 * 40;          // max 40
+      const altComponent         = Math.max(0, 30 - alts * 7.5);             // 0 alt → 30, 4+ → 0
+      const replacementComponent = Math.min(weeks / 12, 1) * 20;             // max 20
+      const criticalityComponent = (criticality - 1) / 4 * 10;               // max 10
+      return { index: spendComponent + altComponent + replacementComponent + criticalityComponent,
+               spendComponent, altComponent, replacementComponent, criticalityComponent };
+    }
+
+    function calcDependency() {
+      const T = TEXTS[currentLang];
+
+      // Čtení vstupů
+      const spendRaw       = document.getElementById('t3c-spend').value.trim();
+      const altsRaw        = document.getElementById('t3c-alts').value.trim();
+      const weeksRaw       = document.getElementById('t3c-weeks').value.trim();
+      const critRaw        = document.getElementById('t3c-criticality').value.trim();
+
+      // Pokud jsou všechna pole prázdná, nekalkujeme
+      if (spendRaw === '' && altsRaw === '' && weeksRaw === '' && critRaw === '') {
+        document.getElementById('t3c-result').style.display = 'none';
+        return;
+      }
+
+      // Validace (D1, T3-14: alternativy a kritičnost jen celá čísla)
+      const spendShare = readRequiredNumber('t3c-spend', { inRange: v => v >= 0 && v <= 100 }, T.err_t3c_spend);
+      const alternatives = readRequiredNumber('t3c-alts', { integer: true, inRange: v => v >= 0 }, T.err_t3c_alts);
+      const replacementWeeks = readRequiredNumber('t3c-weeks', { inRange: v => v >= 0 }, T.err_t3c_weeks);
+      const criticality = readRequiredNumber('t3c-criticality', { integer: true, inRange: v => v >= 1 && v <= 5 }, T.err_t3c_criticality);
+
+      if ([spendShare, alternatives, replacementWeeks, criticality].includes(null)) {
+        document.getElementById('t3c-result').style.display = 'none';
+        return;
+      }
+
+      // T3-8: bez alternativy nemůže být náhrada okamžitá
+      const dep = dependencyIndex({ spend: spendShare, alts: alternatives, weeks: replacementWeeks, criticality });
+      if (dep.error) {
+        showError('t3c-weeks', T.err_t3c_alts_weeks);
+        document.getElementById('t3c-result').style.display = 'none';
+        return;
+      }
+
+      const { spendComponent, altComponent, replacementComponent, criticalityComponent } = dep;
+      const indexRounded = Number(dep.index.toFixed(1));
+
+      // Vyhodnocení
+      let depLevel, badgeClass, recomKey;
+      if (indexRounded >= 60) {
+        depLevel = T.t3c_dep_high; badgeClass = 'danger';  recomKey = 't3c_recom_high';
+      } else if (indexRounded >= 30) {
+        depLevel = T.t3c_dep_mid;  badgeClass = 'warning'; recomKey = 't3c_recom_mid';
+      } else {
+        depLevel = T.t3c_dep_low;  badgeClass = 'success'; recomKey = 't3c_recom_low';
+      }
+
+      // Zobraz index + badge
+      document.getElementById('t3c-index-value').textContent = indexRounded.toFixed(1);
+      const badge = document.getElementById('t3c-dep-badge');
+      badge.textContent = depLevel;
+      badge.className = 'risk-badge ' + badgeClass;
+
+      // Progress bar
+      const bar = document.getElementById('t3c-progress-bar');
+      bar.style.width = Math.min(indexRounded, 100) + '%';
+      bar.className = 'progress-bar-fill ' + badgeClass;
+
+      // Složky indexu
+      const components = document.getElementById('t3c-components');
+      components.innerHTML = '';
+      const compData = [
+        { labelKey: 't3c_comp_spend',       value: spendComponent       },
+        { labelKey: 't3c_comp_alts',        value: altComponent         },
+        { labelKey: 't3c_comp_replacement', value: replacementComponent },
+        { labelKey: 't3c_comp_criticality', value: criticalityComponent },
+      ];
+      compData.forEach(c => {
+        const row = document.createElement('div');
+        row.className = 'result-row';
+        row.innerHTML =
+          '<span class="result-row-label">' + escHtml(T[c.labelKey]) + '</span>' +
+          '<span class="result-row-value">' + c.value.toFixed(1) + '</span>';
+        components.appendChild(row);
+      });
+
+      // Interpretace
+      const interpText = T.t3c_interp
+        .replace('{index}', indexRounded.toFixed(1))
+        .replace('{level}', depLevel);
+      document.getElementById('t3c-interpretation').textContent = interpText;
+
+      // Doporučení (s interpolací spendShare pro střední úroveň)
+      const recomText = T[recomKey].replace('{spend}', spendShare.toFixed(0));
+      document.getElementById('t3c-recommendation').textContent = recomText;
+
+      // Zobraz result box
+      document.getElementById('t3c-result').style.display = 'block';
+    }
+
+    function resetDependency() {
+      ['t3c-spend', 't3c-alts', 't3c-weeks', 't3c-criticality'].forEach(id => {
+        const el = document.getElementById(id);
+        el.value = '';
+        clearError(id);
+      });
+      document.getElementById('t3c-result').style.display = 'none';
+    }
+
+    document.getElementById('t3c-reset').addEventListener('click', resetDependency);
+
+    /* ===========================================================
+       NÁSTROJ 3d: DUAL SOURCING – COST COMPARISON
+       =========================================================== */
+
+    function calcDualSourcing() {
+      const T = TEXTS[currentLang];
+
+      // Čtení vstupů
+      const priceARaw  = document.getElementById('t3d-priceA').value.trim();
+      const priceBRaw  = document.getElementById('t3d-priceB').value.trim();
+      const volumeRaw  = document.getElementById('t3d-volume').value.trim();
+      const splitAVal  = Number(document.getElementById('t3d-splitA').value);
+
+      // Pokud jsou všechna cenová/objemová pole prázdná, nekalkujeme
+      if (priceARaw === '' && priceBRaw === '' && volumeRaw === '') {
+        document.getElementById('t3d-result').style.display = 'none';
+        return;
+      }
+
+      // Edge case: split=0 nebo split=100 (slider mechanicky zabraňuje, ale ošetříme i přímý JS vstup)
+      const warnEl = document.getElementById('t3d-split-warn');
+      if (splitAVal === 0 || splitAVal === 100) {
+        warnEl.textContent = T.t3d_warn_single_source;
+        warnEl.classList.add('visible');
+        document.getElementById('t3d-result').style.display = 'none';
+        return;
+      } else {
+        warnEl.textContent = '';
+        warnEl.classList.remove('visible');
+      }
+
+      // Validace vstupů
+      let hasError = false;
+
+      const priceA = readRequiredNumber('t3d-priceA', { inRange: v => v > 0 }, T.err_t3d_priceA);
+      const priceB = readRequiredNumber('t3d-priceB', { inRange: v => v > 0 }, T.err_t3d_priceB);
+      const totalVolume = readRequiredNumber('t3d-volume', { inRange: v => v > 0 }, T.err_t3d_volume);
+      if ([priceA, priceB, totalVolume].includes(null)) hasError = true;
+
+      if (hasError) {
+        document.getElementById('t3d-result').style.display = 'none';
+        return;
+      }
+
+      // Algoritmus dle architecture_iter-005.md sekce 4.4
+      const splitB   = 100 - splitAVal;
+      const volumeA  = totalVolume * (splitAVal / 100);
+      const volumeB  = totalVolume * (splitB    / 100);
+
+      const costA     = priceA * volumeA;
+      const costB     = priceB * volumeB;
+      const totalDual = costA + costB;
+
+      const avgPriceDual = totalDual / totalVolume;
+
+      const totalSingleA = priceA * totalVolume;
+      const totalSingleB = priceB * totalVolume;
+
+      const cheaperSingle   = Math.min(totalSingleA, totalSingleB);
+      const cheaperWho      = totalSingleA <= totalSingleB ? 'A' : 'B';
+      const diffVsCheaper   = totalDual - cheaperSingle; // vždy >= 0 pro lineární ceny
+
+      // Zobraz hlavní hodnotu
+      document.getElementById('t3d-total-dual').textContent =
+        formatCurrency(totalDual, 0) + ' ' + CURRENCY_CONFIG[currentCurrency].symbol;
+
+      // Rozpad nákladů
+      const breakdown = document.getElementById('t3d-breakdown');
+      breakdown.innerHTML = '';
+      const sym = CURRENCY_CONFIG[currentCurrency].symbol;
+      const breakdownData = [
+        { labelKey: 't3d_breakdown_costA',    value: formatCurrency(costA, 0) + ' ' + sym + ' (' + splitAVal + ' %)' },
+        { labelKey: 't3d_breakdown_costB',    value: formatCurrency(costB, 0) + ' ' + sym + ' (' + splitB    + ' %)' },
+        { labelKey: 't3d_breakdown_avgPrice', value: formatCurrency(avgPriceDual, 2) + ' ' + sym },
+      ];
+      breakdownData.forEach(item => {
+        const row = document.createElement('div');
+        row.className = 'result-row';
+        row.innerHTML =
+          '<span class="result-row-label">' + escHtml(T[item.labelKey]) + '</span>' +
+          '<span class="result-row-value">'  + escHtml(item.value) + '</span>';
+        breakdown.appendChild(row);
+      });
+
+      // Srovnání se single sourcingem
+      const comparison = document.getElementById('t3d-comparison');
+      comparison.innerHTML = '';
+      const compData = [
+        { labelKey: 't3d_single_a',     value: formatCurrency(totalSingleA, 0) + ' ' + sym },
+        { labelKey: 't3d_single_b',     value: formatCurrency(totalSingleB, 0) + ' ' + sym },
+        { labelKey: 't3d_diff_cheaper', value: formatCurrency(diffVsCheaper, 0) + ' ' + sym },
+      ];
+      compData.forEach(item => {
+        const row = document.createElement('div');
+        row.className = 'result-row';
+        row.innerHTML =
+          '<span class="result-row-label">' + escHtml(T[item.labelKey]) + '</span>' +
+          '<span class="result-row-value">'  + escHtml(item.value) + '</span>';
+        comparison.appendChild(row);
+      });
+
+      // Interpretace
+      let interpText;
+      if (diffVsCheaper < 0.005) {
+        interpText = T.t3d_interp_dual_equal;
+      } else {
+        interpText = T.t3d_interp_dual_costlier
+          .replace('{diff}', formatCurrency(diffVsCheaper, 0) + ' ' + sym)
+          .replace('{who}',  cheaperWho);
+      }
+      document.getElementById('t3d-interpretation').textContent = interpText;
+
+      // Zobraz result box
+      document.getElementById('t3d-result').style.display = 'block';
+
+      // Bar chart
+      renderDualChart(totalSingleA, totalSingleB, totalDual);
+    }
+
+    function renderDualChart(totalSingleA, totalSingleB, totalDual) {
+      const T   = TEXTS[currentLang];
+      const sym = CURRENCY_CONFIG[currentCurrency].symbol;
+      const canvas = document.getElementById('chart-3d-dual');
+      const ctx    = canvas.getContext('2d');
+
+      // Vždy destroy + re-create (dle architektury sekce 5)
+      chartDual = destroyChart(chartDual);
+
+      chartDual = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: [T.t3d_chart_label_a, T.t3d_chart_label_b, T.t3d_chart_label_dual],
+          datasets: [{
+            data: [totalSingleA, totalSingleB, totalDual],
+            backgroundColor: [
+              '#3B82F6',  // --color-accent (Single A)
+              '#D97706',  // --color-warning (Single B)
+              '#1E40AF',  // --color-primary (Dual)
+            ],
+            borderRadius: 4,
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: ctx2 => ' ' + formatCurrency(ctx2.parsed.y, 0) + ' ' + sym
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: value => formatCurrency(value, 0) + ' ' + sym,
+                font: { size: 11 },
+                maxTicksLimit: 6,
+              }
+            },
+            x: {
+              ticks: { font: { size: 12 } }
+            }
+          }
+        }
+      });
+    }
+
+    function resetDualSourcing() {
+      // Reset inputs
+      ['t3d-priceA', 't3d-priceB', 't3d-volume'].forEach(id => {
+        document.getElementById(id).value = '';
+        clearError(id);
+      });
+      // Reset slider
+      const slider = document.getElementById('t3d-splitA');
+      slider.value = 50;
+      document.getElementById('t3d-splitA-val').textContent = '50%';
+      // Clear warnings
+      const warnEl = document.getElementById('t3d-split-warn');
+      warnEl.textContent = '';
+      warnEl.classList.remove('visible');
+      // Hide result + destroy chart
+      document.getElementById('t3d-result').style.display = 'none';
+      chartDual = destroyChart(chartDual);
+    }
+
+    document.getElementById('t3d-reset').addEventListener('click', resetDualSourcing);
+
+    /* ===== INIT ===== */
+    initTabs();
+    initLangSwitcher();
+    setLang('cs');
+    setCurrency('CZK');
+  </script>
+</body>
+</html>

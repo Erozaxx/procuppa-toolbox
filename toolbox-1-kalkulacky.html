@@ -1,0 +1,2498 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Procuppa Toolbox 1 – Kalkulačky</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ===== CSS CUSTOM PROPERTIES ===== */
+    :root {
+      /* === BARVY === */
+
+      /* Primární: deep charcoal místo modré – profesionální, neutrální */
+      --color-primary:      #1A1A1A;
+
+      /* Accent: Procuppa žlutá – POUZE jako bg prvku nebo dekorativní border */
+      /* NIKDY jako barva textu na bílém/světlém bg (WCAG ratio 1.37) */
+      --color-accent:       #FFD956;
+
+      /* Stavové barvy – zachovány (nezávislé na brand) */
+      --color-success:      #16A34A;
+      --color-warning:      #D97706;
+      --color-danger:       #DC2626;
+
+      /* Povrchy – warm off-white místo studené modré */
+      --color-bg:           #FAFAF8;
+      --color-surface:      #FFFFFF;
+
+      /* Texty */
+      --color-text:         #1A1A1A;   /* kontrast 17.4:1 na bílé ✓ WCAG AAA */
+
+      /* color-text-muted: POUZE pro sekundární/pomocné texty */
+      /* Pro výsledkové texty (.result-label, .result-value atd.) použít --color-text */
+      --color-text-muted:   #5C6370;
+
+      /* Border – teplý, ne studený modrý */
+      --color-border:       #E5E3DC;
+
+      /* Companion text colors pro barevná pozadí */
+      /* Text NA --color-accent pozadí (#FFD956): kontrast 12.69:1 ✓ WCAG AAA */
+      --color-accent-text:  #1A1A1A;
+
+      /* Text NA --color-primary pozadí (#1A1A1A): kontrast 17.4:1 ✓ WCAG AAA */
+      --color-primary-text: #FFFFFF;
+
+      /* === TYPOGRAFIE === */
+      --font-base: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+      --font-size-sm: 0.875rem;
+      --font-size-md: 1rem;
+      --font-size-lg: 1.25rem;
+      --font-size-xl: 1.5rem;
+      --font-tracking-tight: -0.01em;
+      --font-tracking-normal: 0em;
+
+      /* === SPACING – beze změny === */
+      --space-xs: 0.25rem;
+      --space-sm: 0.5rem;
+      --space-md: 1rem;
+      --space-lg: 1.5rem;
+      --space-xl: 2rem;
+
+      /* === RADIUS – ostřejší, corporate styl === */
+      --radius-sm: 3px;
+      --radius-md: 6px;
+      --radius-lg: 10px;
+
+      /* === SHADOW – zachováno === */
+      --shadow-card: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+    }
+
+    /* ===== RESET + BASE ===== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-base);
+      font-size: var(--font-size-md);
+      color: var(--color-text);
+      background: var(--color-bg);
+      line-height: 1.5;
+    }
+
+    /* ===== LAYOUT ===== */
+    header {
+      position: relative;
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      padding: var(--space-md) var(--space-xl);
+      display: flex;
+      align-items: center;
+      min-height: 60px;
+    }
+
+    #logo {
+      height: 40px;
+      width: auto;
+    }
+
+    .lang-switcher {
+      position: absolute;
+      top: var(--space-md);
+      right: var(--space-md);
+      display: flex;
+      gap: var(--space-xs);
+    }
+
+    .lang-btn {
+      background: none;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-xs) var(--space-sm);
+      font-size: var(--font-size-sm);
+      cursor: pointer;
+      color: var(--color-text-muted);
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+
+    .lang-btn.active,
+    .lang-btn:hover {
+      background: var(--color-primary);
+      color: var(--color-primary-text);
+      border-color: var(--color-primary);
+    }
+
+    /* ===== TAB NAVIGATION ===== */
+    .tab-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      padding: 0 var(--space-xl);
+      gap: 0;
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      padding: var(--space-md) var(--space-lg);
+      font-size: var(--font-size-md);
+      font-weight: 500;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover {
+      color: var(--color-primary);
+    }
+
+    .tab-btn.active {
+      color: var(--color-primary);
+      border-bottom: 3px solid var(--color-accent);
+      font-weight: 700;
+    }
+
+    .tab-btn:focus-visible {
+      outline: 2px solid var(--color-accent);
+      outline-offset: -2px;
+    }
+
+    /* ===== TOOL PANELS ===== */
+    main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: var(--space-xl) var(--space-md);
+    }
+
+    .tool-panel {
+      display: none;
+    }
+
+    .tool-panel.active {
+      display: block;
+    }
+
+    /* ===== TOOL CARD ===== */
+    .tool-card {
+      background: var(--color-surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+      padding: var(--space-lg);
+      margin-bottom: var(--space-lg);
+    }
+
+    .tool-card h2 {
+      font-size: var(--font-size-lg);
+      font-weight: 700;
+      color: var(--color-primary);
+      margin-bottom: var(--space-xs);
+    }
+
+    .tool-card .tool-desc {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-lg);
+    }
+
+    .tool-panel > h1 {
+      font-size: var(--font-size-xl);
+      font-weight: 700;
+      margin-bottom: var(--space-lg);
+      color: var(--color-text);
+    }
+
+    /* ===== INPUT GROUP ===== */
+    .input-group {
+      margin-bottom: var(--space-md);
+    }
+
+    .input-group label {
+      display: block;
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      margin-bottom: var(--space-xs);
+      color: var(--color-text);
+    }
+
+    .input-field {
+      width: 100%;
+      max-width: 300px;
+      padding: var(--space-sm) var(--space-md);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      font-size: var(--font-size-md);
+      font-family: var(--font-base);
+      color: var(--color-text);
+      background: var(--color-surface);
+      transition: border-color 0.15s;
+    }
+
+    .input-field:focus {
+      outline: 2px solid var(--color-accent);
+      outline-offset: 0;
+      border-color: var(--color-accent);
+    }
+
+    .input-field.input-error {
+      border-color: var(--color-danger);
+    }
+
+    /* ===== ERROR MESSAGE ===== */
+    .error-msg {
+      display: none;
+      color: var(--color-danger);
+      font-size: var(--font-size-sm);
+      margin-top: var(--space-xs);
+    }
+
+    .error-msg.visible {
+      display: block;
+    }
+
+    /* ===== RESULT BOX ===== */
+    .result-box {
+      display: none;
+      background: var(--color-bg);
+      border-left: 4px solid var(--color-accent);
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      padding: var(--space-md);
+      margin-top: var(--space-md);
+    }
+
+    .result-value {
+      font-size: var(--font-size-xl);
+      font-weight: 700;
+      color: var(--color-primary);
+    }
+
+    .result-label {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+      margin-top: var(--space-xs);
+    }
+
+    .result-interpretation {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+      margin-top: var(--space-sm);
+      font-style: italic;
+    }
+
+    /* ===== BTN RESET ===== */
+    .btn-reset {
+      background: none;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-sm) var(--space-md);
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+      cursor: pointer;
+      margin-top: var(--space-md);
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .btn-reset:hover {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+
+    /* ===== RATE BUTTONS (1b) ===== */
+    .t1b-rate-btn {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-xs) var(--space-md);
+      font-size: var(--font-size-sm);
+      font-family: var(--font-base);
+      color: var(--color-text-muted);
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+
+    .t1b-rate-btn:hover {
+      border-color: var(--color-accent);
+      color: var(--color-primary);
+    }
+
+    .t1b-rate-btn.active {
+      background: var(--color-primary);
+      color: var(--color-primary-text);
+      border-color: var(--color-primary);
+    }
+
+    /* ===== CNB LOADING & WARNING ===== */
+    .cnb-loading {
+      display: none;
+      color: var(--color-text-muted);
+      font-size: var(--font-size-sm);
+      margin-top: var(--space-sm);
+      font-style: italic;
+    }
+
+    .cnb-loading.visible {
+      display: block;
+    }
+
+    .cnb-fallback-warn {
+      display: none;
+      background: #FEF9C3;
+      border-left: 4px solid var(--color-warning);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: var(--space-sm) var(--space-md);
+      font-size: var(--font-size-sm);
+      color: #92400E;
+      margin-top: var(--space-sm);
+    }
+
+    .cnb-error {
+      display: none;
+      color: var(--color-danger);
+      font-size: var(--font-size-sm);
+      margin-top: var(--space-sm);
+      padding: var(--space-sm) var(--space-md);
+      background: #FEF2F2;
+      border-left: 4px solid var(--color-danger);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    }
+
+    .cnb-error.visible {
+      display: block;
+    }
+
+    .t1c-rate-info {
+      display: grid;
+      gap: var(--space-xs);
+      margin-top: var(--space-sm);
+    }
+
+    .t1c-rate-info .rate-row {
+      display: flex;
+      gap: var(--space-sm);
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+    }
+
+    .t1c-rate-info .rate-row strong {
+      color: var(--color-text);
+      min-width: 120px;
+    }
+
+    .btn-calc {
+      background: var(--color-primary);
+      color: var(--color-primary-text);
+      border: none;
+      border-radius: var(--radius-md);
+      padding: var(--space-sm) var(--space-lg);
+      font-size: var(--font-size-md);
+      font-family: var(--font-base);
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+      margin-top: var(--space-xs);
+    }
+
+    .btn-calc:hover {
+      background: var(--color-accent);
+      color: var(--color-accent-text);
+    }
+
+    .btn-calc:disabled {
+      background: var(--color-text-muted);
+      cursor: not-allowed;
+    }
+
+    /* ===== PLACEHOLDER PANEL ===== */
+    .placeholder-panel {
+      background: var(--color-surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+      padding: var(--space-xl);
+      text-align: center;
+      color: var(--color-text-muted);
+      font-size: var(--font-size-lg);
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+      .tab-nav {
+        overflow-x: auto;
+        white-space: nowrap;
+        padding: 0 var(--space-md);
+        scrollbar-width: none;
+      }
+
+      .tab-nav::-webkit-scrollbar {
+        display: none;
+      }
+
+      .tab-btn {
+        min-width: 80px;
+        padding: var(--space-sm) var(--space-md);
+        font-size: var(--font-size-sm);
+      }
+
+      main {
+        padding: var(--space-md) var(--space-sm);
+      }
+
+      .tool-card {
+        padding: var(--space-md);
+      }
+
+      .input-field {
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <svg id="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 148.163 28.4534" role="img" aria-label="Procuppa"><g><g><path d="M11.569,11.2632c-.6381.0075-1.0349.6975-.7216,1.2547l7.802,13.8774c.2352.4185-.0665.9357-.5458.9357h-8.9926c-.226,0-.4346-.1223-.5457-.3194L.0815,11.9215c-.2352-.4185.0665-.9357.5457-.9357h8.2121c1.1317-.0133,2.1706-.6299,2.7263-1.6178L16.6304.3604c.1251-.2227.3607-.3604.6156-.3604h8.8079c.5406,0,.8812.5838.6156,1.0559l-5.5366,9.8459c-.1251.2227-.3606.3604-.6156.3604h-8.948v.001h-.0003Z" style="fill:#fdd757;"/><path d="M34.1531,24.0212V5.1582h8.2839c2.1897,0,3.8253.6332,4.9334,1.7676,1.0552,1.0817,1.6884,2.559,1.6884,4.3003,0,3.5615-2.348,5.9622-6.3052,5.9622h-4.6432v6.8329h-3.9573ZM38.1104,8.4824v5.5929h3.9572c2.005,0,3.0603-1.108,3.0603-2.8229,0-1.7675-1.108-2.7701-3.0075-2.7701h-4.01ZM53.5891,10.4874v2.1633h.0791c.8178-1.5302,1.7412-2.3216,3.3241-2.3216.3957,0,.6332.0264.8442.1055v3.1394h-.0791c-2.348-.2374-4.0364,1.0025-4.0364,3.8518v6.5954h-3.588v-13.5338h3.4561ZM64.8788,24.417c-4.1947,0-7.0703-3.1131-7.0703-7.1495s2.8756-7.1495,7.0703-7.1495,7.0704,3.1131,7.0704,7.1495-2.8757,7.1495-7.0704,7.1495ZM64.8788,21.6733c2.1897,0,3.4297-1.7676,3.4297-4.4058s-1.24-4.4322-3.4297-4.4322c-2.216,0-3.4296,1.794-3.4296,4.4322s1.2136,4.4058,3.4296,4.4058ZM79.3682,24.417c-4.2738,0-6.9384-3.1131-6.9384-7.1495s2.6382-7.1495,6.7538-7.1495c3.5087,0,5.672,2.0314,6.1469,4.9598h-3.5088c-.2374-1.1872-1.1608-2.0842-2.4799-2.0842-2.1633,0-3.2713,1.6621-3.2713,4.2739,0,2.559,1.0289,4.2738,3.2186,4.2738,1.451,0,2.4799-.765,2.7173-2.2952h3.456c-.2374,2.8756-2.4799,5.1709-6.0942,5.1709ZM98.5035,24.0212h-3.456v-1.5829h-.0792c-.9233,1.24-1.9786,1.9523-3.8781,1.9523-3.0075,0-4.696-1.9259-4.696-4.8807v-9.0225h3.5616v8.4158c0,1.5829.7123,2.4535,2.2424,2.4535,1.6885,0,2.7174-1.2664,2.7174-3.0603v-7.809h3.5879v13.5338ZM100.297,28.4534V10.4874h3.456v1.6884h.079c.87-1.1872,2.137-2.0578,3.983-2.0578,3.588,0,5.884,2.9284,5.884,7.1495,0,4.3794-2.375,7.1495-5.857,7.1495-1.9,0-3.14-.7651-3.905-1.9259h-.052v5.9623h-3.588ZM107.077,21.4358c1.82,0,2.981-1.5037,2.981-4.0628s-.897-4.353-3.113-4.353c-2.243,0-3.14,1.9259-3.14,4.353,0,2.4535,1.135,4.0628,3.272,4.0628ZM114.841,28.4534V10.4874h3.456v1.6884h.079c.87-1.1872,2.137-2.0578,3.983-2.0578,3.588,0,5.884,2.9284,5.884,7.1495,0,4.3794-2.375,7.1495-5.857,7.1495-1.9,0-3.14-.7651-3.905-1.9259h-.052v5.9623h-3.588ZM121.621,21.4358c1.82,0,2.981-1.5037,2.981-4.0628s-.897-4.353-3.113-4.353c-2.243,0-3.14,1.9259-3.14,4.353,0,2.4535,1.135,4.0628,3.272,4.0628ZM137.906,24.0212c-.211-.2638-.343-.8969-.422-1.5037h-.053c-.686,1.0289-1.662,1.8203-3.984,1.8203-2.77,0-4.722-1.451-4.722-4.1419,0-2.9812,2.427-3.9309,5.435-4.353,2.242-.3166,3.271-.5013,3.271-1.5302,0-.9761-.765-1.6093-2.269-1.6093-1.688,0-2.506.6068-2.612,1.8995h-3.192c.106-2.3743,1.873-4.4585,5.831-4.4585,4.062,0,5.698,1.8203,5.698,4.9862v6.8856c0,1.0289.158,1.6357.475,1.8731v.1319h-3.456ZM134.318,21.8315c2.058,0,3.192-1.2663,3.192-2.5854v-2.0314c-.633.3694-1.609.5804-2.506.7915-1.873.4221-2.796.8442-2.796,2.1105s.844,1.7148,2.11,1.7148Z"/><path d="M145.163,13.1927c-1.651,0-3-1.3066-3-3.1,0-1.7806,1.349-3.1,3-3.1,1.652,0,3,1.3194,3,3.1,0,1.7934-1.348,3.1-3,3.1ZM145.163,12.7443c1.437,0,2.484-1.1144,2.484-2.6516,0-1.5244-1.047-2.6517-2.484-2.6517s-2.483,1.1273-2.483,2.6517c0,1.5372,1.046,2.6516,2.483,2.6516ZM143.991,11.6939v-3.2793h1.487c.593,0,1.021.3843,1.021.9223,0,.3715-.189.6789-.605.7814v.0128c.316.0897.467.269.505.6661.05.4612.025.807.138.8583v.0384h-.617c-.089-.0384-.126-.4099-.139-.7558-.013-.3458-.214-.5636-.618-.5636h-.529v1.3194h-.643ZM144.634,8.9526v.9223h.706c.353,0,.529-.1922.529-.4612s-.176-.4612-.529-.4612h-.706Z"/></g></g></svg>
+    <div class="lang-switcher">
+      <button class="lang-btn active" data-lang="cs" id="btn-lang-cs">CZ</button>
+      <button class="lang-btn" data-lang="en" id="btn-lang-en">EN</button>
+    </div>
+  </header>
+
+  <!-- TAB NAVIGATION -->
+  <nav class="tab-nav" role="tablist" aria-label="Nástroje kalkulačky">
+    <button class="tab-btn active" role="tab" data-tab="tab-1a"
+            id="tab-btn-1a" aria-selected="true" aria-controls="tab-1a" tabindex="0"
+            data-i18n="tab1a">Procenta</button>
+    <button class="tab-btn" role="tab" data-tab="tab-1b"
+            id="tab-btn-1b" aria-selected="false" aria-controls="tab-1b" tabindex="-1"
+            data-i18n="tab1b">DPH</button>
+    <button class="tab-btn" role="tab" data-tab="tab-1c"
+            id="tab-btn-1c" aria-selected="false" aria-controls="tab-1c" tabindex="-1"
+            data-i18n="tab1c">Kurzy měn</button>
+    <button class="tab-btn" role="tab" data-tab="tab-1d"
+            id="tab-btn-1d" aria-selected="false" aria-controls="tab-1d" tabindex="-1"
+            data-i18n="tab1d">Úspory</button>
+  </nav>
+
+  <!-- MAIN PANELS -->
+  <main>
+
+    <!-- ===== TAB 1a: PROCENTA / PERCENTAGES ===== -->
+    <section id="tab-1a" class="tool-panel active" role="tabpanel" aria-labelledby="tab-btn-1a">
+      <h1 data-i18n="panel1a_heading">Procenta, zdražení &amp; slevy</h1>
+
+      <!-- Kalkulačka 1a-1: Procentní změna mezi dvěma cenami -->
+      <div class="tool-card">
+        <h2 data-i18n="t1a1_title">Procentní změna mezi cenami</h2>
+        <p class="tool-desc" data-i18n="t1a1_desc">Zadejte původní a novou cenu – kalkulačka vypočítá procentní změnu a slovně ji interpretuje.</p>
+
+        <div class="input-group">
+          <label for="t1a1-orig" data-i18n="t1a1_origPrice">Původní cena (Kč)</label>
+          <input type="text" inputmode="decimal" autocomplete="off" id="t1a1-orig" class="input-field" aria-describedby="t1a1-orig-err"
+                 data-i18n-placeholder="t1a1_origPricePh">
+          <span id="t1a1-orig-err" class="error-msg" role="alert"></span>
+        </div>
+
+        <div class="input-group">
+          <label for="t1a1-new" data-i18n="t1a1_newPrice">Nová cena (Kč)</label>
+          <input type="text" inputmode="decimal" autocomplete="off" id="t1a1-new" class="input-field" aria-describedby="t1a1-new-err"
+                 data-i18n-placeholder="t1a1_newPricePh">
+          <span id="t1a1-new-err" class="error-msg" role="alert"></span>
+        </div>
+
+        <div class="result-box" id="t1a1-result">
+          <div class="result-value" id="t1a1-result-value"></div>
+          <div class="result-label" data-i18n="t1a1_result_label">Procentní změna</div>
+          <div class="result-interpretation" id="t1a1-interpretation"></div>
+        </div>
+
+        <button class="btn-reset" id="t1a1-reset" data-i18n="btn_reset">Resetovat</button>
+      </div>
+
+      <!-- Kalkulačka 1a-2: Navýšení Kč na procenta -->
+      <div class="tool-card">
+        <h2 data-i18n="t1a2_title">Navýšení v Kč → procenta</h2>
+        <p class="tool-desc" data-i18n="t1a2_desc">Zadejte původní cenu a částku navýšení v Kč – kalkulačka vypočítá, o kolik procent byla cena zvýšena.</p>
+
+        <div class="input-group">
+          <label for="t1a2-base" data-i18n="t1a2_basePrice">Původní cena (Kč)</label>
+          <input type="text" inputmode="decimal" autocomplete="off" id="t1a2-base" class="input-field" aria-describedby="t1a2-base-err"
+                 data-i18n-placeholder="t1a2_basePricePh">
+          <span id="t1a2-base-err" class="error-msg" role="alert"></span>
+        </div>
+
+        <div class="input-group">
+          <label for="t1a2-increase" data-i18n="t1a2_increaseKc">Navýšení (Kč)</label>
+          <input type="text" inputmode="decimal" autocomplete="off" id="t1a2-increase" class="input-field" aria-describedby="t1a2-increase-err"
+                 data-i18n-placeholder="t1a2_increaseKcPh">
+          <span id="t1a2-increase-err" class="error-msg" role="alert"></span>
+        </div>
+
+        <div class="result-box" id="t1a2-result">
+          <div class="result-value" id="t1a2-result-value"></div>
+          <div class="result-label" data-i18n="t1a2_result_label">Navýšení v procentech</div>
+          <div class="result-interpretation" id="t1a2-interpretation"></div>
+        </div>
+
+        <button class="btn-reset" id="t1a2-reset" data-i18n="btn_reset">Resetovat</button>
+      </div>
+
+      <!-- Kalkulačka 1a-3: Sleva Kč na procenta -->
+      <div class="tool-card">
+        <h2 data-i18n="t1a3_title">Sleva v Kč → procenta</h2>
+        <p class="tool-desc" data-i18n="t1a3_desc">Zadejte původní cenu a výši slevy v Kč – kalkulačka vypočítá, o kolik procent byla cena snížena.</p>
+
+        <div class="input-group">
+          <label for="t1a3-base" data-i18n="t1a3_basePrice">Původní cena (Kč)</label>
+          <input type="text" inputmode="decimal" autocomplete="off" id="t1a3-base" class="input-field" aria-describedby="t1a3-base-err"
+                 data-i18n-placeholder="t1a3_basePricePh">
+          <span id="t1a3-base-err" class="error-msg" role="alert"></span>
+        </div>
+
+        <div class="input-group">
+          <label for="t1a3-discount" data-i18n="t1a3_discountKc">Sleva (Kč)</label>
+          <input type="text" inputmode="decimal" autocomplete="off" id="t1a3-discount" class="input-field" aria-describedby="t1a3-discount-err"
+                 data-i18n-placeholder="t1a3_discountKcPh">
+          <span id="t1a3-discount-err" class="error-msg" role="alert"></span>
+        </div>
+
+        <div class="result-box" id="t1a3-result">
+          <div class="result-value" id="t1a3-result-value"></div>
+          <div class="result-label" data-i18n="t1a3_result_label">Sleva v procentech</div>
+          <div class="result-interpretation" id="t1a3-interpretation"></div>
+        </div>
+
+        <button class="btn-reset" id="t1a3-reset" data-i18n="btn_reset">Resetovat</button>
+      </div>
+
+      <!-- Kalkulačka 1a-4: Navýšení ceny o procenta -->
+      <div class="tool-card">
+        <h2 data-i18n="t1a4_title">Navýšení ceny o procenta</h2>
+        <p class="tool-desc" data-i18n="t1a4_desc">Zadejte původní cenu a procento navýšení – kalkulačka vypočítá novou cenu po zdražení.</p>
+
+        <div class="input-group">
+          <label for="t1a4-base" data-i18n="t1a4_basePrice">Původní cena (Kč)</label>
+          <input type="text" inputmode="decimal" autocomplete="off" id="t1a4-base" class="input-field" aria-describedby="t1a4-base-err"
+                 data-i18n-placeholder="t1a4_basePricePh">
+          <span id="t1a4-base-err" class="error-msg" role="alert"></span>
+        </div>
+
+        <div class="input-group">
+          <label for="t1a4-pct" data-i18n="t1a4_pctIncrease">Navýšení (%)</label>
+          <input type="text" inputmode="decimal" autocomplete="off" id="t1a4-pct" class="input-field" aria-describedby="t1a4-pct-err"
+                 data-i18n-placeholder="t1a4_pctIncreasePh">
+          <span id="t1a4-pct-err" class="error-msg" role="alert"></span>
+        </div>
+
+        <div class="result-box" id="t1a4-result">
+          <div class="result-value" id="t1a4-result-value"></div>
+          <div class="result-label" data-i18n="t1a4_result_label">Nová cena po navýšení</div>
+          <div class="result-interpretation" id="t1a4-interpretation"></div>
+        </div>
+
+        <button class="btn-reset" id="t1a4-reset" data-i18n="btn_reset">Resetovat</button>
+      </div>
+
+      <!-- Kalkulačka 1a-5: Snížení ceny o procenta -->
+      <div class="tool-card">
+        <h2 data-i18n="t1a5_title">Snížení ceny o procenta</h2>
+        <p class="tool-desc" data-i18n="t1a5_desc">Zadejte původní cenu a procento slevy – kalkulačka vypočítá novou cenu po slevě.</p>
+
+        <div class="input-group">
+          <label for="t1a5-base" data-i18n="t1a5_basePrice">Původní cena (Kč)</label>
+          <input type="text" inputmode="decimal" autocomplete="off" id="t1a5-base" class="input-field" aria-describedby="t1a5-base-err"
+                 data-i18n-placeholder="t1a5_basePricePh">
+          <span id="t1a5-base-err" class="error-msg" role="alert"></span>
+        </div>
+
+        <div class="input-group">
+          <label for="t1a5-pct" data-i18n="t1a5_pctDiscount">Sleva (%)</label>
+          <input type="text" inputmode="decimal" autocomplete="off" id="t1a5-pct" class="input-field" aria-describedby="t1a5-pct-err"
+                 data-i18n-placeholder="t1a5_pctDiscountPh">
+          <span id="t1a5-pct-err" class="error-msg" role="alert"></span>
+        </div>
+
+        <div class="result-box" id="t1a5-result">
+          <div class="result-value" id="t1a5-result-value"></div>
+          <div class="result-label" data-i18n="t1a5_result_label">Nová cena po slevě</div>
+          <div class="result-interpretation" id="t1a5-interpretation"></div>
+        </div>
+
+        <button class="btn-reset" id="t1a5-reset" data-i18n="btn_reset">Resetovat</button>
+      </div>
+    </section>
+
+    <!-- ===== TAB 1b: DPH / VAT ===== -->
+    <section id="tab-1b" class="tool-panel" role="tabpanel" aria-labelledby="tab-btn-1b" hidden>
+      <h1 data-i18n="panel1b_heading">DPH kalkulačka</h1>
+
+      <div class="tool-card">
+        <h2 data-i18n="t1b_title">Výpočet DPH</h2>
+        <p class="tool-desc" data-i18n="t1b_desc">Zadejte částku a sazbu DPH – kalkulačka vypočítá základ daně, výši DPH a cenu s DPH.</p>
+
+        <!-- Přepínač režimu -->
+        <div class="input-group">
+          <label data-i18n="t1b_modeLabel">Režim výpočtu</label>
+          <div style="display:flex; gap: var(--space-sm); margin-top: var(--space-xs);">
+            <label style="display:flex; align-items:center; gap:var(--space-xs); cursor:pointer; font-weight:400;">
+              <input type="radio" name="t1b-mode" id="t1b-mode-excl" value="excl" checked>
+              <span data-i18n="t1b_modeExcl">Cena bez DPH</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:var(--space-xs); cursor:pointer; font-weight:400;">
+              <input type="radio" name="t1b-mode" id="t1b-mode-incl" value="incl">
+              <span data-i18n="t1b_modeIncl">Cena s DPH</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Částka -->
+        <div class="input-group">
+          <label for="t1b-amount" id="t1b-amount-label" data-i18n="t1b_amountExcl">Částka bez DPH (Kč)</label>
+          <input type="text" inputmode="decimal" autocomplete="off" id="t1b-amount" class="input-field" aria-describedby="t1b-amount-err"
+                 data-i18n-placeholder="t1b_amountPh">
+          <span id="t1b-amount-err" class="error-msg" role="alert"></span>
+        </div>
+
+        <!-- Sazba DPH -->
+        <div class="input-group">
+          <label data-i18n="t1b_rateLabel">Sazba DPH</label>
+          <div style="display:flex; gap: var(--space-sm); flex-wrap:wrap; margin-top: var(--space-xs);">
+            <button type="button" class="t1b-rate-btn" data-rate="0"   data-i18n="t1b_rate0">0 %</button>
+            <button type="button" class="t1b-rate-btn" data-rate="10"  data-i18n="t1b_rate10">10 %</button>
+            <button type="button" class="t1b-rate-btn active" data-rate="21" data-i18n="t1b_rate21">21 %</button>
+            <button type="button" class="t1b-rate-btn" data-rate="12"  data-i18n="t1b_rate12">12 %</button>
+            <button type="button" class="t1b-rate-btn" data-rate="custom" data-i18n="t1b_rateCustomBtn">Vlastní</button>
+          </div>
+        </div>
+
+        <!-- Vlastní sazba (skrytá, zobrazí se při volbě Vlastní) -->
+        <div class="input-group" id="t1b-custom-rate-group" style="display:none;">
+          <label for="t1b-custom-rate" data-i18n="t1b_customRateLabel">Vlastní sazba (%)</label>
+          <input type="text" inputmode="decimal" autocomplete="off" id="t1b-custom-rate" class="input-field" aria-describedby="t1b-custom-rate-err"
+                 data-i18n-placeholder="t1b_customRatePh">
+          <span id="t1b-custom-rate-err" class="error-msg" role="alert"></span>
+        </div>
+
+        <!-- Výsledky -->
+        <div class="result-box" id="t1b-result">
+          <div style="display:grid; gap: var(--space-sm);">
+            <div>
+              <div class="result-value" id="t1b-base-value"></div>
+              <div class="result-label" data-i18n="t1b_resultBase">Základ daně (bez DPH)</div>
+            </div>
+            <hr style="border:none; border-top:1px solid var(--color-border);">
+            <div>
+              <div class="result-value" id="t1b-vat-value"></div>
+              <div class="result-label" data-i18n="t1b_resultVAT">DPH (Kč)</div>
+            </div>
+            <hr style="border:none; border-top:1px solid var(--color-border);">
+            <div>
+              <div class="result-value" id="t1b-total-value"></div>
+              <div class="result-label" data-i18n="t1b_resultTotal">Cena s DPH</div>
+            </div>
+          </div>
+          <div class="result-interpretation" id="t1b-interpretation"></div>
+        </div>
+
+        <button class="btn-reset" id="t1b-reset" data-i18n="btn_reset">Resetovat</button>
+      </div>
+    </section>
+
+    <!-- ===== TAB 1c: KURZY MĚN / EXCHANGE RATES ===== -->
+    <section id="tab-1c" class="tool-panel" role="tabpanel" aria-labelledby="tab-btn-1c" hidden>
+      <h1 data-i18n="panel1c_heading">Kurzy měn (ČNB)</h1>
+
+      <div class="tool-card">
+        <h2 data-i18n="t1c_title">Přepočet měn dle kurzů ČNB</h2>
+        <p class="tool-desc" data-i18n="t1c_desc">Vyberte měnu, zadejte částku a datum – kalkulačka načte aktuální kurz z ČNB a provede přepočet.</p>
+
+        <!-- Výběr měny -->
+        <div class="input-group">
+          <label for="t1c-currency" data-i18n="t1c_currencyLabel">Měna</label>
+          <select id="t1c-currency" class="input-field">
+            <option value="USD">USD – Americký dolar</option>
+            <option value="EUR">EUR – Euro</option>
+            <option value="GBP">GBP – Britská libra</option>
+            <option value="CHF">CHF – Švýcarský frank</option>
+            <option value="JPY">JPY – Japonský jen</option>
+            <option value="HUF">HUF – Maďarský forint</option>
+            <option value="PLN">PLN – Polský zlotý</option>
+            <option value="SEK">SEK – Švédská koruna</option>
+            <option value="NOK">NOK – Norská koruna</option>
+            <option value="DKK">DKK – Dánská koruna</option>
+            <option value="CAD">CAD – Kanadský dolar</option>
+            <option value="AUD">AUD – Australský dolar</option>
+            <option value="CNY">CNY – Čínský jüan</option>
+            <option value="RUB">RUB – Ruský rubl</option>
+            <option value="RON">RON – Rumunský leu</option>
+          </select>
+        </div>
+
+        <!-- Částka -->
+        <div class="input-group">
+          <label for="t1c-amount" data-i18n="t1c_amountLabel">Částka</label>
+          <input type="text" inputmode="decimal" autocomplete="off" id="t1c-amount" class="input-field" aria-describedby="t1c-amount-err"
+                 data-i18n-placeholder="t1c_amountPh">
+          <span id="t1c-amount-err" class="error-msg" role="alert"></span>
+        </div>
+
+        <!-- Datum kurzu -->
+        <div class="input-group">
+          <label for="t1c-date" data-i18n="t1c_dateLabel">Datum kurzu (volitelné)</label>
+          <input type="date" id="t1c-date" class="input-field">
+          <div style="font-size: var(--font-size-sm); color: var(--color-text-muted); margin-top: var(--space-xs);"
+               data-i18n="t1c_dateDesc">Ponechte prázdné pro dnešní kurz</div>
+          <span id="t1c-date-err" class="error-msg" role="alert"></span>
+        </div>
+
+        <!-- Směr přepočtu -->
+        <div class="input-group">
+          <label data-i18n="t1c_dirLabel">Směr přepočtu</label>
+          <div style="display:flex; gap: var(--space-sm); margin-top: var(--space-xs); flex-wrap:wrap;">
+            <label style="display:flex; align-items:center; gap:var(--space-xs); cursor:pointer; font-weight:400;">
+              <input type="radio" name="t1c-dir" value="to-czk" checked>
+              <span data-i18n="t1c_dirToCZK">z měny do CZK</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:var(--space-xs); cursor:pointer; font-weight:400;">
+              <input type="radio" name="t1c-dir" value="from-czk">
+              <span data-i18n="t1c_dirFromCZK">z CZK do měny</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Tlačítko Přepočítat -->
+        <div style="margin-top: var(--space-md);">
+          <button type="button" id="t1c-calc-btn" class="btn-calc" data-i18n="t1c_calcBtn">Přepočítat</button>
+        </div>
+
+        <!-- Loading indikátor -->
+        <div id="t1c-loading" class="cnb-loading" role="status" data-i18n="t1c_loading">Načítám kurz z ČNB…</div>
+
+        <!-- Fallback varování -->
+        <div id="t1c-fallback-warn" class="cnb-fallback-warn" role="alert" aria-live="polite"></div>
+
+        <!-- Chybová zpráva (síťová / proxy / jiná) -->
+        <div id="t1c-cnb-error" class="cnb-error" role="alert"></div>
+
+        <!-- Výsledek -->
+        <div class="result-box" id="t1c-result">
+          <div class="result-value" id="t1c-result-value"></div>
+          <div class="result-label" id="t1c-result-label"></div>
+
+          <!-- Detaily kurzu -->
+          <div class="t1c-rate-info">
+            <div class="rate-row">
+              <strong data-i18n="t1c_rate_label">Použitý kurz</strong>
+              <span id="t1c-rate-detail"></span>
+            </div>
+            <div class="rate-row">
+              <strong data-i18n="t1c_date_label">Datum kurzu</strong>
+              <span id="t1c-date-detail"></span>
+            </div>
+          </div>
+
+          <div class="result-interpretation" id="t1c-interpretation"></div>
+        </div>
+
+        <button class="btn-reset" id="t1c-reset" data-i18n="btn_reset">Resetovat</button>
+      </div>
+    </section>
+
+    <!-- ===== TAB 1d: ÚSPORY A DOPAD DO SPENDU ===== -->
+    <section id="tab-1d" class="tool-panel" role="tabpanel" aria-labelledby="tab-btn-1d" hidden>
+      <h1 data-i18n="panel1d_heading">Úspory a dopad do spendu</h1>
+
+      <!-- Sekce A: Kalkulačka úspory -->
+      <div class="tool-card">
+        <h2 data-i18n="t1d_savings_title">Kalkulačka úspory</h2>
+        <p class="tool-desc" data-i18n="t1d_savings_desc">Zadejte původní cenu, novou cenu a volitelně množství kusů – kalkulačka vypočítá úsporu na kus, celkovou úsporu a procentní snížení.</p>
+
+        <div class="input-group">
+          <label for="t1d-s-orig" data-i18n="t1d_origPrice">Původní cena (Kč)</label>
+          <input type="text" inputmode="decimal" autocomplete="off" id="t1d-s-orig" class="input-field" aria-describedby="t1d-s-orig-err"
+                 data-i18n-placeholder="t1d_origPricePh">
+          <span id="t1d-s-orig-err" class="error-msg" role="alert"></span>
+        </div>
+
+        <div class="input-group">
+          <label for="t1d-s-new" data-i18n="t1d_newPrice">Nová cena (Kč)</label>
+          <input type="text" inputmode="decimal" autocomplete="off" id="t1d-s-new" class="input-field" aria-describedby="t1d-s-new-err"
+                 data-i18n-placeholder="t1d_newPricePh">
+          <span id="t1d-s-new-err" class="error-msg" role="alert"></span>
+        </div>
+
+        <div class="input-group">
+          <label for="t1d-s-qty" data-i18n="t1d_qty">Množství / počet kusů (volitelné)</label>
+          <input type="text" inputmode="decimal" autocomplete="off" id="t1d-s-qty" class="input-field" aria-describedby="t1d-s-qty-err"
+                 data-i18n-placeholder="t1d_qtyPh">
+          <span id="t1d-s-qty-err" class="error-msg" role="alert"></span>
+        </div>
+
+        <div class="result-box" id="t1d-s-result">
+          <div style="display:grid; gap: var(--space-sm);">
+            <div>
+              <div class="result-value" id="t1d-s-perunit-value"></div>
+              <div class="result-label" data-i18n="t1d_savings_perUnit_label">Úspora na kus</div>
+            </div>
+            <div id="t1d-s-total-row">
+              <div class="result-value" id="t1d-s-total-value"></div>
+              <div class="result-label" data-i18n="t1d_savings_total_label">Úspora celkem</div>
+            </div>
+            <div>
+              <div class="result-value" id="t1d-s-pct-value"></div>
+              <div class="result-label" data-i18n="t1d_savings_pct_label">Úspora v %</div>
+            </div>
+          </div>
+          <div class="result-interpretation" id="t1d-s-interpretation"></div>
+        </div>
+
+        <button class="btn-reset" id="t1d-s-reset" data-i18n="btn_reset">Resetovat</button>
+      </div>
+
+      <!-- Sekce B: Dopad do spendu -->
+      <div class="tool-card">
+        <h2 data-i18n="t1d_spend_title">Dopad do spendu</h2>
+        <p class="tool-desc" data-i18n="t1d_spend_desc">Zadejte původní cenu, novou cenu a roční objem v Kč – kalkulačka vypočítá, jak se změní roční spend.</p>
+
+        <div class="input-group">
+          <label for="t1d-sp-orig" data-i18n="t1d_spend_origPrice">Původní cena (Kč)</label>
+          <input type="text" inputmode="decimal" autocomplete="off" id="t1d-sp-orig" class="input-field" aria-describedby="t1d-sp-orig-err"
+                 data-i18n-placeholder="t1d_spend_origPricePh">
+          <span id="t1d-sp-orig-err" class="error-msg" role="alert"></span>
+        </div>
+
+        <div class="input-group">
+          <label for="t1d-sp-new" data-i18n="t1d_spend_newPrice">Nová cena (Kč)</label>
+          <input type="text" inputmode="decimal" autocomplete="off" id="t1d-sp-new" class="input-field" aria-describedby="t1d-sp-new-err"
+                 data-i18n-placeholder="t1d_spend_newPricePh">
+          <span id="t1d-sp-new-err" class="error-msg" role="alert"></span>
+        </div>
+
+        <div class="input-group">
+          <label for="t1d-sp-vol" data-i18n="t1d_spend_annualVolume">Roční objem (Kč)</label>
+          <input type="text" inputmode="decimal" autocomplete="off" id="t1d-sp-vol" class="input-field" aria-describedby="t1d-sp-vol-err"
+                 data-i18n-placeholder="t1d_spend_annualVolumePh">
+          <span id="t1d-sp-vol-err" class="error-msg" role="alert"></span>
+        </div>
+
+        <div class="result-box" id="t1d-sp-result">
+          <div style="display:grid; gap: var(--space-sm);">
+            <div>
+              <div class="result-value" id="t1d-sp-origspend-value"></div>
+              <div class="result-label" data-i18n="t1d_spend_origSpend_label">Původní roční spend</div>
+            </div>
+            <div>
+              <div class="result-value" id="t1d-sp-newspend-value"></div>
+              <div class="result-label" data-i18n="t1d_spend_newSpend_label">Nový roční spend</div>
+            </div>
+            <div>
+              <div class="result-value" id="t1d-sp-diffkc-value"></div>
+              <div class="result-label" data-i18n="t1d_spend_diffKc_label">Rozdíl (Kč)</div>
+            </div>
+            <div>
+              <div class="result-value" id="t1d-sp-diffpct-value"></div>
+              <div class="result-label" data-i18n="t1d_spend_diffPct_label">Rozdíl (%)</div>
+            </div>
+          </div>
+          <div class="result-interpretation" id="t1d-sp-interpretation"></div>
+        </div>
+
+        <button class="btn-reset" id="t1d-sp-reset" data-i18n="btn_reset">Resetovat</button>
+      </div>
+
+    </section>
+
+  </main>
+
+  <script>
+    /* ===== i18n TEXTS ===== */
+    const TEXTS = {
+      cs: {
+        // Tab labels
+        tab1a: 'Procenta',
+        tab1b: 'DPH',
+        tab1c: 'Kurzy měn',
+        tab1d: 'Úspory',
+
+        // Panel headings
+        panel1a_heading: 'Procenta, zdražení & slevy',
+
+        // Shared buttons
+        btn_reset: 'Resetovat',
+
+        // Kalkulačka 1a-1: Procentní změna
+        t1a1_title: 'Procentní změna mezi cenami',
+        t1a1_desc: 'Zadejte původní a novou cenu – kalkulačka vypočítá procentní změnu a slovně ji interpretuje.',
+        t1a1_origPrice: 'Původní cena (Kč)',
+        t1a1_origPricePh: 'např. 1000',
+        t1a1_newPrice: 'Nová cena (Kč)',
+        t1a1_newPricePh: 'např. 1200',
+        t1a1_result_label: 'Procentní změna',
+        t1a1_result_increase: 'Zdražení o {pct} % ({diff} Kč)',
+        t1a1_result_decrease: 'Zlevnění o {pct} % ({diff} Kč)',
+        t1a1_result_nochange: 'Beze změny – cena zůstala stejná',
+
+        // Kalkulačka 1a-2: Navýšení Kč → %
+        t1a2_title: 'Navýšení v Kč → procenta',
+        t1a2_desc: 'Zadejte původní cenu a částku navýšení v Kč – kalkulačka vypočítá, o kolik procent byla cena zvýšena.',
+        t1a2_basePrice: 'Původní cena (Kč)',
+        t1a2_basePricePh: 'např. 1000',
+        t1a2_increaseKc: 'Navýšení (Kč)',
+        t1a2_increaseKcPh: 'např. 200',
+        t1a2_result_label: 'Navýšení v procentech',
+        t1a2_result_text: 'Cena byla navýšena o {pct} % (tj. {diff} Kč)',
+
+        // Kalkulačka 1a-3: Sleva Kč → %
+        t1a3_title: 'Sleva v Kč → procenta',
+        t1a3_desc: 'Zadejte původní cenu a výši slevy v Kč – kalkulačka vypočítá, o kolik procent byla cena snížena.',
+        t1a3_basePrice: 'Původní cena (Kč)',
+        t1a3_basePricePh: 'např. 1000',
+        t1a3_discountKc: 'Sleva (Kč)',
+        t1a3_discountKcPh: 'např. 150',
+        t1a3_result_label: 'Sleva v procentech',
+        t1a3_result_text: 'Sleva činí {pct} % z původní ceny (tj. {diff} Kč)',
+
+        // Kalkulačka 1a-4: Navýšení o %
+        t1a4_title: 'Navýšení ceny o procenta',
+        t1a4_desc: 'Zadejte původní cenu a procento navýšení – kalkulačka vypočítá novou cenu po zdražení.',
+        t1a4_basePrice: 'Původní cena (Kč)',
+        t1a4_basePricePh: 'např. 1000',
+        t1a4_pctIncrease: 'Navýšení (%)',
+        t1a4_pctIncreasePh: 'např. 15',
+        t1a4_result_label: 'Nová cena po navýšení',
+        t1a4_result_text: 'Po navýšení o {pct} % je nová cena {newPrice} Kč (+ {diff} Kč)',
+
+        // Kalkulačka 1a-5: Snížení o %
+        t1a5_title: 'Snížení ceny o procenta',
+        t1a5_desc: 'Zadejte původní cenu a procento slevy – kalkulačka vypočítá novou cenu po slevě.',
+        t1a5_basePrice: 'Původní cena (Kč)',
+        t1a5_basePricePh: 'např. 1000',
+        t1a5_pctDiscount: 'Sleva (%)',
+        t1a5_pctDiscountPh: 'např. 20',
+        t1a5_result_label: 'Nová cena po slevě',
+        t1a5_result_text: 'Po slevě {pct} % je nová cena {newPrice} Kč (ušetříte {diff} Kč)',
+
+        // Kalkulačka 1b: DPH
+        panel1b_heading: 'DPH kalkulačka',
+        t1b_title: 'Výpočet DPH',
+        t1b_desc: 'Zadejte částku a sazbu DPH – kalkulačka vypočítá základ daně, výši DPH a cenu s DPH.',
+        t1b_modeLabel: 'Režim výpočtu',
+        t1b_modeExcl: 'Cena bez DPH',
+        t1b_modeIncl: 'Cena s DPH',
+        t1b_amountExcl: 'Částka bez DPH (Kč)',
+        t1b_amountIncl: 'Částka s DPH (Kč)',
+        t1b_amountPh: 'např. 1000',
+        t1b_rateLabel: 'Sazba DPH',
+        t1b_rate0: '0 %',
+        t1b_rate10: '10 %',
+        t1b_rate12: '12 %',
+        t1b_rate21: '21 %',
+        t1b_rateCustomBtn: 'Vlastní',
+        t1b_customRateLabel: 'Vlastní sazba (%)',
+        t1b_customRatePh: 'např. 15',
+        t1b_resultBase: 'Základ daně (bez DPH)',
+        t1b_resultVAT: 'DPH (Kč)',
+        t1b_resultTotal: 'Cena s DPH',
+        t1b_interpExcl: 'K ceně {base} Kč přičítáme {vat} Kč DPH ({rate} %). Výsledná cena s DPH je {total} Kč.',
+        t1b_interpIncl: 'Z ceny {total} Kč připadá {vat} Kč na DPH ({rate} %). Základ daně (bez DPH) je {base} Kč.',
+        t1b_interpZero: 'Sazba DPH je 0 % – daň se neuplatňuje. Cena bez DPH = cena s DPH = {base} Kč.',
+        err_rateRange: 'Sazba musí být v rozsahu 0–100 %',
+
+        // Kalkulačka 1d: Úspory a dopad do spendu
+        panel1d_heading: 'Úspory a dopad do spendu',
+
+        t1d_savings_title: 'Kalkulačka úspory',
+        t1d_savings_desc: 'Zadejte původní cenu, novou cenu a volitelně množství kusů – kalkulačka vypočítá úsporu na kus, celkovou úsporu a procentní snížení.',
+        t1d_origPrice: 'Původní cena (Kč)',
+        t1d_origPricePh: 'např. 1000',
+        t1d_newPrice: 'Nová cena (Kč)',
+        t1d_newPricePh: 'např. 850',
+        t1d_qty: 'Množství / počet kusů (volitelné)',
+        t1d_qtyPh: 'např. 1 000',
+        t1d_savings_perUnit_label: 'Úspora na kus',
+        t1d_savings_total_label: 'Úspora celkem',
+        t1d_savings_pct_label: 'Úspora v %',
+        t1d_savings_interp: 'Uspoříte {perUnit} Kč ({pct} %) na každém kusu. Celková úspora za {qty} ks je {total} Kč.',
+        t1d_savings_interp_increase: 'Cena vzrostla o {perUnit} Kč ({pct} %) na každém kusu. Celkové zdražení za {qty} ks je {total} Kč – zdražení.',
+        t1d_savings_interp_unit: 'Uspoříte {perUnit} Kč ({pct} %) na každém kusu.',
+        t1d_savings_interp_unit_increase: 'Cena vzrostla o {perUnit} Kč ({pct} %) na každém kusu.',
+        t1d_savings_qtyHint: 'Zadejte množství pro celkovou úsporu.',
+
+        t1d_spend_title: 'Dopad do spendu',
+        t1d_spend_desc: 'Zadejte původní cenu, novou cenu a roční objem v Kč – kalkulačka vypočítá, jak se změní roční spend.',
+        t1d_spend_origPrice: 'Původní cena (Kč)',
+        t1d_spend_origPricePh: 'např. 1000',
+        t1d_spend_newPrice: 'Nová cena (Kč)',
+        t1d_spend_newPricePh: 'např. 850',
+        t1d_spend_annualVolume: 'Roční objem (Kč)',
+        t1d_spend_annualVolumePh: 'např. 500000',
+        t1d_spend_origSpend_label: 'Původní roční spend',
+        t1d_spend_newSpend_label: 'Nový roční spend',
+        t1d_spend_diffKc_label: 'Rozdíl (Kč)',
+        t1d_spend_diffPct_label: 'Rozdíl (%)',
+        t1d_spend_interp_save: 'Roční spend klesne o {diffKc} Kč ({diffPct} %): z {origSpend} Kč na {newSpend} Kč.',
+        t1d_spend_interp_increase: 'Roční spend vzroste o {diffKc} Kč ({diffPct} %): z {origSpend} Kč na {newSpend} Kč.',
+        t1d_spend_interp_nochange: 'Roční spend se nemění – zůstává {origSpend} Kč.',
+
+        // Kalkulačka 1c: Kurzy měn
+        panel1c_heading: 'Kurzy měn (ČNB)',
+        t1c_title: 'Přepočet měn dle kurzů ČNB',
+        t1c_desc: 'Vyberte měnu, zadejte částku a datum – kalkulačka načte aktuální kurz z ČNB a provede přepočet.',
+        t1c_currencyLabel: 'Měna',
+        t1c_amountLabel: 'Částka',
+        t1c_amountPh: 'např. 100',
+        t1c_dateLabel: 'Datum kurzu (volitelné)',
+        t1c_dateDesc: 'Ponechte prázdné pro dnešní kurz',
+        t1c_dirLabel: 'Směr přepočtu',
+        t1c_dirToCZK: 'z měny do CZK',
+        t1c_dirFromCZK: 'z CZK do měny',
+        t1c_calcBtn: 'Přepočítat',
+        t1c_loading: 'Načítám kurz z ČNB…',
+        t1c_result_label_toczk: 'Výsledek v CZK',
+        t1c_result_label_fromczk: 'Výsledek v cizí měně',
+        t1c_rate_label: 'Použitý kurz',
+        t1c_date_label: 'Datum kurzu',
+        t1c_fallback_warn: 'Upozornění: Kurz pro {requestedDate} není dostupný (víkend nebo svátek). Použit kurz ke dni {usedDate}.',
+        t1c_interp_toczk: '{amount} {currency} = {result} CZK (kurz 1 {currency} = {rate} CZK ke dni {date})',
+        t1c_interp_fromczk: '{amount} CZK = {result} {currency} (kurz 1 {currency} = {rate} CZK ke dni {date})',
+        err_cnb_unavailable: 'Kurz ČNB není dostupný. Zkuste to prosím za chvíli.',
+        err_currency_not_found: 'Kurz pro zvolenou měnu nebyl nalezen.',
+        err_invalid_date: 'Neplatný formát data.',
+        err_amount_required: 'Zadejte částku.',
+        err_amount_invalid: 'Zadejte platnou kladnou částku.',
+
+        // Sdílené chybové hlášky
+        err_required: 'Pole je povinné',
+        err_nonNumeric: 'Zadejte číslo, např. 1 250,50.',
+        err_ambiguous: 'Nejednoznačný zápis čísla.',
+        err_integer: 'Zadejte celé číslo.',
+        err_min: 'Hodnota musí být alespoň {min}.',
+        err_max: 'Hodnota smí být nejvýše {max}.',
+        err_maxTwoDecimals: 'Zadejte nejvýše 2 desetinná místa.',
+        err_tooLarge: 'Částka je příliš vysoká, nejvýše 1 000 000 000.',
+        err_divByZero: 'Dělení nulou – původní cena nesmí být 0',
+        err_negativeNotAllowed: 'Záporná hodnota není povolena',
+        err_discountTooLarge: 'Sleva nemůže být vyšší než původní cena',
+        err_qtyPositive: 'Množství musí být větší než 0.',
+        numLocale: 'cs-CZ',
+      },
+      en: {
+        // Tab labels
+        tab1a: 'Percentages',
+        tab1b: 'VAT',
+        tab1c: 'Exchange rates',
+        tab1d: 'Savings',
+
+        // Panel headings
+        panel1a_heading: 'Percentages, price increases & discounts',
+
+        // Shared buttons
+        btn_reset: 'Reset',
+
+        // Calculator 1a-1: Percentage change
+        t1a1_title: 'Percentage change between prices',
+        t1a1_desc: 'Enter the original and new price – the calculator will compute the percentage change and interpret it.',
+        t1a1_origPrice: 'Original price (CZK)',
+        t1a1_origPricePh: 'e.g. 1000',
+        t1a1_newPrice: 'New price (CZK)',
+        t1a1_newPricePh: 'e.g. 1200',
+        t1a1_result_label: 'Percentage change',
+        t1a1_result_increase: 'Price increased by {pct} % ({diff} CZK)',
+        t1a1_result_decrease: 'Price decreased by {pct} % ({diff} CZK)',
+        t1a1_result_nochange: 'No change – price remained the same',
+
+        // Calculator 1a-2: Increase CZK → %
+        t1a2_title: 'Increase in CZK → percentage',
+        t1a2_desc: 'Enter the original price and the increase amount in CZK – the calculator will compute the percentage increase.',
+        t1a2_basePrice: 'Original price (CZK)',
+        t1a2_basePricePh: 'e.g. 1000',
+        t1a2_increaseKc: 'Increase (CZK)',
+        t1a2_increaseKcPh: 'e.g. 200',
+        t1a2_result_label: 'Increase in percent',
+        t1a2_result_text: 'Price was increased by {pct} % (i.e. {diff} CZK)',
+
+        // Calculator 1a-3: Discount CZK → %
+        t1a3_title: 'Discount in CZK → percentage',
+        t1a3_desc: 'Enter the original price and the discount amount in CZK – the calculator will compute the percentage discount.',
+        t1a3_basePrice: 'Original price (CZK)',
+        t1a3_basePricePh: 'e.g. 1000',
+        t1a3_discountKc: 'Discount (CZK)',
+        t1a3_discountKcPh: 'e.g. 150',
+        t1a3_result_label: 'Discount in percent',
+        t1a3_result_text: 'Discount is {pct} % of the original price (i.e. {diff} CZK)',
+
+        // Calculator 1a-4: Increase by %
+        t1a4_title: 'Increase price by percentage',
+        t1a4_desc: 'Enter the original price and the percentage increase – the calculator will compute the new price.',
+        t1a4_basePrice: 'Original price (CZK)',
+        t1a4_basePricePh: 'e.g. 1000',
+        t1a4_pctIncrease: 'Increase (%)',
+        t1a4_pctIncreasePh: 'e.g. 15',
+        t1a4_result_label: 'New price after increase',
+        t1a4_result_text: 'After a {pct} % increase the new price is {newPrice} CZK (+ {diff} CZK)',
+
+        // Calculator 1a-5: Decrease by %
+        t1a5_title: 'Decrease price by percentage',
+        t1a5_desc: 'Enter the original price and the discount percentage – the calculator will compute the new price after discount.',
+        t1a5_basePrice: 'Original price (CZK)',
+        t1a5_basePricePh: 'e.g. 1000',
+        t1a5_pctDiscount: 'Discount (%)',
+        t1a5_pctDiscountPh: 'e.g. 20',
+        t1a5_result_label: 'New price after discount',
+        t1a5_result_text: 'After a {pct} % discount the new price is {newPrice} CZK (save {diff} CZK)',
+
+        // Calculator 1b: VAT
+        panel1b_heading: 'VAT Calculator',
+        t1b_title: 'VAT Calculation',
+        t1b_desc: 'Enter the amount and VAT rate – the calculator will compute the tax base, VAT amount and price including VAT.',
+        t1b_modeLabel: 'Calculation mode',
+        t1b_modeExcl: 'Price excl. VAT',
+        t1b_modeIncl: 'Price incl. VAT',
+        t1b_amountExcl: 'Amount excl. VAT (CZK)',
+        t1b_amountIncl: 'Amount incl. VAT (CZK)',
+        t1b_amountPh: 'e.g. 1000',
+        t1b_rateLabel: 'VAT rate',
+        t1b_rate0: '0 %',
+        t1b_rate10: '10 %',
+        t1b_rate12: '12 %',
+        t1b_rate21: '21 %',
+        t1b_rateCustomBtn: 'Custom',
+        t1b_customRateLabel: 'Custom rate (%)',
+        t1b_customRatePh: 'e.g. 15',
+        t1b_resultBase: 'Tax base (excl. VAT)',
+        t1b_resultVAT: 'VAT amount (CZK)',
+        t1b_resultTotal: 'Price incl. VAT',
+        t1b_interpExcl: 'Adding {vat} CZK VAT ({rate} %) to the base price of {base} CZK. Total price incl. VAT is {total} CZK.',
+        t1b_interpIncl: 'Of the total price {total} CZK, {vat} CZK is VAT ({rate} %). The tax base (excl. VAT) is {base} CZK.',
+        t1b_interpZero: 'VAT rate is 0 % – no tax applies. Price excl. VAT = price incl. VAT = {base} CZK.',
+        err_rateRange: 'Rate must be between 0 and 100 %',
+
+        // Calculator 1d: Savings & spend impact
+        panel1d_heading: 'Savings & spend impact',
+
+        t1d_savings_title: 'Savings calculator',
+        t1d_savings_desc: 'Enter the original price, new price and optional quantity – the calculator will compute savings per unit, total savings and the percentage reduction.',
+        t1d_origPrice: 'Original price (CZK)',
+        t1d_origPricePh: 'e.g. 1000',
+        t1d_newPrice: 'New price (CZK)',
+        t1d_newPricePh: 'e.g. 850',
+        t1d_qty: 'Quantity / number of units (optional)',
+        t1d_qtyPh: 'e.g. 1000',
+        t1d_savings_perUnit_label: 'Savings per unit',
+        t1d_savings_total_label: 'Total savings',
+        t1d_savings_pct_label: 'Savings %',
+        t1d_savings_interp: 'You save {perUnit} CZK ({pct} %) on each unit. Total savings for {qty} units: {total} CZK.',
+        t1d_savings_interp_increase: 'Price increased by {perUnit} CZK ({pct} %) per unit. Total price increase for {qty} units: {total} CZK – price increase.',
+        t1d_savings_interp_unit: 'You save {perUnit} CZK ({pct} %) on each unit.',
+        t1d_savings_interp_unit_increase: 'Price increased by {perUnit} CZK ({pct} %) per unit.',
+        t1d_savings_qtyHint: 'Enter a quantity to see the total savings.',
+
+        t1d_spend_title: 'Spend impact',
+        t1d_spend_desc: 'Enter the original price, new price and annual volume in CZK – the calculator will show the change in annual spend.',
+        t1d_spend_origPrice: 'Original price (CZK)',
+        t1d_spend_origPricePh: 'e.g. 1000',
+        t1d_spend_newPrice: 'New price (CZK)',
+        t1d_spend_newPricePh: 'e.g. 850',
+        t1d_spend_annualVolume: 'Annual volume (CZK)',
+        t1d_spend_annualVolumePh: 'e.g. 500000',
+        t1d_spend_origSpend_label: 'Original annual spend',
+        t1d_spend_newSpend_label: 'New annual spend',
+        t1d_spend_diffKc_label: 'Difference (CZK)',
+        t1d_spend_diffPct_label: 'Difference (%)',
+        t1d_spend_interp_save: 'Annual spend will decrease by {diffKc} CZK ({diffPct} %): from {origSpend} CZK to {newSpend} CZK.',
+        t1d_spend_interp_increase: 'Annual spend will increase by {diffKc} CZK ({diffPct} %): from {origSpend} CZK to {newSpend} CZK.',
+        t1d_spend_interp_nochange: 'Annual spend unchanged – remains {origSpend} CZK.',
+
+        // Calculator 1c: Exchange rates
+        panel1c_heading: 'Exchange rates (CNB)',
+        t1c_title: 'Currency conversion using CNB rates',
+        t1c_desc: 'Select a currency, enter an amount and a date – the calculator will fetch the CNB exchange rate and convert.',
+        t1c_currencyLabel: 'Currency',
+        t1c_amountLabel: 'Amount',
+        t1c_amountPh: 'e.g. 100',
+        t1c_dateLabel: 'Rate date (optional)',
+        t1c_dateDesc: 'Leave empty for today\'s rate',
+        t1c_dirLabel: 'Conversion direction',
+        t1c_dirToCZK: 'from currency to CZK',
+        t1c_dirFromCZK: 'from CZK to currency',
+        t1c_calcBtn: 'Convert',
+        t1c_loading: 'Fetching CNB rate…',
+        t1c_result_label_toczk: 'Result in CZK',
+        t1c_result_label_fromczk: 'Result in foreign currency',
+        t1c_rate_label: 'Exchange rate used',
+        t1c_date_label: 'Rate date',
+        t1c_fallback_warn: 'Notice: No rate available for {requestedDate} (weekend or holiday). Rate from {usedDate} was used instead.',
+        t1c_interp_toczk: '{amount} {currency} = {result} CZK (rate 1 {currency} = {rate} CZK as of {date})',
+        t1c_interp_fromczk: '{amount} CZK = {result} {currency} (rate 1 {currency} = {rate} CZK as of {date})',
+        err_cnb_unavailable: 'CNB rate is unavailable. Please try again in a moment.',
+        err_currency_not_found: 'Rate for the selected currency was not found.',
+        err_invalid_date: 'Invalid date format.',
+        err_amount_required: 'Please enter an amount.',
+        err_amount_invalid: 'Please enter a valid positive amount.',
+
+        // Shared error messages
+        err_required: 'This field is required',
+        err_nonNumeric: 'Enter a number, e.g. 1,250.50 or 1250.50.',
+        err_ambiguous: 'Ambiguous number: write 1250 or 1,250.00 for thousands, 1.25 for decimals.',
+        err_integer: 'Enter a whole number.',
+        err_min: 'Value must be at least {min}.',
+        err_max: 'Value must be at most {max}.',
+        err_maxTwoDecimals: 'Enter at most 2 decimal places.',
+        err_tooLarge: 'Amount is too large, maximum 1,000,000,000.',
+        err_divByZero: 'Division by zero – original price must not be 0',
+        err_negativeNotAllowed: 'Negative value is not allowed',
+        err_discountTooLarge: 'Discount cannot exceed the original price',
+        err_qtyPositive: 'Quantity must be greater than 0.',
+        numLocale: 'en-US',
+      }
+    };
+
+    let currentLang = 'cs';
+
+    /* ===== UTILITY FUNCTIONS ===== */
+    function formatCurrency(value, decimals = 2) {
+      return new Intl.NumberFormat('cs-CZ', {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals
+      }).format(value);
+    }
+
+    /* ===== D1: ČTENÍ ČÍSEL PODLE JAZYKA =====
+       Blok mezi značkami D1-SHARED je ve všech převedených toolboxech textově shodný
+       (hlídá iter-013-gates.js). Neměnit v jednom souboru bez ostatních.
+       CZ: mezera = tisíce, čárka NEBO tečka = desetinná („1,250“ = 1,25).
+       EN: mezera nebo čárka po trojicích = tisíce, tečka = desetinná; „1,250“ bez tečky je
+       víceznačné a odmítne se. Přepnutí jazyka tak nikdy tiše nezmění číslo. */
+    // D1-SHARED-BEGIN
+    const NUM_SPACES = /[\s\u00a0\u202f]/g;
+    const NUM_PLAIN = /^[+-]?(?:\d+(?:[.,]\d*)?|[.,]\d+)$/;
+    const NUM_EN_GROUPED = /^[+-]?\d{1,3}(?:,\d{3})+\.\d*$/;
+    const NUM_EN_AMBIGUOUS = /^[+-]?[1-9]\d{0,2}(?:,\d{3})+$/;
+
+    /** → { value, canonical, error }; error ∈ null | 'empty' | 'nonNumeric' | 'ambiguous' | 'integer'.
+        canonical = zápis s desetinnou tečkou bez oddělovačů tisíců (pro přesné výpočty v setinách). */
+    function parseNumEx(str, { integer = false, lang = currentLang } = {}) {
+      const s = String(str == null ? '' : str).trim().replace(NUM_SPACES, '');
+      if (s === '') return { value: null, canonical: '', error: 'empty' };
+      let canonical;
+      if (lang === 'en') {
+        if (NUM_EN_GROUPED.test(s)) canonical = s.replace(/,/g, '');
+        else if (NUM_EN_AMBIGUOUS.test(s)) return { value: NaN, canonical: '', error: 'ambiguous' };
+        else if (s.includes(',')) return { value: NaN, canonical: '', error: 'nonNumeric' };
+        else if (NUM_PLAIN.test(s)) canonical = s;
+      } else if (NUM_PLAIN.test(s)) {
+        canonical = s.replace(',', '.');
+      }
+      if (canonical === undefined) return { value: NaN, canonical: '', error: 'nonNumeric' };
+      const n = Number(canonical);
+      if (!Number.isFinite(n)) return { value: NaN, canonical: '', error: 'nonNumeric' };
+      if (integer && !Number.isInteger(n)) return { value: NaN, canonical, error: 'integer' };
+      return { value: n, canonical, error: null };
+    }
+
+    /** Číslo, nebo NaN (prázdné i neplatné). */
+    function parseNum(str, lang = currentLang) {
+      const r = parseNumEx(str, { lang });
+      return r.error ? NaN : r.value;
+    }
+    // D1-SHARED-END
+
+    /** Kód chyby (parseNumEx, vatSplit) → hláška v aktuálním jazyce. */
+    function numErrorText(code) {
+      const T = TEXTS[currentLang];
+      const key = {
+        empty: 'err_required', required: 'err_required', nonNumeric: 'err_nonNumeric',
+        ambiguous: 'err_ambiguous', integer: 'err_integer', negative: 'err_negativeNotAllowed',
+        rateRange: 'err_rateRange', maxTwoDecimals: 'err_maxTwoDecimals', tooLarge: 'err_tooLarge'
+      }[code];
+      return T[key] || T.err_nonNumeric;
+    }
+
+    function formatPlainNumber(n) {
+      return new Intl.NumberFormat(TEXTS[currentLang].numLocale, { maximumFractionDigits: 6 }).format(n);
+    }
+
+    /* ===== VALIDATION HELPERS ===== */
+    function showError(inputId, message) {
+      const input = document.getElementById(inputId);
+      const errEl = document.getElementById(inputId + '-err');
+      if (!input || !errEl) return;
+      input.classList.add('input-error');
+      input.setAttribute('aria-invalid', 'true');
+      errEl.textContent = message;
+      errEl.classList.add('visible');
+    }
+
+    function clearError(inputId) {
+      const input = document.getElementById(inputId);
+      const errEl = document.getElementById(inputId + '-err');
+      if (!input || !errEl) return;
+      input.classList.remove('input-error');
+      input.removeAttribute('aria-invalid');
+      errEl.textContent = '';
+      errEl.classList.remove('visible');
+    }
+
+    /** Vrací hlášku chyby, nebo null. Čte podle aktuálního jazyka (parseNumEx). */
+    function validateNumeric(value, { required = true, allowNegative = false, allowZero = true,
+                                      integer = false, min = null, max = null } = {}) {
+      const T = TEXTS[currentLang];
+      const r = parseNumEx(value, { integer });
+      if (r.error === 'empty') return required ? T.err_required : null;
+      if (r.error) return numErrorText(r.error);
+      const n = r.value;
+      if (!allowNegative && n < 0) return T.err_negativeNotAllowed;
+      if (!allowZero && n === 0) return T.err_divByZero;
+      if (min !== null && n < min) return T.err_min.replace('{min}', formatPlainNumber(min));
+      if (max !== null && n > max) return T.err_max.replace('{max}', formatPlainNumber(max));
+      return null;
+    }
+
+    /* ===== i18n ===== */
+    function setLang(lang) {
+      currentLang = lang;
+      document.documentElement.lang = lang;
+
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (TEXTS[lang][key] !== undefined) el.textContent = TEXTS[lang][key];
+      });
+
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        if (TEXTS[lang][key] !== undefined) el.placeholder = TEXTS[lang][key];
+      });
+
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lang === lang);
+      });
+
+      // Update DPH amount label when language changes (depends on current mode)
+      if (typeof updateVATAmountLabel === 'function') updateVATAmountLabel();
+    }
+
+    /* ===== TAB NAVIGATION ===== */
+    function initTabs() {
+      const nav = document.querySelector('.tab-nav');
+      const panels = document.querySelectorAll('.tool-panel');
+      const buttons = Array.from(nav.querySelectorAll('.tab-btn'));
+
+      nav.addEventListener('click', (e) => {
+        const btn = e.target.closest('.tab-btn');
+        if (!btn) return;
+        activateTab(btn, buttons, panels);
+      });
+
+      nav.addEventListener('keydown', (e) => {
+        const btn = e.target.closest('.tab-btn');
+        if (!btn) return;
+        const currentIndex = buttons.indexOf(btn);
+        let targetIndex = -1;
+
+        if (e.key === 'ArrowRight') {
+          targetIndex = (currentIndex + 1) % buttons.length;
+        } else if (e.key === 'ArrowLeft') {
+          targetIndex = (currentIndex - 1 + buttons.length) % buttons.length;
+        } else if (e.key === 'Home') {
+          targetIndex = 0;
+        } else if (e.key === 'End') {
+          targetIndex = buttons.length - 1;
+        }
+
+        if (targetIndex >= 0) {
+          e.preventDefault();
+          buttons[targetIndex].focus();
+          activateTab(buttons[targetIndex], buttons, panels);
+        }
+      });
+    }
+
+    function activateTab(btn, buttons, panels) {
+      buttons.forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-selected', 'false');
+        b.setAttribute('tabindex', '-1');
+      });
+      panels.forEach(p => {
+        p.classList.remove('active');
+        p.setAttribute('hidden', '');
+      });
+
+      btn.classList.add('active');
+      btn.setAttribute('aria-selected', 'true');
+      btn.setAttribute('tabindex', '0');
+      const targetId = btn.dataset.tab;
+      const panel = document.getElementById(targetId);
+      if (panel) {
+        panel.classList.add('active');
+        panel.removeAttribute('hidden');
+      }
+    }
+
+    /* ===== LANG SWITCHER ===== */
+    function initLangSwitcher() {
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          setLang(btn.dataset.lang);
+        });
+      });
+    }
+
+    /* =========================================================
+       NÁSTROJ 1a-1: Procentní změna mezi dvěma cenami
+       ========================================================= */
+    function calc1a1() {
+      const origRaw = document.getElementById('t1a1-orig').value;
+      const newRaw  = document.getElementById('t1a1-new').value;
+      const T = TEXTS[currentLang];
+
+      const errOrig = validateNumeric(origRaw, { required: true, allowNegative: false, allowZero: false });
+      const errNew  = validateNumeric(newRaw,  { required: true, allowNegative: false, allowZero: true  });
+
+      clearError('t1a1-orig');
+      clearError('t1a1-new');
+
+      let hasError = false;
+      if (errOrig) { showError('t1a1-orig', errOrig); hasError = true; }
+      if (errNew)  { showError('t1a1-new',  errNew);  hasError = true; }
+      if (hasError) {
+        document.getElementById('t1a1-result').style.display = 'none';
+        return;
+      }
+
+      const orig   = parseNum(origRaw);
+      const newVal = parseNum(newRaw);
+      const diff   = newVal - orig;
+      const pct    = (diff / orig) * 100;
+
+      document.getElementById('t1a1-result').style.display = 'block';
+      document.getElementById('t1a1-result-value').textContent = pct.toFixed(2) + ' %';
+
+      let interpretation;
+      if (Math.abs(diff) < 0.001) {
+        interpretation = T.t1a1_result_nochange;
+      } else if (diff > 0) {
+        interpretation = T.t1a1_result_increase
+          .replace('{pct}',  Math.abs(pct).toFixed(2))
+          .replace('{diff}', formatCurrency(Math.abs(diff)));
+      } else {
+        interpretation = T.t1a1_result_decrease
+          .replace('{pct}',  Math.abs(pct).toFixed(2))
+          .replace('{diff}', formatCurrency(Math.abs(diff)));
+      }
+      document.getElementById('t1a1-interpretation').textContent = interpretation;
+    }
+
+    function reset1a1() {
+      ['t1a1-orig', 't1a1-new'].forEach(id => {
+        document.getElementById(id).value = '';
+        clearError(id);
+      });
+      document.getElementById('t1a1-result').style.display = 'none';
+    }
+
+    /* =========================================================
+       NÁSTROJ 1a-2: Navýšení Kč → procenta
+       ========================================================= */
+    function calc1a2() {
+      const baseRaw     = document.getElementById('t1a2-base').value;
+      const increaseRaw = document.getElementById('t1a2-increase').value;
+      const T = TEXTS[currentLang];
+
+      const errBase     = validateNumeric(baseRaw,     { required: true, allowNegative: false, allowZero: false });
+      const errIncrease = validateNumeric(increaseRaw, { required: true, allowNegative: false, allowZero: true  });
+
+      clearError('t1a2-base');
+      clearError('t1a2-increase');
+
+      let hasError = false;
+      if (errBase)     { showError('t1a2-base',     errBase);     hasError = true; }
+      if (errIncrease) { showError('t1a2-increase', errIncrease); hasError = true; }
+      if (hasError) {
+        document.getElementById('t1a2-result').style.display = 'none';
+        return;
+      }
+
+      const base     = parseNum(baseRaw);
+      const increase = parseNum(increaseRaw);
+      const pct      = (increase / base) * 100;
+
+      document.getElementById('t1a2-result').style.display = 'block';
+      document.getElementById('t1a2-result-value').textContent = pct.toFixed(2) + ' %';
+      document.getElementById('t1a2-interpretation').textContent = T.t1a2_result_text
+        .replace('{pct}',  pct.toFixed(2))
+        .replace('{diff}', formatCurrency(increase));
+    }
+
+    function reset1a2() {
+      ['t1a2-base', 't1a2-increase'].forEach(id => {
+        document.getElementById(id).value = '';
+        clearError(id);
+      });
+      document.getElementById('t1a2-result').style.display = 'none';
+    }
+
+    /* =========================================================
+       NÁSTROJ 1a-3: Sleva Kč → procenta
+       ========================================================= */
+    function calc1a3() {
+      const baseRaw     = document.getElementById('t1a3-base').value;
+      const discountRaw = document.getElementById('t1a3-discount').value;
+      const T = TEXTS[currentLang];
+
+      const errBase     = validateNumeric(baseRaw,     { required: true, allowNegative: false, allowZero: false });
+      const errDiscount = validateNumeric(discountRaw, { required: true, allowNegative: false, allowZero: true  });
+
+      clearError('t1a3-base');
+      clearError('t1a3-discount');
+
+      let hasError = false;
+      if (errBase)     { showError('t1a3-base',     errBase);     hasError = true; }
+      if (errDiscount) { showError('t1a3-discount', errDiscount); hasError = true; }
+      if (hasError) {
+        document.getElementById('t1a3-result').style.display = 'none';
+        return;
+      }
+
+      const base     = parseNum(baseRaw);
+      const discount = parseNum(discountRaw);
+
+      if (discount > base) {
+        showError('t1a3-discount', T.err_discountTooLarge);
+        document.getElementById('t1a3-result').style.display = 'none';
+        return;
+      }
+
+      const pct = (discount / base) * 100;
+
+      document.getElementById('t1a3-result').style.display = 'block';
+      document.getElementById('t1a3-result-value').textContent = pct.toFixed(2) + ' %';
+      document.getElementById('t1a3-interpretation').textContent = T.t1a3_result_text
+        .replace('{pct}',  pct.toFixed(2))
+        .replace('{diff}', formatCurrency(discount));
+    }
+
+    function reset1a3() {
+      ['t1a3-base', 't1a3-discount'].forEach(id => {
+        document.getElementById(id).value = '';
+        clearError(id);
+      });
+      document.getElementById('t1a3-result').style.display = 'none';
+    }
+
+    /* =========================================================
+       NÁSTROJ 1a-4: Navýšení ceny o procenta
+       ========================================================= */
+    function calc1a4() {
+      const baseRaw = document.getElementById('t1a4-base').value;
+      const pctRaw  = document.getElementById('t1a4-pct').value;
+      const T = TEXTS[currentLang];
+
+      const errBase = validateNumeric(baseRaw, { required: true, allowNegative: false, allowZero: false });
+      const errPct  = validateNumeric(pctRaw,  { required: true, allowNegative: false, allowZero: true  });
+
+      clearError('t1a4-base');
+      clearError('t1a4-pct');
+
+      let hasError = false;
+      if (errBase) { showError('t1a4-base', errBase); hasError = true; }
+      if (errPct)  { showError('t1a4-pct',  errPct);  hasError = true; }
+      if (hasError) {
+        document.getElementById('t1a4-result').style.display = 'none';
+        return;
+      }
+
+      const base     = parseNum(baseRaw);
+      const pct      = parseNum(pctRaw);
+      const diff     = base * pct / 100;
+      const newPrice = base + diff;
+
+      document.getElementById('t1a4-result').style.display = 'block';
+      document.getElementById('t1a4-result-value').textContent = formatCurrency(newPrice) + ' Kč';
+      document.getElementById('t1a4-interpretation').textContent = T.t1a4_result_text
+        .replace('{pct}',      pct.toFixed(2))
+        .replace('{newPrice}', formatCurrency(newPrice))
+        .replace('{diff}',     formatCurrency(diff));
+    }
+
+    function reset1a4() {
+      ['t1a4-base', 't1a4-pct'].forEach(id => {
+        document.getElementById(id).value = '';
+        clearError(id);
+      });
+      document.getElementById('t1a4-result').style.display = 'none';
+    }
+
+    /* =========================================================
+       NÁSTROJ 1a-5: Snížení ceny o procenta
+       ========================================================= */
+    function calc1a5() {
+      const baseRaw = document.getElementById('t1a5-base').value;
+      const pctRaw  = document.getElementById('t1a5-pct').value;
+      const T = TEXTS[currentLang];
+
+      const errBase = validateNumeric(baseRaw, { required: true, allowNegative: false, allowZero: false });
+      const errPct  = validateNumeric(pctRaw,  { required: true, allowNegative: false, allowZero: true  });
+
+      clearError('t1a5-base');
+      clearError('t1a5-pct');
+
+      let hasError = false;
+      if (errBase) { showError('t1a5-base', errBase); hasError = true; }
+      if (errPct)  { showError('t1a5-pct',  errPct);  hasError = true; }
+      if (hasError) {
+        document.getElementById('t1a5-result').style.display = 'none';
+        return;
+      }
+
+      const base     = parseNum(baseRaw);
+      const pct      = parseNum(pctRaw);
+
+      if (pct > 100) {
+        showError('t1a5-pct', T.err_discountTooLarge);
+        document.getElementById('t1a5-result').style.display = 'none';
+        return;
+      }
+
+      const diff     = base * pct / 100;
+      const newPrice = base - diff;
+
+      document.getElementById('t1a5-result').style.display = 'block';
+      document.getElementById('t1a5-result-value').textContent = formatCurrency(newPrice) + ' Kč';
+      document.getElementById('t1a5-interpretation').textContent = T.t1a5_result_text
+        .replace('{pct}',      pct.toFixed(2))
+        .replace('{newPrice}', formatCurrency(newPrice))
+        .replace('{diff}',     formatCurrency(diff));
+    }
+
+    function reset1a5() {
+      ['t1a5-base', 't1a5-pct'].forEach(id => {
+        document.getElementById(id).value = '';
+        clearError(id);
+      });
+      document.getElementById('t1a5-result').style.display = 'none';
+    }
+
+    /* =========================================================
+       NÁSTROJ 1b: DPH kalkulačka
+       ========================================================= */
+
+    /** Aktivní sazba: číslo nebo 'custom' */
+    let t1bSelectedRate = 21;
+
+    /** Kanonický zápis (tečka, bez tisíců) → celé setiny. Víc než 2 desetinná místa → null. */
+    function toHundredths(canonical) {
+      const neg = canonical.startsWith('-');
+      const body = canonical.replace(/^[+-]/, '');
+      const [i = '', f = ''] = body.split('.');
+      if (f.length > 2) return null;
+      const h = Number(i || '0') * 100 + Number((f + '00').slice(0, 2));
+      return neg && h !== 0 ? -h : h;
+    }
+
+    /** Podíl nezáporných celých čísel zaokrouhlený půl nahoru, bez floatu. */
+    function halfUp(num, den) {
+      const q = Math.floor(num / den), r = num - q * den;
+      return 2 * r >= den ? q + 1 : q;
+    }
+
+    /**
+     * T1-3: DPH v celých haléřích (čistá funkce, bez DOM).
+     *  bez DPH: daň = halfUp(základ_h × sazba_c, 10 000), celkem = základ + daň
+     *  s DPH:   daň = halfUp(celkem_h × sazba_c, 10 000 + sazba_c), základ = celkem − daň (§ 37 odst. 2 ZDPH)
+     *  sazba_c = sazba v setinách procenta (21 % → 2100). Vstupy jsou řetězce v jazyce `lang`.
+     * Vrací { baseH, taxH, totalH, rate } v haléřích, nebo { error, field }.
+     */
+    function vatSplit({ amount, rate, mode, lang = currentLang }) {
+      const a = parseNumEx(amount, { lang }), r = parseNumEx(rate, { lang });
+      if (a.error) return { error: a.error === 'empty' ? 'required' : a.error, field: 'amount' };
+      if (r.error) return { error: r.error === 'empty' ? 'required' : r.error, field: 'rate' };
+      if (a.value < 0) return { error: 'negative', field: 'amount' };
+      if (a.value > 1e9) return { error: 'tooLarge', field: 'amount' };   // součin zůstane pod 2^53
+      if (r.value < 0 || r.value > 100) return { error: 'rateRange', field: 'rate' };
+      const ah = toHundredths(a.canonical), rc = toHundredths(r.canonical);
+      if (ah === null) return { error: 'maxTwoDecimals', field: 'amount' };
+      if (rc === null) return { error: 'maxTwoDecimals', field: 'rate' };
+      if (mode === 'excl') {
+        const t = halfUp(ah * rc, 10000);
+        return { baseH: ah, taxH: t, totalH: ah + t, rate: r.value };
+      }
+      const t = halfUp(ah * rc, 10000 + rc);
+      return { baseH: ah - t, taxH: t, totalH: ah, rate: r.value };
+    }
+
+    function calcVAT() {
+      const T = TEXTS[currentLang];
+      const amountRaw = document.getElementById('t1b-amount').value;
+      const mode = document.querySelector('input[name="t1b-mode"]:checked').value;
+      const rateRaw = t1bSelectedRate === 'custom'
+        ? document.getElementById('t1b-custom-rate').value
+        : String(t1bSelectedRate);
+
+      clearError('t1b-amount');
+      clearError('t1b-custom-rate');
+
+      const res = vatSplit({ amount: amountRaw, rate: rateRaw, mode });
+      if (res.error) {
+        showError(res.field === 'amount' ? 't1b-amount' : 't1b-custom-rate', numErrorText(res.error));
+        document.getElementById('t1b-result').style.display = 'none';
+        return;
+      }
+
+      renderVAT(res, mode, T);
+    }
+
+    /** Vstup v haléřích; na koruny se dělí až při formátování. */
+    function renderVAT({ baseH, taxH, totalH, rate }, mode, T) {
+      const base = formatCurrency(baseH / 100), vat = formatCurrency(taxH / 100), total = formatCurrency(totalH / 100);
+      const rateText = formatPlainNumber(rate);
+      document.getElementById('t1b-base-value').textContent  = base  + ' Kč';
+      document.getElementById('t1b-vat-value').textContent   = vat   + ' Kč';
+      document.getElementById('t1b-total-value').textContent = total + ' Kč';
+
+      let interp;
+      if (rate === 0) {
+        interp = T.t1b_interpZero
+          .replace('{base}', base);
+      } else if (mode === 'excl') {
+        interp = T.t1b_interpExcl
+          .replace('{base}',  base)
+          .replace('{vat}',   vat)
+          .replace('{rate}',  rateText)
+          .replace('{total}', total);
+      } else {
+        interp = T.t1b_interpIncl
+          .replace('{total}', total)
+          .replace('{vat}',   vat)
+          .replace('{rate}',  rateText)
+          .replace('{base}',  base);
+      }
+
+      document.getElementById('t1b-interpretation').textContent = interp;
+      document.getElementById('t1b-result').style.display = 'block';
+    }
+
+    function resetVAT() {
+      document.getElementById('t1b-amount').value = '';
+      document.getElementById('t1b-custom-rate').value = '';
+      clearError('t1b-amount');
+      clearError('t1b-custom-rate');
+
+      // Vrátit přepínač na "cena bez DPH"
+      document.getElementById('t1b-mode-excl').checked = true;
+      updateVATAmountLabel();
+
+      // Vrátit aktivní sazbu na 21 %
+      t1bSelectedRate = 21;
+      document.querySelectorAll('.t1b-rate-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.rate === '21');
+      });
+      document.getElementById('t1b-custom-rate-group').style.display = 'none';
+
+      document.getElementById('t1b-result').style.display = 'none';
+    }
+
+    function updateVATAmountLabel() {
+      const T = TEXTS[currentLang];
+      const mode = document.querySelector('input[name="t1b-mode"]:checked').value;
+      const label = document.getElementById('t1b-amount-label');
+      if (label) {
+        label.textContent = mode === 'excl' ? T.t1b_amountExcl : T.t1b_amountIncl;
+        label.setAttribute('data-i18n', mode === 'excl' ? 't1b_amountExcl' : 't1b_amountIncl');
+      }
+    }
+
+    function initVAT() {
+      // Rate buttons
+      document.querySelectorAll('.t1b-rate-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.t1b-rate-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const r = btn.dataset.rate;
+          t1bSelectedRate = (r === 'custom') ? 'custom' : Number(r);
+          const customGroup = document.getElementById('t1b-custom-rate-group');
+          customGroup.style.display = (r === 'custom') ? '' : 'none';
+          calcVAT();
+        });
+      });
+
+      // Mode toggle
+      document.querySelectorAll('input[name="t1b-mode"]').forEach(radio => {
+        radio.addEventListener('change', () => {
+          updateVATAmountLabel();
+          calcVAT();
+        });
+      });
+
+      // Amount input
+      document.getElementById('t1b-amount').addEventListener('input', calcVAT);
+
+      // Custom rate input
+      document.getElementById('t1b-custom-rate').addEventListener('input', calcVAT);
+
+      // Reset
+      document.getElementById('t1b-reset').addEventListener('click', resetVAT);
+    }
+
+    /* =========================================================
+       NÁSTROJ 1c: Kurzy měn ČNB
+       ========================================================= */
+
+    const CNB_BASE_URL = 'https://www.cnb.cz/cs/financni-trhy/devizovy-trh/kurzy-devizoveho-trhu/kurzy-devizoveho-trhu/denni_kurz.txt';
+
+    // CORS_PROXIES: seřazeny dle preference. Iterujeme v pořadí při každém selhání.
+    // Přidání třetí proxy: stačí rozšířit pole – žádná jiná změna není potřeba.
+    const CORS_PROXIES = [
+      {
+        url: 'https://api.allorigins.win/get?url=',   // primární – vrací JSON { contents }
+        extract: async r => { const j = await r.json(); if (!j.contents) throw new Error('contents_missing'); return j.contents; }
+      },
+      {
+        url: 'https://corsproxy.io/?',                // záloha – vrací raw text
+        extract: async r => r.text()
+      }
+    ];
+
+    let cnbRateCache = {};          // { 'DD.MM.YYYY': { EUR: 25.12, USD: 23.45, ... } }
+    let cnbLastAvailableDate = null;
+    let cnbFetching = false;        // zamezí souběžnému fetch
+
+    const CNB_CODE_RE = /^[A-Z]{3}$/;   // ISO 4217 – přesně 3 velká písmena
+    const CNB_RATE_MAX = 100000;         // rozumný horní limit pro kurz
+    const DATE_DDMMYYYY_RE = /^\d{2}\.\d{2}\.\d{4}$/;
+
+    /** Parsuje DD.MM.YYYY string na objekt Date */
+    function parseDDMMYYYY(str) {
+      const [d, m, y] = str.split('.');
+      return new Date(Number(y), Number(m) - 1, Number(d));
+    }
+
+    /** Formátuje Date objekt na DD.MM.YYYY */
+    function formatDDMMYYYY(date) {
+      const d = String(date.getDate()).padStart(2, '0');
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      const y = date.getFullYear();
+      return `${d}.${m}.${y}`;
+    }
+
+    /** Převede YYYY-MM-DD (z input[type=date]) na DD.MM.YYYY */
+    function convertToddmmyyyy(isoStr) {
+      if (!isoStr) return '';
+      const [y, m, d] = isoStr.split('-');
+      if (!y || !m || !d) return '';
+      return `${d}.${m}.${y}`;
+    }
+
+    /**
+     * Parsuje textový výstup ČNB do objektu { KOD: kurz_za_1_jednotku }.
+     * Správně pracuje s měnami na více jednotek (HUF 100, JPY 100 apod.).
+     * Řádky s neplatným kódem měny nebo hodnotami mimo rozsah jsou přeskočeny.
+     */
+    function parseCNBText(text) {
+      const rates = {};
+      if (!text) return rates;
+      const lines = text.split('\n');
+      // Přeskočit header řádky (první 2)
+      for (let i = 2; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+        const parts = line.split('|');
+        if (parts.length < 5) continue;
+        const amount = parseFloat(parts[2].replace(',', '.'));
+        const code   = parts[3].trim();
+        const rate   = parseFloat(parts[4].replace(',', '.'));
+
+        // Guard 1: kód měny musí být přesně 3 velká písmena (ISO 4217)
+        if (!CNB_CODE_RE.test(code)) continue;
+
+        // Guard 2: číselné hodnoty musí být v platném rozsahu
+        if (isNaN(amount) || isNaN(rate)) continue;
+        if (amount <= 0 || amount >= CNB_RATE_MAX) continue;
+        if (rate   <= 0 || rate   >= CNB_RATE_MAX) continue;
+
+        rates[code] = rate / amount;  // vždy na 1 jednotku měny
+      }
+      return rates;
+    }
+
+    // =========================================================
+    // Pomocné funkce pro výpočet pracovních dnů (CZ)
+    // Pozn.: všechny Date instance jsou bez časové složky (new Date(y, m-1, d))
+    // =========================================================
+
+    /**
+     * Vrátí true pokud date je sobota nebo neděle.
+     * @param {Date} date
+     * @returns {boolean}
+     */
+    function isWeekend(date) {
+      const dow = date.getDay(); // 0=neděle, 6=sobota
+      return dow === 0 || dow === 6;
+    }
+
+    /**
+     * Výpočet Velikonoční neděle algoritmem Anonymous Gregorian (Meeus/Jones/Butcher).
+     * @param {number} year
+     * @returns {Date} Velikonoční neděle (bez časové složky)
+     */
+    function easterSunday(year) {
+      const a = year % 19;
+      const b = Math.floor(year / 100);
+      const c = year % 100;
+      const d = Math.floor(b / 4);
+      const e = b % 4;
+      const f = Math.floor((b + 8) / 25);
+      const g = Math.floor((b - f + 1) / 3);
+      const h = (19 * a + b - d - g + 15) % 30;
+      const i = Math.floor(c / 4);
+      const k = c % 4;
+      const l = (32 + 2 * e + 2 * i - h - k) % 7;
+      const m = Math.floor((a + 11 * h + 22 * l) / 451);
+      const month = Math.floor((h + l - 7 * m + 114) / 31); // 3=březen, 4=duben
+      const day   = ((h + l - 7 * m + 114) % 31) + 1;
+      return new Date(year, month - 1, day);
+    }
+
+    /** Pevné české státní svátky (měsíc a den, 1-based). */
+    const CZECH_FIXED_HOLIDAYS = [
+      { month: 1,  day: 1  }, // Nový rok / Den obnovy samostatného českého státu
+      { month: 5,  day: 1  }, // Svátek práce
+      { month: 5,  day: 8  }, // Den vítězství
+      { month: 7,  day: 5  }, // Den slovanských věrozvěstů Cyrila a Metoděje
+      { month: 7,  day: 6  }, // Den upálení mistra Jana Husa
+      { month: 9,  day: 28 }, // Den české státnosti
+      { month: 10, day: 28 }, // Den vzniku samostatného československého státu
+      { month: 11, day: 17 }, // Den boje za svobodu a demokracii
+      { month: 12, day: 24 }, // Štědrý den
+      { month: 12, day: 25 }, // 1. svátek vánoční
+      { month: 12, day: 26 }, // 2. svátek vánoční
+    ];
+
+    /**
+     * Vrátí true pokud date je český státní svátek (pevný nebo pohyblivý).
+     * @param {Date} date
+     * @returns {boolean}
+     */
+    function isCzechHoliday(date) {
+      const year  = date.getFullYear();
+      const month = date.getMonth() + 1; // 1-based
+      const day   = date.getDate();
+
+      // Pevné svátky
+      for (const h of CZECH_FIXED_HOLIDAYS) {
+        if (h.month === month && h.day === day) return true;
+      }
+
+      // Pohyblivé – Velký pátek (2 dny před Velikonoční nedělí) a Velikonoční pondělí (1 den po)
+      const easter = easterSunday(year);
+      const goodFriday   = new Date(easter); goodFriday.setDate(easter.getDate() - 2);
+      const easterMonday = new Date(easter); easterMonday.setDate(easter.getDate() + 1);
+
+      if (date.getTime() === goodFriday.getTime())   return true;
+      if (date.getTime() === easterMonday.getTime()) return true;
+
+      return false;
+    }
+
+    /**
+     * Vrátí nejbližší předchozí pracovní den VČETNĚ zadaného data.
+     * Pokud date je pracovní den → vrátí kopii date.
+     * Pokud date je víkend nebo svátek → jde zpět dokud nenajde pracovní den.
+     * Nemutuje původní objekt.
+     * @param {Date} date
+     * @returns {Date}
+     */
+    function getPreviousWorkingDay(date) {
+      // Pracujeme s kopií bez časové složky, aby se nezmutovalo původní datum
+      const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      while (isWeekend(d) || isCzechHoliday(d)) {
+        d.setDate(d.getDate() - 1);
+      }
+      return d;
+    }
+
+    /**
+     * Fetch kurzu ČNB pro zadané datum.
+     * Strategie (v pořadí):
+     *   1. Proaktivní přesun na předchozí pracovní den (oprava BUG-CNB-001)
+     *   2. Cache hit → okamžitý return
+     *   3. Iterace CORS_PROXIES (primary → fallback proxy)
+     *   4. Při selhání všech proxy → posun na předchozí pracovní den (oprava BUG-CNB-002), max. 7 pokusů
+     *   5. Absolutní fallback → poslední data z cache
+     *
+     * @param {string} dateStr - 'DD.MM.YYYY' (validovaný regexem před předáním) nebo '' pro aktuální
+     * @returns {Promise<{ rates: Object, usedDate: string, isFallback: boolean, requestedDate: string }>}
+     */
+    async function fetchCNBRate(dateStr) {
+      const MAX_FALLBACK_DAYS = 7;
+
+      // Výchozí datum z parametru nebo dnešek (bez časové složky, aby porovnání Date fungovalo)
+      const requestedDate = dateStr ? parseDDMMYYYY(dateStr) : new Date(
+        new Date().getFullYear(), new Date().getMonth(), new Date().getDate()
+      );
+
+      // [OPRAVA BUG-CNB-001] Proaktivně najdi předchozí pracovní den před prvním fetch pokusem
+      let workingDate = getPreviousWorkingDay(requestedDate);
+      let isFallback = workingDate.getTime() !== requestedDate.getTime();
+
+      const requestedDateStr = formatDDMMYYYY(requestedDate); // pro notifikaci uživateli
+
+      for (let attempt = 0; attempt < MAX_FALLBACK_DAYS; attempt++) {
+        const key = formatDDMMYYYY(workingDate);
+
+        // Guard: key musí být validní DD.MM.YYYY před sestavením URL
+        if (!DATE_DDMMYYYY_RE.test(key)) {
+          throw new Error('invalid_date_format');
+        }
+
+        if (cnbRateCache[key]) {
+          return { rates: cnbRateCache[key], usedDate: key, isFallback, requestedDate: requestedDateStr };
+        }
+
+        // [MAJOR-002] Vždy explicitní ?date= – deterministické chování nezávislé na CNB API interpretaci
+        const cnbUrl = `${CNB_BASE_URL}?date=${key}`;
+
+        // Iterace přes CORS proxy – zkusíme každou proxy před posunutím data
+        let lastProxyError = null;
+        for (const proxy of CORS_PROXIES) {
+          try {
+            const proxyUrl = `${proxy.url}${encodeURIComponent(cnbUrl)}`;
+            const response = await fetch(proxyUrl, { signal: AbortSignal.timeout(8000) });
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const text = await proxy.extract(response);
+
+            const rates = parseCNBText(text);
+            if (Object.keys(rates).length === 0) throw new Error('empty');
+
+            cnbRateCache[key] = rates;
+            cnbLastAvailableDate = key;
+            return { rates, usedDate: key, isFallback, requestedDate: requestedDateStr };
+
+          } catch (err) {
+            lastProxyError = err;
+            // Pokračovat na další proxy v poli
+          }
+        }
+
+        // [OPRAVA BUG-CNB-002] Všechny proxy selhaly → posunout o 1 den dozadu a přeskočit víkendy/svátky
+        const prevDay = new Date(workingDate.getFullYear(), workingDate.getMonth(), workingDate.getDate());
+        prevDay.setDate(prevDay.getDate() - 1);
+        workingDate = getPreviousWorkingDay(prevDay);
+        isFallback = true;
+      }
+
+      // Absolutní fallback – použít naposledy dostupná data z cache
+      if (cnbLastAvailableDate && cnbRateCache[cnbLastAvailableDate]) {
+        return {
+          rates: cnbRateCache[cnbLastAvailableDate],
+          usedDate: cnbLastAvailableDate,
+          isFallback: true,
+          requestedDate: requestedDateStr
+        };
+      }
+
+      throw new Error('cnb_unavailable');
+    }
+
+    /** Zobrazí/skryje loading stav a zakáže/povolí tlačítko */
+    function showCNBLoading(visible) {
+      const loadEl = document.getElementById('t1c-loading');
+      const calcBtn = document.getElementById('t1c-calc-btn');
+      if (visible) {
+        loadEl.classList.add('visible');
+        calcBtn.disabled = true;
+      } else {
+        loadEl.classList.remove('visible');
+        calcBtn.disabled = false;
+      }
+    }
+
+    /** Zobrazí inline chybovou zprávu pro CNB (síťová/proxy chyba) */
+    function renderCurrencyError(errCode) {
+      const T = TEXTS[currentLang];
+      const errEl = document.getElementById('t1c-cnb-error');
+      let msg;
+      switch (errCode) {
+        case 'cnb_unavailable':      msg = T.err_cnb_unavailable;    break;
+        case 'currency_not_found':   msg = T.err_currency_not_found; break;
+        case 'invalid_date_format':  msg = T.err_invalid_date;       break;
+        default:                     msg = T.err_cnb_unavailable;    break;
+      }
+      errEl.textContent = msg;
+      errEl.classList.add('visible');
+      document.getElementById('t1c-result').style.display = 'none';
+      document.getElementById('t1c-fallback-warn').style.display = 'none';
+    }
+
+    /** Zobrazí výsledek přepočtu */
+    function renderCurrency({ result, usedDate, isFallback, requestedDate = usedDate }) {
+      const T = TEXTS[currentLang];
+
+      // Skrýt chybovou zprávu
+      const errEl = document.getElementById('t1c-cnb-error');
+      errEl.textContent = '';
+      errEl.classList.remove('visible');
+
+      // Fallback varování – zobrazí requestedDate (co uživatel zadal) i usedDate (co bylo použito)
+      const warnEl = document.getElementById('t1c-fallback-warn');
+      if (isFallback) {
+        warnEl.textContent = T.t1c_fallback_warn
+          .replace('{requestedDate}', requestedDate)
+          .replace('{usedDate}',      usedDate);
+        warnEl.style.display = 'block';
+      } else {
+        warnEl.style.display = 'none';
+      }
+
+      // Výsledná hodnota a label dle směru
+      const resultEl  = document.getElementById('t1c-result');
+      const valueEl   = document.getElementById('t1c-result-value');
+      const labelEl   = document.getElementById('t1c-result-label');
+      const rateEl    = document.getElementById('t1c-rate-detail');
+      const dateEl    = document.getElementById('t1c-date-detail');
+      const interpEl  = document.getElementById('t1c-interpretation');
+
+      if (result.direction === 'to-czk') {
+        valueEl.textContent = formatCurrency(result.czk) + ' CZK';
+        labelEl.textContent = T.t1c_result_label_toczk;
+        interpEl.textContent = T.t1c_interp_toczk
+          .replace('{amount}',   formatCurrency(result.foreign))
+          .replace('{currency}', result.currency)
+          .replace('{result}',   formatCurrency(result.czk))
+          .replace('{rate}',     formatCurrency(result.rate, 4))
+          .replace('{date}',     usedDate);
+      } else {
+        valueEl.textContent = formatCurrency(result.foreign, 4) + ' ' + result.currency;
+        labelEl.textContent = T.t1c_result_label_fromczk;
+        interpEl.textContent = T.t1c_interp_fromczk
+          .replace('{amount}',   formatCurrency(result.czk))
+          .replace('{result}',   formatCurrency(result.foreign, 4))
+          .replace('{currency}', result.currency)
+          .replace('{rate}',     formatCurrency(result.rate, 4))
+          .replace('{date}',     usedDate);
+      }
+
+      rateEl.textContent = '1 ' + result.currency + ' = ' + formatCurrency(result.rate, 4) + ' CZK';
+      dateEl.textContent = usedDate;
+
+      resultEl.style.display = 'block';
+    }
+
+    /** Hlavní funkce přepočtu – async, volá fetchCNBRate */
+    async function calcCurrency() {
+      if (cnbFetching) return;
+
+      const T = TEXTS[currentLang];
+      const currency  = document.getElementById('t1c-currency').value;
+      const amountRaw = document.getElementById('t1c-amount').value;
+      const dateStr   = document.getElementById('t1c-date').value;       // 'YYYY-MM-DD' z input[type=date]
+      const direction = document.querySelector('input[name="t1c-dir"]:checked').value; // 'to-czk' | 'from-czk'
+
+      // Vyčistit předchozí chyby
+      clearError('t1c-amount');
+      clearError('t1c-date');
+      document.getElementById('t1c-cnb-error').classList.remove('visible');
+      document.getElementById('t1c-cnb-error').textContent = '';
+
+      // Validace částky (parser podle jazyka; prázdná a nekladná mají vlastní hlášky)
+      const parsedAmount = parseNumEx(amountRaw);
+      if (parsedAmount.error === 'empty') {
+        showError('t1c-amount', T.err_amount_required);
+        return;
+      }
+      if (parsedAmount.error) {
+        showError('t1c-amount', numErrorText(parsedAmount.error));
+        return;
+      }
+      const amount = parsedAmount.value;
+      if (amount <= 0) {
+        showError('t1c-amount', T.err_amount_invalid);
+        return;
+      }
+
+      // dateStr validace: převeď a ověř formát před předáním do fetchCNBRate
+      let formattedDate = '';
+      if (dateStr) {
+        formattedDate = convertToddmmyyyy(dateStr);
+        // Guard: výsledek konverze musí odpovídat DD.MM.YYYY
+        if (!DATE_DDMMYYYY_RE.test(formattedDate)) {
+          showError('t1c-date', T.err_invalid_date);
+          return;
+        }
+      }
+
+      cnbFetching = true;
+      showCNBLoading(true);
+
+      try {
+        const { rates, usedDate, isFallback, requestedDate } = await fetchCNBRate(formattedDate);
+        const rate = rates[currency];
+        if (!rate) throw new Error('currency_not_found');
+
+        const result = direction === 'to-czk'
+          ? { direction, czk: amount * rate, foreign: amount, rate, currency }
+          : { direction, czk: amount, foreign: amount / rate, rate, currency };
+
+        renderCurrency({ result, usedDate, isFallback, requestedDate });
+
+      } catch (err) {
+        renderCurrencyError(err.message);
+      } finally {
+        showCNBLoading(false);
+        cnbFetching = false;
+      }
+    }
+
+    /** Reset nástroje 1c – sahá pouze na elementy svého nástroje */
+    function resetCurrency() {
+      document.getElementById('t1c-amount').value = '';
+      document.getElementById('t1c-date').value = '';
+      document.getElementById('t1c-currency').selectedIndex = 0;
+      document.querySelector('input[name="t1c-dir"][value="to-czk"]').checked = true;
+
+      clearError('t1c-amount');
+      clearError('t1c-date');
+
+      const errEl = document.getElementById('t1c-cnb-error');
+      errEl.textContent = '';
+      errEl.classList.remove('visible');
+
+      document.getElementById('t1c-fallback-warn').style.display = 'none';
+      document.getElementById('t1c-result').style.display = 'none';
+    }
+
+    /** Inicializace nástroje 1c */
+    function initCurrency() {
+      document.getElementById('t1c-calc-btn').addEventListener('click', calcCurrency);
+      document.getElementById('t1c-reset').addEventListener('click', resetCurrency);
+    }
+
+    /* =========================================================
+       NÁSTROJ 1d-A: Kalkulačka úspory
+       ========================================================= */
+
+    /** Vypočítá a zobrazí výsledky kalkulačky úspory */
+    function calcSavings() {
+      const T = TEXTS[currentLang];
+      const origRaw = document.getElementById('t1d-s-orig').value;
+      const newRaw  = document.getElementById('t1d-s-new').value;
+      const qtyRaw  = document.getElementById('t1d-s-qty').value;
+
+      clearError('t1d-s-orig');
+      clearError('t1d-s-new');
+      clearError('t1d-s-qty');
+
+      // Validace původní ceny: povinná, nezáporná, nenulová (dělitel)
+      const errOrig = validateNumeric(origRaw, { required: true, allowNegative: false, allowZero: false });
+      // Validace nové ceny: povinná, nezáporná
+      const errNew  = validateNumeric(newRaw,  { required: true, allowNegative: false, allowZero: true });
+      // Množství: volitelné. Prázdné = bez celkové úspory (T1-6), zadané musí být kladné číslo.
+      let errQty = validateNumeric(qtyRaw, { required: false, allowNegative: false, allowZero: true });
+      if (!errQty && parseNum(qtyRaw) === 0) errQty = T.err_qtyPositive;
+
+      let hasError = false;
+      if (errOrig) { showError('t1d-s-orig', errOrig); hasError = true; }
+      if (errNew)  { showError('t1d-s-new',  errNew);  hasError = true; }
+      if (errQty)  { showError('t1d-s-qty',  errQty);  hasError = true; }
+
+      if (hasError) {
+        document.getElementById('t1d-s-result').style.display = 'none';
+        return;
+      }
+
+      const orig   = parseNum(origRaw);
+      const newP   = parseNum(newRaw);
+      const qty    = parseNum(qtyRaw);            // NaN = množství nezadané
+      const hasQty = !Number.isNaN(qty);
+      const perUnit = orig - newP;
+      const total   = hasQty ? perUnit * qty : null;
+      const pct     = (perUnit / orig) * 100;
+
+      renderSavings({ orig, newP, qty, perUnit, total, pct });
+    }
+
+    /** Renders results – separate function for readability. total === null → bez řádku „celkem“ (T1-6). */
+    function renderSavings({ orig, newP, qty, perUnit, total, pct }) {
+      const T = TEXTS[currentLang];
+      const hasTotal = total !== null;
+
+      document.getElementById('t1d-s-result').style.display = 'block';
+      document.getElementById('t1d-s-perunit-value').textContent = formatCurrency(perUnit) + ' Kč';
+      document.getElementById('t1d-s-total-row').style.display   = hasTotal ? '' : 'none';
+      document.getElementById('t1d-s-total-value').textContent   = hasTotal ? formatCurrency(total) + ' Kč' : '';
+      document.getElementById('t1d-s-pct-value').textContent     = formatCurrency(pct, 2)  + ' %';
+
+      const increase = perUnit < 0;
+      let interp;
+      if (hasTotal) {
+        interp = T[increase ? 't1d_savings_interp_increase' : 't1d_savings_interp']
+          .replace('{qty}',   qty % 1 === 0 ? qty.toFixed(0) : qty.toFixed(2))
+          .replace('{total}', formatCurrency(Math.abs(total)));
+      } else {
+        interp = T[increase ? 't1d_savings_interp_unit_increase' : 't1d_savings_interp_unit'] + ' ' + T.t1d_savings_qtyHint;
+      }
+      document.getElementById('t1d-s-interpretation').textContent = interp
+        .replace('{perUnit}', formatCurrency(Math.abs(perUnit)))
+        .replace('{pct}',     Math.abs(pct).toFixed(2));
+    }
+
+    /** Reset sekce A úspory */
+    function resetSavings() {
+      ['t1d-s-orig', 't1d-s-new', 't1d-s-qty'].forEach(id => {
+        document.getElementById(id).value = '';
+        clearError(id);
+      });
+      document.getElementById('t1d-s-result').style.display = 'none';
+    }
+
+    /* =========================================================
+       NÁSTROJ 1d-B: Dopad do spendu
+       ========================================================= */
+
+    /** Vypočítá a zobrazí výsledky dopadu do ročního spendu */
+    function calcSpend() {
+      const T = TEXTS[currentLang];
+      const origRaw = document.getElementById('t1d-sp-orig').value;
+      const newRaw  = document.getElementById('t1d-sp-new').value;
+      const volRaw  = document.getElementById('t1d-sp-vol').value;
+
+      clearError('t1d-sp-orig');
+      clearError('t1d-sp-new');
+      clearError('t1d-sp-vol');
+
+      // Původní cena: povinná, nezáporná, nenulová (použita jako dělitel pro % výpočet)
+      const errOrig = validateNumeric(origRaw, { required: true, allowNegative: false, allowZero: false });
+      const errNew  = validateNumeric(newRaw,  { required: true, allowNegative: false, allowZero: true });
+      // Roční objem: povinný, nezáporný (0 je technicky validní – spend = 0)
+      const errVol  = validateNumeric(volRaw,  { required: true, allowNegative: false, allowZero: true });
+
+      let hasError = false;
+      if (errOrig) { showError('t1d-sp-orig', errOrig); hasError = true; }
+      if (errNew)  { showError('t1d-sp-new',  errNew);  hasError = true; }
+      if (errVol)  { showError('t1d-sp-vol',  errVol);  hasError = true; }
+
+      if (hasError) {
+        document.getElementById('t1d-sp-result').style.display = 'none';
+        return;
+      }
+
+      const orig      = parseNum(origRaw);
+      const newP      = parseNum(newRaw);
+      const vol       = parseNum(volRaw);
+
+      // Roční spend = roční objem (Kč) / původní cena × nová cena
+      // Zjednodušení z briefu: roční objem je přímo v Kč, proto:
+      // origSpend = vol, newSpend = vol * (newP / orig)
+      const origSpend = vol;
+      const newSpend  = orig > 0 ? vol * (newP / orig) : 0;
+      const diffKc    = origSpend - newSpend;   // kladné = úspora, záporné = nárůst
+      const diffPct   = origSpend > 0 ? ((origSpend - newSpend) / origSpend) * 100 : 0;
+
+      renderSpend({ origSpend, newSpend, diffKc, diffPct });
+    }
+
+    /** Zobrazí výsledky dopadu do spendu */
+    function renderSpend({ origSpend, newSpend, diffKc, diffPct }) {
+      const T = TEXTS[currentLang];
+
+      document.getElementById('t1d-sp-result').style.display = 'block';
+      document.getElementById('t1d-sp-origspend-value').textContent = formatCurrency(origSpend) + ' Kč';
+      document.getElementById('t1d-sp-newspend-value').textContent  = formatCurrency(newSpend)  + ' Kč';
+      document.getElementById('t1d-sp-diffkc-value').textContent    = formatCurrency(Math.abs(diffKc)) + ' Kč';
+      document.getElementById('t1d-sp-diffpct-value').textContent   = Math.abs(diffPct).toFixed(2) + ' %';
+
+      let interp;
+      if (Math.abs(diffKc) < 0.005) {
+        interp = T.t1d_spend_interp_nochange
+          .replace('{origSpend}', formatCurrency(origSpend));
+      } else if (diffKc > 0) {
+        interp = T.t1d_spend_interp_save
+          .replace('{diffKc}',   formatCurrency(diffKc))
+          .replace('{diffPct}',  diffPct.toFixed(2))
+          .replace('{origSpend}', formatCurrency(origSpend))
+          .replace('{newSpend}',  formatCurrency(newSpend));
+      } else {
+        interp = T.t1d_spend_interp_increase
+          .replace('{diffKc}',   formatCurrency(Math.abs(diffKc)))
+          .replace('{diffPct}',  Math.abs(diffPct).toFixed(2))
+          .replace('{origSpend}', formatCurrency(origSpend))
+          .replace('{newSpend}',  formatCurrency(newSpend));
+      }
+      document.getElementById('t1d-sp-interpretation').textContent = interp;
+    }
+
+    /** Reset sekce B spend */
+    function resetSpend() {
+      ['t1d-sp-orig', 't1d-sp-new', 't1d-sp-vol'].forEach(id => {
+        document.getElementById(id).value = '';
+        clearError(id);
+      });
+      document.getElementById('t1d-sp-result').style.display = 'none';
+    }
+
+    /** Inicializace nástroje 1d */
+    function initSavingsSpend() {
+      // Sekce A: úspora
+      document.getElementById('t1d-s-orig').addEventListener('input', calcSavings);
+      document.getElementById('t1d-s-new').addEventListener('input', calcSavings);
+      document.getElementById('t1d-s-qty').addEventListener('input', calcSavings);
+      document.getElementById('t1d-s-reset').addEventListener('click', resetSavings);
+
+      // Sekce B: spend
+      document.getElementById('t1d-sp-orig').addEventListener('input', calcSpend);
+      document.getElementById('t1d-sp-new').addEventListener('input', calcSpend);
+      document.getElementById('t1d-sp-vol').addEventListener('input', calcSpend);
+      document.getElementById('t1d-sp-reset').addEventListener('click', resetSpend);
+    }
+
+    /* ===== EVENT LISTENERS ===== */
+    function initEventListeners() {
+      // 1a-1
+      document.getElementById('t1a1-orig').addEventListener('input', calc1a1);
+      document.getElementById('t1a1-new').addEventListener('input', calc1a1);
+      document.getElementById('t1a1-reset').addEventListener('click', reset1a1);
+
+      // 1a-2
+      document.getElementById('t1a2-base').addEventListener('input', calc1a2);
+      document.getElementById('t1a2-increase').addEventListener('input', calc1a2);
+      document.getElementById('t1a2-reset').addEventListener('click', reset1a2);
+
+      // 1a-3
+      document.getElementById('t1a3-base').addEventListener('input', calc1a3);
+      document.getElementById('t1a3-discount').addEventListener('input', calc1a3);
+      document.getElementById('t1a3-reset').addEventListener('click', reset1a3);
+
+      // 1a-4
+      document.getElementById('t1a4-base').addEventListener('input', calc1a4);
+      document.getElementById('t1a4-pct').addEventListener('input', calc1a4);
+      document.getElementById('t1a4-reset').addEventListener('click', reset1a4);
+
+      // 1a-5
+      document.getElementById('t1a5-base').addEventListener('input', calc1a5);
+      document.getElementById('t1a5-pct').addEventListener('input', calc1a5);
+      document.getElementById('t1a5-reset').addEventListener('click', reset1a5);
+    }
+
+    /* ===== INIT ===== */
+    (function init() {
+      setLang('cs');
+      initTabs();
+      initLangSwitcher();
+      initEventListeners();
+      initVAT();
+      initCurrency();
+      initSavingsSpend();
+    })();
+  </script>
+
+</body>
+</html>
