@@ -970,12 +970,6 @@
         <!-- Loading indikátor -->
         <div id="t1c-loading" class="cnb-loading" role="status" data-i18n="t1c_loading">Načítám kurz z ČNB…</div>
 
-        <!-- Fallback varování -->
-        <div id="t1c-fallback-warn" class="cnb-fallback-warn" role="alert" aria-live="polite"></div>
-
-        <!-- Varování u vlastního kurzu: pravděpodobně kurz za 100 jednotek zadaný jako za 1 (T1-5) -->
-        <div id="t1c-manual-warn" class="cnb-fallback-warn" role="alert" aria-live="polite"></div>
-
         <!-- Chybová zpráva (síťová / proxy / jiná) -->
         <div id="t1c-cnb-error" class="cnb-error" role="alert"></div>
 
@@ -1002,6 +996,13 @@
             </div>
 
             <div class="result-interpretation" id="t1c-interpretation"></div>
+
+            <!-- Varování jsou v kopírovaném obsahu (R6 iter-014): ukazují se jen spolu s výsledkem -->
+            <!-- Fallback varování (víkend / svátek, nejnovější dostupný kurz) -->
+            <div id="t1c-fallback-warn" class="cnb-fallback-warn" role="alert" aria-live="polite"></div>
+
+            <!-- Varování u vlastního kurzu: pravděpodobně kurz za 100 jednotek zadaný jako za 1 (T1-5) -->
+            <div id="t1c-manual-warn" class="cnb-fallback-warn" role="alert" aria-live="polite"></div>
           </div>
           <!-- D4: kopírování výsledku; je uvnitř výsledku, bez výsledku se tedy nezobrazí -->
           <div class="copy-result" id="t1c-copy-bar">
@@ -2136,8 +2137,9 @@
 
 
     /* ===== T1-2: MĚNA VÝSLEDKŮ v 1a, 1b a 1d (vzor CURRENCY_CONFIG z T2/T3) =====
-       Mění se jen označení, čísla a jejich formát zůstávají. 1c má vlastní výběr měny proti CZK.
-       Hodnota ve výsledku nese symbol (120,00 €), text věty podle TEXTS.curDisplay (CZ symbol, EN kód EUR). */
+       Mění se jen označení, čísla zůstávají. 1c má vlastní výběr měny proti CZK.
+       Označení měny u hodnoty i ve větě podle TEXTS.curDisplay (CZ symbol 120,00 €, EN kód 120.00 EUR),
+       aby se v EN nemíchalo „Kč“ s „CZK“ (O1 iter-014). */
     let currentCurrency = 'CZK';
 
     const CURRENCY_CONFIG = {
@@ -2151,21 +2153,22 @@
     };
 
     function curSymbol() { return CURRENCY_CONFIG[currentCurrency].symbol; }
-    function curText() { return CURRENCY_CONFIG[currentCurrency][TEXTS[currentLang].curDisplay]; }
+    function curText() { return TEXTS[currentLang].curDisplay === 'code' ? CURRENCY_CONFIG[currentCurrency].code : curSymbol(); }
     /** Doplní {cur}. Náhrada funkcí, aby se „$“ (USD) nečetl jako vzor String.replace. */
     function fillCur(s) { return String(s).replace(/\{cur\}/g, () => curText()); }
 
     /* ===== UTILITY FUNCTIONS ===== */
+    /** Číslo s pevným počtem desetinných míst podle jazyka (CZ 1 234,50, EN 1,234.50; O1 iter-014). */
     function formatCurrency(value, decimals = 2) {
-      return new Intl.NumberFormat('cs-CZ', {
+      return new Intl.NumberFormat(TEXTS[currentLang].numLocale, {
         minimumFractionDigits: decimals,
         maximumFractionDigits: decimals
       }).format(value);
     }
 
-    /** Částka se symbolem zvolené měny (T1-2), formát čísla beze změny. */
+    /** Částka s označením zvolené měny (T1-2): CZ symbol, EN kód, stejně jako ve větě (curText). */
     function money(value) {
-      return formatCurrency(value) + ' ' + curSymbol();
+      return formatCurrency(value) + ' ' + curText();
     }
 
     /* ===== D1: ČTENÍ ČÍSEL PODLE JAZYKA =====
@@ -2799,9 +2802,9 @@
     function renderVAT({ baseH, taxH, totalH, rate }, mode, T) {
       const base = formatCurrency(baseH / 100), vat = formatCurrency(taxH / 100), total = formatCurrency(totalH / 100);
       const rateText = formatPlainNumber(rate);
-      document.getElementById('t1b-base-value').textContent  = base  + ' ' + curSymbol();
-      document.getElementById('t1b-vat-value').textContent   = vat   + ' ' + curSymbol();
-      document.getElementById('t1b-total-value').textContent = total + ' ' + curSymbol();
+      document.getElementById('t1b-base-value').textContent  = base  + ' ' + curText();
+      document.getElementById('t1b-vat-value').textContent   = vat   + ' ' + curText();
+      document.getElementById('t1b-total-value').textContent = total + ' ' + curText();
 
       let interp;
       if (rate === 0) {
@@ -3316,9 +3319,9 @@
       return CNB_LOT_100.includes(code) && ratePerUnit >= 1;
     }
 
-    /** Kurz s až 6 desetinnými místy (0,15123), aby vlastní kurz nebyl v textu zaokrouhlený. */
+    /** Kurz s až 6 desetinnými místy (0,15123 / 0.15123 podle jazyka), aby vlastní kurz nebyl v textu zaokrouhlený. */
     function formatRate(rate) {
-      return new Intl.NumberFormat('cs-CZ', { minimumFractionDigits: 2, maximumFractionDigits: 6 }).format(rate);
+      return new Intl.NumberFormat(TEXTS[currentLang].numLocale, { minimumFractionDigits: 2, maximumFractionDigits: 6 }).format(rate);
     }
 
     /**

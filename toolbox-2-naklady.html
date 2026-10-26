@@ -1297,6 +1297,7 @@
         err_negativeNotAllowed:'Záporná hodnota není povolena',
         err_divByZero:         'Dělení nulou – hodnota musí být nenulová',
         numLocale:             'cs-CZ',
+        moneyLocale:           '',        // O1: částky v CZ podle locale měny (CURRENCY_CONFIG)
 
         // Nástroj 2d: Cost breakdown
         t2d_title:   'Rozpad ceny (Cost breakdown)',
@@ -1315,8 +1316,9 @@
         t2d_breakdown_col_value:  '{currency}',
         t2d_breakdown_col_pct:    '%',
 
-        t2d_interp: 'Celkový rozpad zahrnuje {count} složek v hodnotě {total} {currency}. Největší položkou je {top} ({topPct} %).',
-        t2d_interp_pct: 'Celkový rozpad zahrnuje {count} složek. Největší položkou je {top} ({topPct} %).',
+        t2d_interp: 'Celkový rozpad zahrnuje {count} {components} v hodnotě {total} {currency}. Největší položkou je {top} ({topPct} %).',
+        t2d_interp_pct: 'Celkový rozpad zahrnuje {count} {components}. Největší položkou je {top} ({topPct} %).',
+        t2d_components: ['složku', 'složky', 'složek'],   // O2: tvar pro 1 / 2–4 / 5 a víc (4. pád, „zahrnuje 3 složky“)
         t2d_interp_offer: ' Z nabídky {offer} {currency} na ni připadá {amount} {currency}.',
         t2d_offer:        'Nabídková cena ({currency}, nepovinné)',
         t2d_result_offer: 'Nabídková cena rozdělená podle podílů',
@@ -1502,6 +1504,7 @@
         err_negativeNotAllowed:'Negative value is not allowed',
         err_divByZero:         'Division by zero – value must not be zero',
         numLocale:             'en-US',
+        moneyLocale:           'en-US',   // O1: částky v EN vždy en-US (tečka, tisíce čárkou)
 
         // Tool 2d: Cost breakdown
         t2d_title:   'Cost breakdown',
@@ -1520,8 +1523,9 @@
         t2d_breakdown_col_value:  '{currency}',
         t2d_breakdown_col_pct:    '%',
 
-        t2d_interp: 'The breakdown includes {count} components totalling {total} {currency}. The largest item is {top} ({topPct} %).',
-        t2d_interp_pct: 'The breakdown includes {count} components. The largest item is {top} ({topPct} %).',
+        t2d_interp: 'The breakdown includes {count} {components} totalling {total} {currency}. The largest item is {top} ({topPct} %).',
+        t2d_interp_pct: 'The breakdown includes {count} {components}. The largest item is {top} ({topPct} %).',
+        t2d_components: ['component', 'components', 'components'],   // O2: 1 / 2–4 / 5 and more
         t2d_interp_offer: ' Of the {offer} {currency} offer, it accounts for {amount} {currency}.',
         t2d_offer:        'Offer price ({currency}, optional)',
         t2d_result_offer: 'Offer price split by shares',
@@ -1959,9 +1963,11 @@
     let breakdownRowCount = 3; // inicializace: 3 řádky
 
     /* ===== UTILITY FUNCTIONS ===== */
+    /** Částka bez symbolu. CZ podle zvyklostí měny (beze změny), EN vždy en-US jako ostatní čísla
+        v EN (desetinná tečka, tisíce čárkou; O1 iter-014). */
     function formatCurrency(value, decimals = 2) {
       const cfg = CURRENCY_CONFIG[currentCurrency] || CURRENCY_CONFIG['CZK'];
-      return new Intl.NumberFormat(cfg.locale, {
+      return new Intl.NumberFormat(TEXTS[currentLang].moneyLocale || cfg.locale, {
         minimumFractionDigits: decimals,
         maximumFractionDigits: decimals
       }).format(value);
@@ -2016,6 +2022,12 @@
         rateRange: 'err_rateRange', maxTwoDecimals: 'err_maxTwoDecimals', tooLarge: 'err_tooLarge'
       }[code];
       return T[key] || T.err_nonNumeric;
+    }
+
+    /** O2: tvar slova podle počtu, forms = [1, 2–4, 5 a víc (i 0)]. EN má 2. a 3. tvar stejný. */
+    function countForm(n, forms) {
+      if (n === 1) return forms[0];
+      return n >= 2 && n <= 4 ? forms[1] : forms[2];
     }
 
     function formatPlainNumber(n) {
@@ -3247,6 +3259,7 @@
       const currSym2d = CURRENCY_CONFIG[currentCurrency].symbol;
       let interp = T[interpKey]
         .replace('{count}', items.length)
+        .replace('{components}', countForm(items.length, T.t2d_components))
         .replace('{top}',   topItem.name)
         .replace('{topPct}', topPctVal)
         .replace(/\{currency\}/g, currSym2d);

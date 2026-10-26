@@ -167,6 +167,8 @@
     /* ===== D4: Kopírovat výsledek (T-017, T6 doplněno v T-005 iter-014) ===== */
     .copy-result { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-sm); margin-top: var(--space-md); }
     .copy-result[hidden] { display: none; }
+    /* 6a: celý e-mail (předmět + text) pro záložní kopírování bez Clipboard API; neviditelný, ale označitelný */
+    .copy-fallback-src { position: fixed; top: 0; left: 0; width: 1px; height: 1px; padding: 0; border: 0; opacity: 0; pointer-events: none; resize: none; }
     .btn-copy-result { padding: var(--space-xs) var(--space-md); border: 1px solid var(--color-primary); border-radius: var(--radius-sm);
                        background: var(--color-surface); color: var(--color-primary); font: inherit; font-size: var(--font-size-sm); font-weight: 600; cursor: pointer; }
     .btn-copy-result:hover { background: var(--color-accent); color: var(--color-accent-text, var(--color-primary)); }
@@ -227,6 +229,7 @@
           <div class="eb-subject-value" id="eb-subject"></div>
           <div class="section-heading" data-i18n="emailBody">Text emailu:</div>
           <textarea class="eb-output" id="eb-output" readonly></textarea>
+          <textarea class="copy-fallback-src" id="eb-copy-full" readonly tabindex="-1" aria-hidden="true"></textarea>
           <div class="btn-group">
             <button class="btn eb-copy-btn" onclick="copyEmail()" data-i18n="copyBtn">Kopírovat email</button>
             <button class="btn-reset" onclick="resetEmail()" data-i18n="resetBtn">Resetovat</button>
@@ -1001,6 +1004,7 @@
       copy_result: 'Kopírovat výsledek',
       copy_done: 'Výsledek zkopírován.',
       copy_selected: 'Text je označený, zkopírujte ho Ctrl+C (Cmd+C).',
+      copy_email_done: 'E-mail zkopírován.',
       selectSituation: "Vyberte situaci", selectSituationPlaceholder: "— vyberte situaci —",
       selectGoal: "Cíl nákupčího", argumentsTitle: "Argumenty",
       counterArgsTitle: "Možné protiargumenty", recommendedStyle: "Doporučený styl",
@@ -1077,6 +1081,7 @@
       copy_result: 'Copy result',
       copy_done: 'Result copied.',
       copy_selected: 'Text is selected, copy it with Ctrl+C (Cmd+C).',
+      copy_email_done: 'E-mail copied.',
       selectSituation: "Select situation", selectSituationPlaceholder: "— select situation —",
       selectGoal: "Buyer goal", argumentsTitle: "Arguments",
       counterArgsTitle: "Possible counter-arguments", recommendedStyle: "Recommended style",
@@ -1395,11 +1400,11 @@
       return String(el.innerText || '').split('\n').map(s => s.trim()).filter(Boolean).join('\n');
     }
 
-    /** Hláška po kopírování ('copied' → copy_done, jinak copy_selected), po čase zmizí. */
-    function showCopyStatus(feedbackId, r) {
+    /** Hláška po kopírování ('copied' → doneKey, výchozí copy_done; jinak copy_selected), po čase zmizí. */
+    function showCopyStatus(feedbackId, r, doneKey = 'copy_done') {
       const status = document.getElementById(feedbackId);
       const T = TEXTS[currentLang];
-      status.textContent = r === 'copied' ? T.copy_done : T.copy_selected;
+      status.textContent = r === 'copied' ? T[doneKey] : T.copy_selected;
       clearTimeout(copyStatusTimers[feedbackId]);
       copyStatusTimers[feedbackId] = setTimeout(() => { status.textContent = ''; }, COPY_STATUS_MS[r] || COPY_STATUS_MS.selected);
       return r;
@@ -1673,15 +1678,18 @@
     document.getElementById('eb-variables-grid').innerHTML = '';
   }
 
-  /** 6a: zkopíruje předmět a text e-mailu přes copyText (XFER-SHARED). Když schránka nejde, označí se text e-mailu
-      (pole eb-output) a hláška vyzve ke Ctrl+C. → Promise<'copied' | 'selected'>. */
+  /** 6a: zkopíruje předmět a text e-mailu přes copyText (XFER-SHARED). Záložní cesta (bez Clipboard API) označí
+      neviditelné pole eb-copy-full s celým e-mailem, takže execCommand i ruční Ctrl+C vezmou předmět i text.
+      Hláška „E-mail zkopírován.“ (copy_email_done), jinak výzva ke Ctrl+C. → Promise<'copied' | 'selected'>. */
   function copyEmail() {
     const subject = document.getElementById('eb-subject').textContent;
     const body = document.getElementById('eb-output').value;
     const text = (TEXTS[currentLang].subjectLabel + ' ' + subject + '\n\n' + body).trim();
-    return copyText(text, document.getElementById('eb-output'))
+    const full = document.getElementById('eb-copy-full');
+    full.value = text;
+    return copyText(text, full)
       .catch(() => 'selected')
-      .then(r => showCopyStatus('eb-copy-status', r));
+      .then(r => showCopyStatus('eb-copy-status', r, 'copy_email_done'));
   }
 
   // ============================================================

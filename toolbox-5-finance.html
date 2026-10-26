@@ -1998,9 +1998,9 @@
       return CURRENCY_SYMBOLS[el && el.value] || CURRENCY_SYMBOLS.CZK;
     }
 
-    /** Setiny měny (haléře, centy) → „1 234,56 €“ (formát cs-CZ jako ostatní částky v souboru). */
+    /** Setiny měny (haléře, centy) → „1 234,56 €“ / EN „1,234.56 €“ (formát čísel podle jazyka, O1 iter-014). */
     function fmtMoneyH(h, symbol) {
-      return (h / 100).toLocaleString('cs-CZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '\u00a0' + symbol;
+      return (h / 100).toLocaleString(TEXTS[currentLang].numLocale, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '\u00a0' + symbol;
     }
 
     /** Přepočítá nástroj jen tehdy, když už výsledek ukazuje (změna měny nemá vyvolat hlášky u prázdných polí). */
@@ -2008,8 +2008,9 @@
       if (!document.getElementById(resultsId).classList.contains('hidden')) calc();
     }
 
+    /** Číslo s pevným počtem desetinných míst podle jazyka (CZ 1 234,5, EN 1,234.5). */
     function fmtNum(num, decimals) {
-      return num.toLocaleString('cs-CZ', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+      return num.toLocaleString(TEXTS[currentLang].numLocale, { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
     }
 
     /* ===== D1: ČTENÍ ČÍSEL PODLE JAZYKA =====
@@ -2264,7 +2265,7 @@
     function renderCashflowResults(r, amount, depositPct, finalDaysA, netDaysB, altYieldPa, currency) {
       const T = TEXTS[currentLang];
       const sym = currency === 'EUR' ? '€' : 'Kč';
-      const fmtC = (v) => Math.abs(v).toLocaleString('cs-CZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '\u00a0' + sym;
+      const fmtC = (v) => Math.abs(v).toLocaleString(TEXTS[currentLang].numLocale, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '\u00a0' + sym;
 
       // Variant A summary
       const aEl = document.getElementById('cf-a-summary');
@@ -2330,7 +2331,7 @@
         const bar = document.createElement('div');
         bar.className = 'cf-bar variant-a';
         bar.style.height = heightPct + 'px';
-        bar.title = `${ev.label}: ${ev.amount.toLocaleString('cs-CZ', { maximumFractionDigits: 0 })} – ${TEXTS[currentLang].day_label} ${ev.day}`;
+        bar.title = `${ev.label}: ${ev.amount.toLocaleString(TEXTS[currentLang].numLocale, { maximumFractionDigits: 0 })} – ${TEXTS[currentLang].day_label} ${ev.day}`;
         const lbl = document.createElement('div');
         lbl.className = 'cf-bar-label';
         lbl.textContent = `d${ev.day}`;
@@ -2355,7 +2356,7 @@
         const bar = document.createElement('div');
         bar.className = 'cf-bar variant-b';
         bar.style.height = '44px';
-        bar.title = `${ev.label}: ${ev.amount.toLocaleString('cs-CZ', { maximumFractionDigits: 0 })} – ${TEXTS[currentLang].day_label} ${ev.day}`;
+        bar.title = `${ev.label}: ${ev.amount.toLocaleString(TEXTS[currentLang].numLocale, { maximumFractionDigits: 0 })} – ${TEXTS[currentLang].day_label} ${ev.day}`;
         const lbl = document.createElement('div');
         lbl.className = 'cf-bar-label';
         lbl.textContent = `d${ev.day}`;

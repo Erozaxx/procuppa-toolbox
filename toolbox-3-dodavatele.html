@@ -1636,6 +1636,7 @@
         err_negativeNotAllowed:'Záporná hodnota není povolena',
         err_divByZero:         'Dělení nulou – hodnota musí být nenulová',
         numLocale:             'cs-CZ',
+        moneyLocale:           '',        // O1: částky v CZ podle locale měny (CURRENCY_CONFIG)
 
         // Nástroj 3d: Dual sourcing
         t3d_title: 'Srovnání nákladů – dual vs. single sourcing',
@@ -1915,6 +1916,7 @@
         err_negativeNotAllowed:'Negative value is not allowed',
         err_divByZero:         'Division by zero – value must not be zero',
         numLocale:             'en-US',
+        moneyLocale:           'en-US',   // O1: částky v EN vždy en-US (tečka, tisíce čárkou)
 
         // Tool 3d: Dual sourcing
         t3d_title: 'Cost comparison – dual vs. single sourcing',
@@ -2410,9 +2412,11 @@
     let chartDual      = null; // nástroj 3d
 
     /* ===== UTILITY FUNCTIONS ===== */
+    /** Částka bez symbolu. CZ podle zvyklostí měny (beze změny), EN vždy en-US jako ostatní čísla
+        v EN (desetinná tečka, tisíce čárkou; O1 iter-014). */
     function formatCurrency(value, decimals = 2) {
       const cfg = CURRENCY_CONFIG[currentCurrency] || CURRENCY_CONFIG['CZK'];
-      return new Intl.NumberFormat(cfg.locale, {
+      return new Intl.NumberFormat(TEXTS[currentLang].moneyLocale || cfg.locale, {
         minimumFractionDigits: decimals,
         maximumFractionDigits: decimals
       }).format(value);
