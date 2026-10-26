@@ -43,7 +43,9 @@
     #logo { height: 40px; width: auto; }
     .lang-switcher { position: absolute; top: var(--space-md); right: var(--space-md); display: flex; gap: var(--space-xs); }
     .lang-btn { background: none; border: 1px solid var(--color-border); border-radius: var(--radius-sm); padding: var(--space-xs) var(--space-sm); font-size: var(--font-size-sm); cursor: pointer; color: var(--color-text-muted); font-family: var(--font-base); transition: background 0.15s, color 0.15s, border-color 0.15s; }
-    .lang-btn.active, .lang-btn:hover { background: var(--color-primary); color: var(--color-primary-text); border-color: var(--color-primary); }
+    .lang-btn.active { background: var(--color-primary); color: var(--color-primary-text); border-color: var(--color-primary); }
+    /* Hover na neaktivním jazyce jen obrys, aby nevypadal jako zvolený (T-017) */
+    .lang-btn:not(.active):hover { color: var(--color-primary); border-color: var(--color-primary); }
     .tab-nav { position: sticky; top: 0; z-index: 100; background: var(--color-surface); border-bottom: 1px solid var(--color-border); display: flex; padding: 0 var(--space-xl); overflow-x: auto; }
     .tab-btn { background: none; border: none; border-bottom: 3px solid transparent; padding: var(--space-md) var(--space-lg); font-size: var(--font-size-md); font-weight: 500; font-family: var(--font-base); color: var(--color-text-muted); cursor: pointer; transition: color 0.15s, border-color 0.15s; white-space: nowrap; }
     .tab-btn:hover { color: var(--color-primary); }
@@ -112,8 +114,8 @@
     .rf-level-badge[data-level="high"] { background: var(--color-danger); }
     .rf-level-badge[data-level="none"] { background: var(--color-text-muted); }
     .rf-partial-note { font-size: var(--font-size-sm); color: var(--color-text-muted); margin-bottom: var(--space-md); }
-    .rf-critical { background: var(--color-bg); border-left: 4px solid var(--color-danger); border-radius: 0 var(--radius-md) var(--radius-md) 0; padding: var(--space-md); margin-bottom: var(--space-md); font-size: var(--font-size-sm); }
-    .rf-critical strong { color: var(--color-danger); }
+    .rf-critical, .pos-critical { background: var(--color-bg); border-left: 4px solid var(--color-danger); border-radius: 0 var(--radius-md) var(--radius-md) 0; padding: var(--space-md); margin-bottom: var(--space-md); font-size: var(--font-size-sm); }
+    .rf-critical strong, .pos-critical strong { color: var(--color-danger); }
     .rf-critical ul { list-style: none; padding: 0; margin-top: var(--space-xs); }
     .rf-critical ul li { padding: var(--space-xs) 0 var(--space-xs) var(--space-md); position: relative; }
     .rf-critical ul li::before { content: '!'; position: absolute; left: 0; color: var(--color-danger); font-weight: 700; }
@@ -142,6 +144,28 @@
     .pos-steps-list li { font-size: var(--font-size-sm); padding: var(--space-xs) 0 var(--space-xs) var(--space-lg); position: relative; border-bottom: 1px solid var(--color-border); line-height: 1.5; }
     .pos-steps-list li:last-child { border-bottom: none; }
     .pos-steps-list li::before { content: '→'; position: absolute; left: 0; color: var(--color-primary); font-weight: 700; }
+
+    /* ===== D2/D2b: odkazy mezi nástroji a přenos hodnot (T-016) ===== */
+    .xfer-box { margin-top: var(--space-md); padding-top: var(--space-md); border-top: 1px solid var(--color-border); }
+    .btn-xfer { display: inline-block; padding: var(--space-xs) var(--space-md); border: 1px solid var(--color-primary); border-radius: var(--radius-sm);
+                background: var(--color-surface); color: var(--color-primary); font: inherit; font-weight: 600; text-decoration: none; cursor: pointer; }
+    .btn-xfer:hover { background: var(--color-accent); color: var(--color-accent-text, var(--color-primary)); }
+    .btn-xfer:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+    .btn-xfer[aria-disabled="true"], .btn-xfer:disabled { opacity: 0.55; cursor: not-allowed; background: var(--color-surface); }
+    .xfer-hint { display: block; margin-top: var(--space-xs); font-size: var(--font-size-sm); color: var(--color-text-muted); }
+    .xfer-note { margin: var(--space-sm) 0; font-size: var(--font-size-sm); }
+    .xfer-note:empty { margin: 0; }
+    .xfer-note.xfer-error { color: var(--color-danger); font-weight: 600; }
+    .xfer-details { margin-top: var(--space-sm); font-size: var(--font-size-sm); }
+    .xfer-details summary { cursor: pointer; font-weight: 600; }
+    .xfer-details > * + * { margin-top: var(--space-sm); }
+    .xfer-details label { display: block; font-weight: 600; }
+    .xfer-json { display: block; width: 100%; box-sizing: border-box; padding: var(--space-sm); font-family: Consolas, monospace; font-size: 0.8rem;
+                 border: 1px solid var(--color-border); border-radius: var(--radius-sm); }
+    .xfer-actions { display: flex; flex-wrap: wrap; gap: var(--space-sm); align-items: center; }
+    .tool-links { margin-top: var(--space-md); font-size: var(--font-size-sm); }
+    .tool-links a { color: var(--color-primary); font-weight: 600; }
+    .xfer-box[hidden], .xfer-box [hidden], .tool-links [hidden], .xfer-note[hidden] { display: none !important; }
   </style>
 </head>
 <body>
@@ -157,16 +181,16 @@
 
   <!-- TAB NAVIGATION -->
   <nav class="tab-nav" role="tablist">
-    <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="tab-6a" data-tab="6a" data-i18n="tab6a">Email builder</button>
-    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-6b" data-tab="6b" data-i18n="tab6b">Argumenty</button>
-    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-6c" data-tab="6c" data-i18n="tab6c">Red flag checker</button>
-    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-6d" data-tab="6d" data-i18n="tab6d">Vyjednávací pozice</button>
+    <button class="tab-btn active" role="tab" id="tab-btn-6a" aria-selected="true" aria-controls="tab-6a" tabindex="0" data-tab="6a" data-i18n="tab6a">Email builder</button>
+    <button class="tab-btn" role="tab" id="tab-btn-6b" aria-selected="false" aria-controls="tab-6b" tabindex="-1" data-tab="6b" data-i18n="tab6b">Argumenty</button>
+    <button class="tab-btn" role="tab" id="tab-btn-6c" aria-selected="false" aria-controls="tab-6c" tabindex="-1" data-tab="6c" data-i18n="tab6c">Red flag checker</button>
+    <button class="tab-btn" role="tab" id="tab-btn-6d" aria-selected="false" aria-controls="tab-6d" tabindex="-1" data-tab="6d" data-i18n="tab6d">Vyjednávací pozice</button>
   </nav>
 
   <main>
 
     <!-- ===== TAB 6a: Email builder ===== -->
-    <section id="tab-6a" class="tool-panel active" role="tabpanel">
+    <section id="tab-6a" class="tool-panel active" role="tabpanel" aria-labelledby="tab-btn-6a">
       <h1 data-i18n="panel6a_heading">Email builder</h1>
       <div class="tool-card">
         <p class="tool-desc" data-i18n="toolDesc6a">Sestavte profesionální email na míru situaci a zvolenému tónu.</p>
@@ -208,7 +232,7 @@
     </section>
 
     <!-- ===== TAB 6b: Argumenty pro vyjednávání ===== -->
-    <section id="tab-6b" class="tool-panel" role="tabpanel">
+    <section id="tab-6b" class="tool-panel" role="tabpanel" aria-labelledby="tab-btn-6b">
       <h1 data-i18n="panel6b_heading">Argumenty pro vyjednávání</h1>
       <div class="tool-card">
         <p class="tool-desc" data-i18n="toolDesc6b">Získejte argumenty, protiargumenty a doporučený styl pro vaši situaci.</p>
@@ -241,10 +265,19 @@
     </section>
 
     <!-- ===== TAB 6c: Red flag checker ===== -->
-    <section id="tab-6c" class="tool-panel" role="tabpanel">
+    <section id="tab-6c" class="tool-panel" role="tabpanel" aria-labelledby="tab-btn-6c">
       <h1 data-i18n="panel6c_heading">Red flag checker</h1>
       <div class="tool-card">
         <p class="tool-desc" data-i18n="toolDesc6c">Vyhodnoťte rizikovost dodavatele na základě příznaků.</p>
+
+        <!-- D2b: převzetí hodnot z jiného nástroje (cookie při načtení, nebo vložená data) -->
+        <p id="rf-xfer-note" class="xfer-note" role="status" hidden></p>
+        <details id="rf-xfer-paste" class="xfer-details">
+          <summary data-i18n="xfer_paste_summary">Vložit data z jiného nástroje</summary>
+          <label for="rf-xfer-input" data-i18n="xfer_paste_label">Data zkopírovaná z jiného nástroje</label>
+          <textarea id="rf-xfer-input" class="xfer-json" rows="4" maxlength="2000" autocomplete="off" spellcheck="false"></textarea>
+          <button type="button" class="btn-xfer" id="rf-xfer-load" data-i18n="xfer_load">Načíst</button>
+        </details>
 
         <div class="section-heading" data-i18n="rfCategoryFinancial">Finanční stabilita</div>
         <div id="rf-cat-financial"></div>
@@ -278,11 +311,16 @@
             <strong data-i18n="rfRecommendationLabel">Doporučení</strong>: <span id="rf-recommendation-text"></span>
           </div>
         </div>
+
+        <!-- D2: kontextové odkazy na podrobné posouzení dodavatele (toolbox-3) -->
+        <p class="tool-links"><span data-i18n="rf_links_intro">Podrobněji posoudit dodavatele:</span>
+          <a data-tool-link="3b" data-i18n="rf_link_3b">Risk checker (Dodavatelé) ↗</a> ·
+          <a data-tool-link="3c" data-i18n="rf_link_3c">Index závislosti (Dodavatelé) ↗</a></p>
       </div>
     </section>
 
     <!-- ===== TAB 6d: Vyjednávací pozice ===== -->
-    <section id="tab-6d" class="tool-panel" role="tabpanel">
+    <section id="tab-6d" class="tool-panel" role="tabpanel" aria-labelledby="tab-btn-6d">
       <h1 data-i18n="panel6d_heading">Vyjednávací pozice</h1>
       <div class="tool-card">
         <p class="tool-desc" data-i18n="toolDesc6d">Zjistěte sílu vaší vyjednávací pozice a získejte doporučení.</p>
@@ -295,6 +333,10 @@
           <div class="pos-score-label"><span data-i18n="posScoreLabel">Celkové skóre pozice</span>: <strong id="pos-score-value">0</strong>/100</div>
           <div class="pos-score-bar"><div class="pos-score-fill" id="pos-score-fill"></div></div>
           <div id="pos-level-badge-wrap" style="margin-bottom:1rem;"></div>
+
+          <div class="pos-critical hidden" id="pos-critical" role="alert">
+            <strong data-i18n="posCriticalTitle">Nejdřív zajistěte proveditelnou variantu</strong>: <span data-i18n="posCriticalText">nemáte alternativního dodavatele a komodita je kritická nebo je časový tlak urgentní. Ostatní výhody nepovažujte za dostatečnou pojistku. Ověřte proveditelnou alternativu včetně kvalifikace, kapacity a termínu, případně překlenovací řešení. Skóre se tím nemění.</span>
+          </div>
 
           <div class="pos-comment" id="pos-comment"></div>
 
@@ -338,10 +380,10 @@
           }
         },
         urgent: {
-          subject: { cs: "URGENTNÍ: Nesouhlasíme se zdražením – ${firma} – odpověď do 48h", en: "URGENT: Price increase rejected – ${firma} – respond within 48h" },
+          subject: { cs: "Prioritní: navrhované zdražení – ${firma}", en: "Priority: proposed price increase – ${firma}" },
           body: {
-            cs: "Dobrý den,\n\noznámení o zdražení z ${castka} na ${nova_castka} (${datum}) jsme obdrželi. Tuto změnu ODMÍTÁME.\n\nVyžadujeme okamžitá vyjednávání. Bez dohody zahájíme výběrové řízení na alternativní dodavatele.\n\nOdpovězte prosím do 48 hodin.\n\nS pozdravem",
-            en: "Dear Sir/Madam,\n\nWe have received the notice of a price increase from ${castka} to ${nova_castka} (${datum}). We REJECT this change.\n\nWe require immediate negotiations. Without agreement, we will initiate a tender for alternative suppliers.\n\nPlease respond within 48 hours.\n\nBest regards"
+            cs: "Dobrý den,\n\nobdrželi jsme oznámení o zdražení z ${castka} na ${nova_castka} s účinností od ${datum}.\n\nProsíme o přednostní projednání. Potřebujeme rozpad navržené změny a uvedení smluvního ujednání, o které se opírá. Do dohody prosíme o zachování stávajících podmínek.\n\nProsíme o potvrzení, kdo se věci na Vaší straně ujme, a o nejbližší možný termín jednání.\n\nS pozdravem",
+            en: "Dear Sir/Madam,\n\nWe have received your notice of a price increase from ${castka} to ${nova_castka} effective ${datum}.\n\nPlease treat this as a priority. We need a breakdown of the proposed change and the contractual provision it is based on. Until we reach an agreement, please keep the current terms.\n\nPlease confirm who will take responsibility on your side and the earliest possible date for a meeting.\n\nBest regards"
           }
         }
       }
@@ -372,10 +414,10 @@
           }
         },
         urgent: {
-          subject: { cs: "URGENTNÍ: Kritická neshoda dodávky – ${produkt} – ${firma}", en: "URGENT: Critical delivery non-conformity – ${produkt} – ${firma}" },
+          subject: { cs: "Prioritní: neshoda dodávky – ${produkt} – ${firma}", en: "Priority: delivery non-conformity – ${produkt} – ${firma}" },
           body: {
-            cs: "Dobrý den,\n\nkritická neshoda v dodávce ${produkt} (${objednavka}, ${datum}), rozsah ${mnozstvi}, ZASTAVUJE naši výrobu.\n\nVyžadujeme okamžitou náhradu nebo expresní dodávku konformního zboží. Odpověď do 24 hodin, jinak eskalujeme na management a zahájíme alternativní nákup.\n\nS pozdravem",
-            en: "Dear Sir/Madam,\n\nA critical non-conformity in delivery of ${produkt} (${objednavka}, ${datum}), scope ${mnozstvi}, is HALTING our production.\n\nWe require immediate replacement or express delivery of conforming goods. Response within 24 hours or we escalate to management and initiate alternative sourcing.\n\nBest regards"
+            cs: "Dobrý den,\n\nv dodávce ${produkt} (${objednavka}, ${datum}) jsme zjistili neshodu, rozsah ${mnozstvi}.\n\nProsíme o přednostní řešení: návrh náhradní dodávky nebo jiného překlenovacího řešení a termín, který reálně zvládnete. Současně prosíme o písemné stanovisko a postup nápravy.\n\nProsíme o potvrzení, kdo se věci na Vaší straně ujme.\n\nS pozdravem",
+            en: "Dear Sir/Madam,\n\nWe have found a non-conformity in the delivery of ${produkt} (${objednavka}, ${datum}), scope ${mnozstvi}.\n\nPlease treat this as a priority: propose a replacement delivery or another interim solution and a date you can realistically meet. Please also send a written response and your corrective action plan.\n\nPlease confirm who will take responsibility on your side.\n\nBest regards"
           }
         }
       }
@@ -406,10 +448,10 @@
           }
         },
         urgent: {
-          subject: { cs: "URGENTNÍ: Cenová nabídka do 48h – ${produkt} – ${firma}", en: "URGENT: Pricing offer within 48h – ${produkt} – ${firma}" },
+          subject: { cs: "Prioritní: cenová nabídka – ${produkt} – ${firma}", en: "Priority: pricing offer – ${produkt} – ${firma}" },
           body: {
-            cs: "Dobrý den,\n\nrozhodujeme o nákupu ${objem} produktu ${produkt}. Finální rozhodnutí padne do 48 hodin.\n\nPožadujeme potvrzení slevy ${pozadovana_sleva} nebo nejlepší dostupnou nabídku obratem. Bez odpovědi zadáme objednávku jinde.\n\nS pozdravem",
-            en: "Dear Sir/Madam,\n\nWe are deciding on a purchase of ${objem} of ${produkt}. Final decision will be made within 48 hours.\n\nWe require confirmation of a ${pozadovana_sleva} discount or your best available offer immediately. Without a response, we will place the order elsewhere.\n\nBest regards"
+            cs: "Dobrý den,\n\npřipravujeme rozhodnutí o nákupu ${objem} produktu ${produkt}.\n\nProsíme o přednostní vyjádření k požadované slevě ${pozadovana_sleva} nebo o Vaši nejlepší nabídku s jasně uvedenými podmínkami. Uvedený objem je plán, nikoli tímto e-mailem potvrzený závazek.\n\nProsíme o sdělení, kdy můžete nabídku poslat.\n\nS pozdravem",
+            en: "Dear Sir/Madam,\n\nWe are preparing a decision on purchasing ${objem} of ${produkt}.\n\nPlease respond with priority to the requested discount of ${pozadovana_sleva} or send your best offer with clearly stated conditions. The stated volume is a forecast, not a commitment confirmed by this email.\n\nPlease let us know when you can send the offer.\n\nBest regards"
           }
         }
       }
@@ -440,10 +482,10 @@
           }
         },
         urgent: {
-          subject: { cs: "URGENTNÍ: Nezaplacená faktura ${cislo_faktury} – ${firma} – hrozí penále", en: "URGENT: Unpaid invoice ${cislo_faktury} – ${firma} – penalties imminent" },
+          subject: { cs: "Prioritní: neuhrazená faktura ${cislo_faktury} – ${firma}", en: "Priority: unpaid invoice ${cislo_faktury} – ${firma}" },
           body: {
-            cs: "Dobrý den,\n\nfaktura ${cislo_faktury} (${castka}, splatnost ${splatnost}) je po lhůtě splatnosti. Pokud neobdržíme platbu do 24 hodin, aktivujeme smluvní penále a předáme pohledávku k vymáhání.\n\nS pozdravem",
-            en: "Dear Sir/Madam,\n\nInvoice ${cislo_faktury} (${castka}, due ${splatnost}) is overdue. If we do not receive payment within 24 hours, we will activate contractual penalties and refer the debt for collection.\n\nBest regards"
+            cs: "Dobrý den,\n\npodle naší evidence zůstává faktura ${cislo_faktury} (${castka}, splatnost ${splatnost}) neuhrazená.\n\nProsíme o přednostní ověření stavu a sdělení termínu úhrady. Pokud platba již odešla, pošlete prosím datum a identifikaci platby pro spárování. Pokud úhradě brání konkrétní nesrovnalost, prosíme o její popis.\n\nS pozdravem",
+            en: "Dear Sir/Madam,\n\nAccording to our records, invoice ${cislo_faktury} (${castka}, due ${splatnost}) remains unpaid.\n\nPlease check the payment status as a priority and confirm the payment date. If payment has already been sent, please provide the date and payment reference so we can reconcile it. If a specific issue is preventing payment, please describe it.\n\nBest regards"
           }
         }
       }
@@ -473,10 +515,10 @@
           }
         },
         urgent: {
-          subject: { cs: "Zamítnutí nabídky – ${produkt} – ${firma} – finální rozhodnutí", en: "Offer rejected – ${produkt} – ${firma} – final decision" },
+          subject: { cs: "Prioritní: odpověď na nabídku – ${produkt} – ${firma}", en: "Priority: response to offer – ${produkt} – ${firma}" },
           body: {
-            cs: "Dobrý den,\n\nVaši nabídku ze dne ${datum} na ${produkt} ZAMÍTÁME. Hlavní důvod: ${duvod}. Toto je naše finální rozhodnutí.\n\nS pozdravem",
-            en: "Dear Sir/Madam,\n\nWe REJECT your offer dated ${datum} for ${produkt}. Primary reason: ${duvod}. This is our final decision.\n\nBest regards"
+            cs: "Dobrý den,\n\nděkujeme za nabídku ze dne ${datum} na ${produkt}. Po posouzení jsme se rozhodli ji nepřijmout. Důvod: ${duvod}.\n\nDáváme Vám vědět hned, abyste s nabídkou dále nepočítali.\n\nS pozdravem",
+            en: "Dear Sir/Madam,\n\nThank you for your offer dated ${datum} for ${produkt}. Following our review, we have decided not to accept it. Reason: ${duvod}.\n\nWe are letting you know straight away so that you do not need to plan around this offer.\n\nBest regards"
           }
         }
       }
@@ -507,10 +549,10 @@
           }
         },
         urgent: {
-          subject: { cs: "URGENTNÍ: Potřebujeme odložení platby ${castka} – ${firma}", en: "URGENT: Payment deferral needed – ${castka} – ${firma}" },
+          subject: { cs: "Prioritní: žádost o odklad splatnosti ${castka} – ${firma}", en: "Priority: request to defer payment of ${castka} – ${firma}" },
           body: {
-            cs: "Dobrý den,\n\nz důvodu ${duvod} nemůžeme uhradit ${castka} k termínu ${puvodni_splatnost}. Urgentně žádáme o prodloužení do ${nova_splatnost}.\n\nBez potvrzení do 24 hodin budeme nuceni eskalovat situaci na nejvyšší úroveň.\n\nS pozdravem",
-            en: "Dear Sir/Madam,\n\nDue to ${duvod}, we are unable to pay ${castka} by ${puvodni_splatnost}. We urgently request an extension to ${nova_splatnost}.\n\nWithout confirmation within 24 hours, we will be forced to escalate the situation to senior management.\n\nBest regards"
+            cs: "Dobrý den,\n\nz důvodu ${duvod} nemůžeme uhradit ${castka} k termínu ${puvodni_splatnost}. Žádáme o prodloužení splatnosti do ${nova_splatnost}.\n\nProsíme o přednostní posouzení a písemné vyjádření včetně případných podmínek. Do potvrzení dohody nepovažujeme původní splatnost za změněnou.\n\nS pozdravem",
+            en: "Dear Sir/Madam,\n\nDue to ${duvod}, we are unable to pay ${castka} by ${puvodni_splatnost}. We request an extension of the due date to ${nova_splatnost}.\n\nPlease review this request as a priority and confirm your position in writing, including any conditions. We do not consider the original due date changed until an agreement is confirmed.\n\nBest regards"
           }
         }
       }
@@ -744,20 +786,20 @@
 
   const RED_FLAGS = [
     { id: "rf-01", category: "financial",      weight: 15, label: { cs: "Dodavatel odmítá poskytnout finanční výkazy nebo audit", en: "Supplier refuses to provide financial statements or audit" } },
-    { id: "rf-02", category: "financial",      weight: 12, label: { cs: "Žádá o neobvykle vysoké zálohy (>50 % hodnoty zakázky)", en: "Requests unusually high prepayments (>50 % of order value)" } },
+    { id: "rf-02", category: "financial",      weight: 12, label: { cs: "Žádá zálohu nezvykle vysokou vzhledem k oboru a dodávce", en: "Requests a prepayment that is unusually high for the industry and the delivery" } },
     { id: "rf-03", category: "financial",      weight: 10, critical: true, label: { cs: "Nedávno prošel insolvencí nebo je v restrukturalizaci", en: "Recently went through insolvency or is in restructuring" } },
-    { id: "rf-04", category: "financial",      weight: 8,  critical: true, label: { cs: "Časté změny bankovního účtu nebo platebních instrukcí", en: "Frequent changes of bank account or payment instructions" } },
-    { id: "rf-05", category: "quality",        weight: 12, label: { cs: "Certifikace ISO/QS vypršela nebo nebyla obnovena", en: "ISO/QS certification expired or not renewed" } },
-    { id: "rf-06", category: "quality",        weight: 10, label: { cs: "Opakované neshody v dodávkách (>3× za rok)", en: "Repeated delivery non-conformities (>3× per year)" } },
+    { id: "rf-04", category: "financial",      weight: 8,  critical: true, label: { cs: "Změna bankovního účtu nebo platebních instrukcí, která není nezávisle ověřená", en: "Change of bank account or payment instructions that is not independently verified" } },
+    { id: "rf-05", category: "quality",        weight: 12, label: { cs: "Chybí platná certifikace, kterou daná dodávka skutečně vyžaduje", en: "A valid certification that the delivery actually requires is missing" } },
+    { id: "rf-06", category: "quality",        weight: 10, label: { cs: "Neshody v dodávkách se opakují a nápravná opatření nejsou účinná", en: "Delivery non-conformities keep recurring and corrective actions are not effective" } },
     { id: "rf-07", category: "quality",        weight: 8,  label: { cs: "Odmítá auditní návštěvy nebo zpřístupnění procesů", en: "Refuses audit visits or process access" } },
     { id: "rf-08", category: "quality",        weight: 6,  label: { cs: "Změna subdodavatele bez předchozího oznámení", en: "Change of subcontractor without prior notice" } },
     { id: "rf-09", category: "supply-risk",    weight: 12, critical: true, label: { cs: "Jediný zdroj pro kritickou komoditu bez alternativy", en: "Single source for critical commodity with no alternative" } },
-    { id: "rf-10", category: "supply-risk",    weight: 10, label: { cs: "Produkce koncentrována v jediné lokalitě s vysokým geo-rizikem", en: "Production concentrated in a single location with high geopolitical risk" } },
-    { id: "rf-11", category: "supply-risk",    weight: 8,  label: { cs: "Dodavatel odebírá >80 % kapacity od jediného subdodavatele", en: "Supplier sources >80 % capacity from a single sub-supplier" } },
-    { id: "rf-12", category: "supply-risk",    weight: 6,  label: { cs: "Prodleva v dodávkách >10 dní bez zdůvodnění (2×+ za rok)", en: "Delivery delays >10 days without explanation (2×+ per year)" } },
+    { id: "rf-10", category: "supply-risk",    weight: 10, label: { cs: "Produkce soustředěná v jediné lokalitě s konkrétním neřešeným rizikem", en: "Production concentrated in a single location with a specific unresolved risk" } },
+    { id: "rf-11", category: "supply-risk",    weight: 8,  label: { cs: "Dodavatel je u klíčového vstupu závislý na jediném subdodavateli", en: "Supplier depends on a single sub-supplier for a key input" } },
+    { id: "rf-12", category: "supply-risk",    weight: 6,  label: { cs: "Opakovaná nevysvětlená zpoždění dodávek s významným dopadem", en: "Repeated unexplained delivery delays with a significant impact" } },
     { id: "rf-13", category: "communication",  weight: 8,  label: { cs: "Časté střídání kontaktních osob na straně dodavatele", en: "Frequent turnover of contact persons on supplier side" } },
     { id: "rf-14", category: "communication",  weight: 7,  label: { cs: "Vyhýbá se písemné komunikaci, preferuje ústní dohody", en: "Avoids written communication, prefers verbal agreements" } },
-    { id: "rf-15", category: "communication",  weight: 8,  label: { cs: "Odpovědi na dotazy trvají >5 pracovních dní", en: "Response to queries takes >5 business days" } },
+    { id: "rf-15", category: "communication",  weight: 8,  label: { cs: "Odpovědi na dotazy opakovaně nesplňují potřebný nebo sjednaný termín", en: "Responses to queries repeatedly miss the required or agreed deadline" } },
     { id: "rf-16", category: "communication",  weight: 5,  label: { cs: "Nejasná nebo rozporná smluvní dokumentace", en: "Unclear or contradictory contract documentation" } }
   ];
 
@@ -890,6 +932,36 @@
 
   const TEXTS = {
     cs: {
+      // D2/D2b: odkazy a přenos hodnot mezi nástroji (T-016)
+      xfer_paste_summary: 'Vložit data z jiného nástroje',
+      xfer_paste_label: 'Data zkopírovaná z jiného nástroje',
+      xfer_load: 'Načíst',
+      xfer_ok: 'Převzato z: {source}. Zkontrolujte hodnoty.',
+      xfer_ok_invalid: 'Převzato z: {source}. Některá pole nejsou platná, zkontrolujte je.',
+      xfer_err_empty: 'Vložte text zkopírovaný z jiného nástroje.',
+      xfer_err_tooLarge: 'Text je příliš dlouhý, nejde o data z toolboxu.',
+      xfer_err_badJson: 'Text není ve formátu dat z toolboxu. Zkopírujte ho znovu celý.',
+      xfer_err_version: 'Data jsou z jiné verze toolboxu a nejdou načíst.',
+      xfer_err_badRoute: 'Tato data nejsou určená pro tento nástroj.',
+      xfer_err_otherFile: 'Data jsou určená pro jiný toolbox ({target}). Otevřete ho a vložte je tam.',
+      xfer_err_value: 'Data obsahují neplatnou nebo chybějící hodnotu ({field}). Nic nebylo vyplněno.',
+      xfer_err_range: 'Hodnota {field} je mimo povolený rozsah. Nic nebylo vyplněno.',
+      xfer_err_expired: 'Přenos vypršel (platí 10 minut). Zopakujte ho ve zdrojovém nástroji.',
+      xfer_field_unknown: 'neznámá položka',
+      xfer_toolbox_t1: 'Kalkulačky',
+      xfer_toolbox_t2: 'Náklady',
+      xfer_toolbox_t3: 'Dodavatelé',
+      xfer_toolbox_t4: 'Logistika',
+      xfer_toolbox_t5: 'Finance',
+      xfer_toolbox_t6: 'Rychlá pomoc',
+      xfer_ok_none: 'Převzato z: {source}. Z vyplněných údajů nevyplývá žádný z převoditelných signálů.',
+      xfer_src_t3_3b: 'Dodavatelé, Risk checker',
+      xfer_src_t3_3c: 'Dodavatelé, Index závislosti',
+      xfer_f_rf09: 'Jediný zdroj pro kritickou komoditu',
+      xfer_f_rf10: 'Produkce v jediné lokalitě',
+      rf_links_intro: 'Podrobněji posoudit dodavatele:',
+      rf_link_3b: 'Risk checker (Dodavatelé) ↗',
+      rf_link_3c: 'Index závislosti (Dodavatelé) ↗',
       tab6a: "Email builder", tab6b: "Argumenty", tab6c: "Red flag checker", tab6d: "Vyjednávací pozice",
       panel6a_heading: "Email builder", panel6b_heading: "Argumenty pro vyjednávání",
       panel6c_heading: "Red flag checker", panel6d_heading: "Vyjednávací pozice",
@@ -921,6 +993,8 @@
       posSelectPlaceholder: "— vyberte —",
       posIncompleteBadge: "VYPLNĚNO {n} Z {total}",
       posIncomplete: "Skóre a verdikt ukážeme až po vyplnění všech faktorů. Chybí: {missing}.",
+      posCriticalTitle: "Nejdřív zajistěte proveditelnou variantu",
+      posCriticalText: "nemáte alternativního dodavatele a komodita je kritická nebo je časový tlak urgentní. Ostatní výhody nepovažujte za dostatečnou pojistku. Ověřte proveditelnou alternativu včetně kvalifikace, kapacity a termínu, případně překlenovací řešení. Skóre se tím nemění.",
       selectGoalPlaceholder: "— vyberte cíl —",
       toolDesc6a: "Sestavte profesionální email na míru situaci a zvolenému tónu.",
       toolDesc6b: "Získejte argumenty, protiargumenty a doporučený styl pro vaši situaci.",
@@ -929,6 +1003,36 @@
       weightLabel: "váha"
     },
     en: {
+      // D2/D2b: odkazy a přenos hodnot mezi nástroji (T-016)
+      xfer_paste_summary: 'Paste data from another tool',
+      xfer_paste_label: 'Data copied from another tool',
+      xfer_load: 'Load',
+      xfer_ok: 'Taken over from: {source}. Please check the values.',
+      xfer_ok_invalid: 'Taken over from: {source}. Some fields are not valid, please check them.',
+      xfer_err_empty: 'Paste the text copied from another tool.',
+      xfer_err_tooLarge: 'The text is too long to be toolbox data.',
+      xfer_err_badJson: 'This is not toolbox data. Copy the whole text again.',
+      xfer_err_version: 'The data comes from a different toolbox version and cannot be loaded.',
+      xfer_err_badRoute: 'This data is not meant for this tool.',
+      xfer_err_otherFile: 'The data is meant for another toolbox ({target}). Open it and paste the data there.',
+      xfer_err_value: 'The data contains an invalid or missing value ({field}). Nothing was filled in.',
+      xfer_err_range: '{field} is out of the allowed range. Nothing was filled in.',
+      xfer_err_expired: 'The transfer has expired (valid for 10 minutes). Repeat it in the source tool.',
+      xfer_field_unknown: 'unknown item',
+      xfer_toolbox_t1: 'Calculators',
+      xfer_toolbox_t2: 'Costs',
+      xfer_toolbox_t3: 'Suppliers',
+      xfer_toolbox_t4: 'Logistics',
+      xfer_toolbox_t5: 'Finance',
+      xfer_toolbox_t6: 'Quick help',
+      xfer_ok_none: 'Taken over from: {source}. None of the transferable signals follows from the data.',
+      xfer_src_t3_3b: 'Suppliers, Risk checker',
+      xfer_src_t3_3c: 'Suppliers, Dependency index',
+      xfer_f_rf09: 'Single source for a critical commodity',
+      xfer_f_rf10: 'Production in a single location',
+      rf_links_intro: 'Assess the supplier in more detail:',
+      rf_link_3b: 'Risk checker (Suppliers) ↗',
+      rf_link_3c: 'Dependency index (Suppliers) ↗',
       tab6a: "Email builder", tab6b: "Arguments", tab6c: "Red flag checker", tab6d: "Negotiation position",
       panel6a_heading: "Email builder", panel6b_heading: "Negotiation arguments",
       panel6c_heading: "Red flag checker", panel6d_heading: "Negotiation position",
@@ -960,6 +1064,8 @@
       posSelectPlaceholder: "— select —",
       posIncompleteBadge: "{n} OF {total} ANSWERED",
       posIncomplete: "Score and verdict appear once all factors are filled in. Missing: {missing}.",
+      posCriticalTitle: "First secure a workable option",
+      posCriticalText: "you have no alternative supplier and the commodity is critical or the time pressure is urgent. Do not treat other advantages as sufficient protection. Verify a workable alternative, including qualification, capacity and timing, or an interim solution. The score does not change.",
       selectGoalPlaceholder: "— select goal —",
       toolDesc6a: "Build a professional email tailored to the situation and chosen tone.",
       toolDesc6b: "Get arguments, counter-arguments and a recommended style for your situation.",
@@ -973,6 +1079,312 @@
   // STATE
   // ============================================================
   let currentLang = 'cs';
+
+    /* ===== D2: KONFIGURACE ODKAZŮ MEZI NÁSTROJI (pro admina webu) =====
+       Hodnoty mají být stejné ve všech šesti souborech.
+       TOOLBOX_LINKS        adresa každého toolboxu: soubor vedle tohoto, nebo URL stránky CMS. Prázdná hodnota odkaz
+                            (i tlačítko přenosu hodnot do toho toolboxu) skryje.
+       TOOLBOX_LINK_TARGET  '_top' (výchozí; při vložení přes <iframe> otevře celou stránku), '_self' (inline vložení
+                            do stránky CMS), '_blank' (nová karta).
+       TOOLBOX_DEEP_LINK    false = odkaz bez #tool=… otevře výchozí tab. Použít při vložení přes <iframe>, kde by kotva
+                            zůstala na rodičovské stránce; jinak samostatné stránky CMS s <iframe src="…?tool=3b">.
+       Vložení přes <iframe>: přidat allow="clipboard-write", jinak tlačítka kopírování text jen označí.
+       Cookie procuppa_xfer, text pro cookie lištu webu (kategorie technicky nezbytné, souhlas se nevyžaduje):
+         CZ: procuppa_xfer – technicky nezbytná cookie. Vznikne jen po kliknutí na „Přenést do …“ a přenese zadaná čísla
+             do jiného nástroje toolboxu. Neobsahuje osobní údaje, neslouží k měření ani reklamě, platí nejvýš 10 minut
+             a cílový nástroj ji po přečtení hned smaže.
+         EN: procuppa_xfer – strictly necessary cookie. It is set only when you click "Send to …" and carries the numbers
+             you entered to another toolbox tool. It contains no personal data, is not used for analytics or advertising,
+             lasts at most 10 minutes and is deleted as soon as the target tool reads it. */
+    const TOOLBOX_LINKS = {
+      t1: 'toolbox-1-kalkulacky.html',
+      t2: 'toolbox-2-naklady.html',
+      t3: 'toolbox-3-dodavatele.html',
+      t4: 'toolbox-4-logistika.html',
+      t5: 'toolbox-5-finance.html',
+      t6: 'toolbox-6-rychla-pomoc.html',
+    };
+    const TOOLBOX_LINK_TARGET = '_top';   // '_top' | '_self' | '_blank'
+    const TOOLBOX_DEEP_LINK = true;       // false = odkaz bez #tool=… (otevře výchozí tab)
+    const TOOLBOX_TOOLS = ['6a', '6b', '6c', '6d'];   // taby tohoto souboru (router)
+
+    /* ===== D2: ROUTER #tool= A ODKAZY =====
+       Blok mezi značkami ROUTER-SHARED je ve všech šesti toolboxech textově shodný (hlídá iter-013-gates.js, brána R).
+       Každý soubor má vlastní activateToolById(id, { focus, remember }) nad svými taby.
+       Kotva #tool=3b se záměrně neshoduje s id panelu, takže prohlížeč ani CMS na ni po načtení neskočí. */
+    // ROUTER-SHARED-BEGIN
+    const TOOL_ID = /^[1-6][a-f]$/;
+
+    /** Nástroj z adresy: #tool=3b, nebo ?tool=3b (i mezi jinými parametry). Jiné kotvy a tvary → null. */
+    function toolFromLocation() {
+      let hash = '', search = '';
+      try { hash = String(location.hash || ''); search = String(location.search || ''); } catch (e) { return null; }
+      const h = hash.match(/^#tool=([1-6][a-f])$/);
+      if (h) return h[1];
+      const q = search.replace(/^\?/, '').split('&').map(p => p.match(/^tool=([1-6][a-f])$/)).find(Boolean);
+      return q ? q[1] : null;
+    }
+
+    /** Odkaz na nástroj podle TOOLBOX_LINKS a TOOLBOX_DEEP_LINK; '' = odkaz skrýt. */
+    function toolboxHref(tool) {
+      if (!TOOL_ID.test(String(tool))) return '';
+      const file = TOOLBOX_LINKS['t' + String(tool).charAt(0)];
+      if (typeof file !== 'string' || file === '') return '';
+      return TOOLBOX_DEEP_LINK ? file + '#tool=' + tool : file;
+    }
+
+    /** Odkaz <a data-tool-link="1d"> dostane href a target; bez adresy se skryje. → true, když odkaz platí. */
+    function setToolLink(a, tool) {
+      const href = toolboxHref(tool);
+      a.hidden = !href;
+      if (!href) { a.removeAttribute('href'); return false; }
+      a.setAttribute('href', href);
+      a.setAttribute('target', TOOLBOX_LINK_TARGET);
+      if (TOOLBOX_LINK_TARGET === '_blank') a.setAttribute('rel', 'noopener');
+      else a.removeAttribute('rel');
+      return true;
+    }
+
+    /** Výběr tabu uživatelem: kotva v adrese bez nové položky historie (tlačítko Zpět neprochází taby). */
+    function rememberTool(tool) {
+      try { history.replaceState(null, '', '#tool=' + tool); } catch (e) { /* sandbox nebo file:// bez history */ }
+    }
+
+    /** Načtení: tab z adresy bez přesunu fokusu. Změna kotvy (hashchange): tab a fokus na jeho tlačítko. */
+    function initRouter() {
+      document.querySelectorAll('[data-tool-link]').forEach(a => setToolLink(a, a.getAttribute('data-tool-link')));
+      const tool = toolFromLocation();
+      if (tool) activateToolById(tool, { focus: false, remember: false });
+      window.addEventListener('hashchange', () => {
+        const t = toolFromLocation();
+        if (t) activateToolById(t, { focus: true, remember: false });
+      });
+    }
+    // ROUTER-SHARED-END
+
+    /* ===== D2b: PŘEDÁVÁNÍ HODNOT MEZI SOUBORY =====
+       Blok mezi značkami XFER-SHARED je ve všech šesti toolboxech textově shodný
+       (hlídá iter-013-gates.js, G5). Neměnit v jednom souboru bez ostatních.
+       Nezávisí na D1 ani na DOM konkrétního souboru; routy a texty má každý soubor vlastní. */
+    // XFER-SHARED-BEGIN
+    const XFER_COOKIE = 'procuppa_xfer';
+    const XFER_VERSION = 1;
+    const XFER_MAX_AGE = 600;      // s, cookie i kontrola ts
+    const XFER_MAX_BYTES = 1024;   // délka zakódované hodnoty cookie
+    const XFER_MAX_PASTE = 2000;   // znaků ve vkládacím poli
+    const XFER_MAX_DP = 6;         // desetinná místa čísla v payloadu
+    const XFER_ID = /^t([1-6])-\1[a-d]$/;
+    const xferHas = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
+
+    function xferAttrs(maxAge) {
+      return '; path=/; max-age=' + maxAge + '; SameSite=Lax' + (location.protocol === 'https:' ? '; Secure' : '');
+    }
+
+    /** Surová (zakódovaná) hodnota cookie, nebo null. */
+    function xferRead() {
+      let all = '';
+      try { all = String(document.cookie || ''); } catch (e) { return null; }
+      const hit = all.split(/;\s*/).find(c => c.indexOf(XFER_COOKIE + '=') === 0);
+      return hit ? hit.slice(XFER_COOKIE.length + 1) : null;
+    }
+
+    function xferClear() {
+      try { document.cookie = XFER_COOKIE + '=' + xferAttrs(0); } catch (e) { /* cookies zablokované */ }
+    }
+
+    function xferMake(from, to, values, now = Date.now()) {
+      return { v: XFER_VERSION, from, to, ts: now, values };
+    }
+
+    /** Zápis a zpětné čtení. → { ok, reason?, json }; json se při neúspěchu nabídne ke zkopírování. */
+    function xferSend(payload) {
+      const json = JSON.stringify(payload);
+      const enc = encodeURIComponent(json);
+      if (enc.length > XFER_MAX_BYTES) return { ok: false, reason: 'tooLarge', json };
+      try { document.cookie = XFER_COOKIE + '=' + enc + xferAttrs(XFER_MAX_AGE); } catch (e) { return { ok: false, reason: 'blocked', json }; }
+      return xferRead() === enc ? { ok: true, json } : { ok: false, reason: 'blocked', json };
+    }
+
+    /** Text (cookie nebo vložený JSON) → { payload } | { error }. */
+    function xferParse(text) {
+      if (typeof text !== 'string' || text.trim() === '') return { error: 'empty' };
+      if (text.length > XFER_MAX_PASTE) return { error: 'tooLarge' };
+      let p;
+      try { p = JSON.parse(text); } catch (e) { return { error: 'badJson' }; }
+      if (!p || typeof p !== 'object' || Array.isArray(p)) return { error: 'badJson' };
+      if (p.v !== XFER_VERSION) return { error: 'version' };
+      if (typeof p.from !== 'string' || typeof p.to !== 'string' || !XFER_ID.test(p.from) || !XFER_ID.test(p.to)) return { error: 'badRoute' };
+      if (typeof p.ts !== 'number' || !Number.isFinite(p.ts)) return { error: 'badJson' };
+      if (!p.values || typeof p.values !== 'object' || Array.isArray(p.values)) return { error: 'badValues' };
+      return { payload: p };
+    }
+
+    function xferNumError(v, spec) {
+      if (typeof v !== 'number' || !Number.isFinite(v)) return 'badValue';
+      if (Number(v.toFixed(spec.int ? 0 : XFER_MAX_DP)) !== v) return 'badValue';
+      if (v < spec.min || v > spec.max) return 'range';
+      return null;
+    }
+
+    /** Whitelist cíle. → { routeKey, route, fields: [{ key, id, type, value }] } | { error, key? }. */
+    function xferCheck(payload, routes, self) {
+      if (payload.to.slice(0, 2) !== self) return { error: 'otherFile' };
+      const routeKey = payload.from + '>' + payload.to;
+      if (!xferHas(routes, routeKey)) return { error: 'badRoute' };
+      const route = routes[routeKey];
+      const vals = payload.values;
+      for (const k of Object.keys(vals)) if (!xferHas(route.fields, k)) return { error: 'unknownKey', key: k };
+      const fields = [];
+      for (const k of Object.keys(route.fields)) {
+        const spec = route.fields[k];
+        if (!xferHas(vals, k)) { if (spec.required) return { error: 'missing', key: k }; continue; }
+        const v = vals[k];
+        const err = spec.type === 'bool' ? (typeof v === 'boolean' ? null : 'badValue')
+          : spec.type === 'enum' ? (spec.values.indexOf(v) >= 0 ? null : 'badValue')
+          : xferNumError(v, spec);
+        if (err) return { error: err, key: k };
+        fields.push({ key: k, id: spec.id || null, type: spec.type, value: v });
+      }
+      return { routeKey, route, fields };
+    }
+
+    /** Kanonické číslo → text pole v daném jazyce (D1 ho přečte zpět beze změny). */
+    function xferFieldText(n, lang) {
+      const s = String(n);
+      return lang === 'cs' ? s.replace('.', ',') : s;
+    }
+
+    /** Vše, nebo nic. Jen .value a .checked, žádné vkládání HTML. → true | false (chybí prvek). */
+    function xferApply(fields, lang) {
+      const els = fields.map(f => (f.id ? document.getElementById(f.id) : null));
+      if (fields.some((f, i) => f.id && !els[i])) return false;
+      fields.forEach((f, i) => {
+        if (!f.id) return;
+        if (f.type === 'bool') els[i].checked = f.value;
+        else if (f.type === 'enum') els[i].value = f.value;
+        else els[i].value = xferFieldText(f.value, lang);
+      });
+      return true;
+    }
+
+    /** Při načtení: cookie pro tento soubor přečíst a hned smazat (jednorázově, i neplatnou).
+        Cookie jiného souboru nechat být. → null | { payload } | { error }. */
+    function xferTakeCookie(self, now = Date.now()) {
+      const raw = xferRead();
+      if (raw === null) return null;
+      let text;
+      try { text = decodeURIComponent(raw); } catch (e) { xferClear(); return { error: 'badJson' }; }
+      const r = xferParse(text);
+      if (r.payload && r.payload.to.slice(0, 2) !== self) return null;
+      xferClear();
+      if (r.error) return r;
+      if (now - r.payload.ts > XFER_MAX_AGE * 1000 || r.payload.ts - now > 60000) return { error: 'expired' };
+      return r;
+    }
+
+    /** Schránka pro D4 i pro fallback JSON. → Promise<'copied' | 'selected'>.
+        selectEl: textarea/input se označí přes select(), jiný prvek přes Range. */
+    function copyText(text, selectEl) {
+      const fallback = () => {
+        if (!selectEl) return 'selected';
+        try {
+          if (typeof selectEl.select === 'function') { selectEl.focus(); selectEl.select(); }
+          else { const r = document.createRange(); r.selectNodeContents(selectEl); const s = window.getSelection(); s.removeAllRanges(); s.addRange(r); }
+          if (document.execCommand && document.execCommand('copy')) return 'copied';
+        } catch (e) { /* označení zůstane, uživatel zkopíruje ručně */ }
+        return 'selected';
+      };
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(text).then(() => 'copied', fallback);
+      } catch (e) { /* iframe bez clipboard-write */ }
+      return Promise.resolve(fallback());
+    }
+    // XFER-SHARED-END
+
+    /* ===== D2b: CÍL PŘENOSU – toolbox-6, nástroj 6c Red flags (mapa převodů D2b, řádky 4–6) ===== */
+    const XFER_SELF = 't6';
+    const XFER_DEFAULT_TOOL = '6c';
+    const XFER_UI = { note: 'rf-xfer-note', input: 'rf-xfer-input', load: 'rf-xfer-load' };
+    const XFER_ROUTES = {
+      't3-3b>t6-6c': {
+        tool: '6c', source: 'xfer_src_t3_3b', after: calcRedFlags,
+        fields: {
+          rf09: { id: 'rf-09', type: 'bool', label: 'xfer_f_rf09' },
+          rf10: { id: 'rf-10', type: 'bool', label: 'xfer_f_rf10' },
+        },
+      },
+      't3-3c>t6-6c': {
+        tool: '6c', source: 'xfer_src_t3_3c', after: calcRedFlags,
+        fields: { rf09: { id: 'rf-09', type: 'bool', required: true, label: 'xfer_f_rf09' } },
+      },
+    };
+
+    /* ===== D2b: CÍL PŘENOSU – obsluha (stejná v toolbox-1 a toolbox-6) =====
+       Při načtení xferBoot() převezme cookie pro tento soubor (jednorázově), tlačítko Načíst vložený JSON.
+       Zapisuje se jen .value / .checked polí z whitelistu XFER_ROUTES (xferApply), poznámka jen přes textContent
+       a jen z TEXTS (nikdy z textu payloadu). */
+    let xferNoteState = null;   // { key, vars, error } poslední poznámky, aby ji přepnutí jazyka přeložilo
+
+    function xferRenderNote() {
+      const el = document.getElementById(XFER_UI.note);
+      if (!el) return;
+      if (!xferNoteState) { el.textContent = ''; el.hidden = true; return; }
+      const T = TEXTS[currentLang], v = xferNoteState.vars;
+      el.textContent = T[xferNoteState.key].replace(/\{(source|target|field|cur)\}/g, (m, k) => (k === 'cur' ? v.cur : T[v[k]]) || m);
+      el.classList.toggle('xfer-error', xferNoteState.error);
+      el.hidden = false;
+    }
+
+    /** → false při chybě, true při převzetí. */
+    function xferSetNote(key, vars, error) {
+      xferNoteState = key ? { key, vars: vars || {}, error: !!error } : null;
+      xferRenderNote();
+      return !error;
+    }
+
+    /** Chyba xferParse / xferTakeCookie / xferCheck → [klíč poznámky, proměnné]. Názvy jen z TEXTS. */
+    function xferErrorNote(err, payload) {
+      const route = payload && xferHas(XFER_ROUTES, payload.from + '>' + payload.to) ? XFER_ROUTES[payload.from + '>' + payload.to] : null;
+      const field = route && err.key && xferHas(route.fields, err.key) ? route.fields[err.key].label : 'xfer_field_unknown';
+      switch (err.error) {
+        case 'otherFile': return ['xfer_err_otherFile', { target: 'xfer_toolbox_' + payload.to.slice(0, 2) }];
+        case 'unknownKey': case 'missing': case 'badValue': return ['xfer_err_value', { field }];
+        case 'range': return ['xfer_err_range', { field }];
+        case 'empty': case 'tooLarge': case 'version': case 'badRoute': case 'expired': return ['xfer_err_' + err.error, {}];
+        default: return ['xfer_err_badJson', {}];   // badJson, badValues
+      }
+    }
+
+    /** { payload } | { error } → whitelist, zápis vše-nebo-nic, výpočet nástroje, aktivace tabu, poznámka. */
+    function xferReceive(r) {
+      if (!r) return false;
+      const fail = (err, payload) => {
+        activateToolById(XFER_DEFAULT_TOOL, { focus: false, remember: false });
+        const [key, vars] = xferErrorNote(err, payload);
+        return xferSetNote(key, vars, true);
+      };
+      if (r.error) return fail(r, null);
+      const c = xferCheck(r.payload, XFER_ROUTES, XFER_SELF);
+      if (c.error) return fail(c, r.payload);
+      if (!xferApply(c.fields, currentLang)) return fail({ error: 'badRoute' }, r.payload);
+      c.route.after(c.fields);
+      activateToolById(c.route.tool, { focus: false, remember: false });
+      const invalid = c.fields.some(f => f.id && document.getElementById(f.id).getAttribute('aria-invalid') === 'true');
+      const noneTrue = c.fields.every(f => f.type === 'bool') && !c.fields.some(f => f.value === true);
+      return xferSetNote(invalid ? 'xfer_ok_invalid' : noneTrue ? 'xfer_ok_none' : 'xfer_ok', { source: c.route.source }, false);
+    }
+
+    /** Tlačítko Načíst u „Vložit data z jiného nástroje“ (fallback bez cookie). */
+    function xferPasteLoad() {
+      return xferReceive(xferParse(document.getElementById(XFER_UI.input).value));
+    }
+
+    /** Poslední krok inicializace (po routeru): tlačítko Načíst a jednorázové převzetí cookie. */
+    function xferBoot() {
+      document.getElementById(XFER_UI.load).addEventListener('click', xferPasteLoad);
+      return xferReceive(xferTakeCookie(XFER_SELF));
+    }
+
   let currentTone = 'firm';
   let currentScenarioId = null;
   const selections = Object.fromEntries(POSITION_FACTORS.map(f => [f.id, null]));
@@ -982,14 +1394,7 @@
   // ============================================================
   function initTabs() {
     document.querySelectorAll('.tab-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const tab = btn.dataset.tab;
-        document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
-        document.querySelectorAll('.tool-panel').forEach(p => p.classList.remove('active'));
-        btn.classList.add('active');
-        btn.setAttribute('aria-selected', 'true');
-        document.getElementById('tab-' + tab)?.classList.add('active');
-      });
+      btn.addEventListener('click', () => activateToolById(btn.dataset.tab));
     });
 
     document.querySelectorAll('.lang-btn').forEach(btn => {
@@ -997,7 +1402,30 @@
     });
   }
 
+  function activateTab(tab) {
+    document.querySelectorAll('.tab-btn').forEach(b => {
+      const on = b.dataset.tab === tab;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-selected', on ? 'true' : 'false');
+      b.tabIndex = on ? 0 : -1;
+    });
+    document.querySelectorAll('.tool-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-' + tab));
+  }
+
+  /** D2: aktivuje tab podle id nástroje ('6c'). focus = fokus na tlačítko tabu, remember = kotva #tool= v adrese.
+      → false, když tab v tomto souboru není. */
+  function activateToolById(id, { focus = false, remember = true } = {}) {
+    if (TOOLBOX_TOOLS.indexOf(id) < 0) return false;
+    activateTab(id);
+    if (focus) document.getElementById('tab-btn-' + id).focus();
+    if (remember) rememberTool(id);
+    return true;
+  }
+
   function setLang(lang) {
+    // 6a: hodnoty vyplněných proměnných e-mailu přežijí přegenerování polí v novém jazyce
+    const ebTpl = currentScenarioId ? EMAIL_TEMPLATES.find(t => t.id === currentScenarioId) : null;
+    const ebKeep = ebTpl ? getVars(ebTpl) : {};
     currentLang = lang;
     document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.lang === lang));
     document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -1009,7 +1437,7 @@
     populateSituationSelect();
     renderRedFlagCategories();
     renderPositionFactors();
-    if (currentScenarioId) onScenarioChange();
+    if (currentScenarioId) onScenarioChange(ebKeep);
     const argSit = document.getElementById('arg-situation').value;
     const argGoal = document.getElementById('arg-goal').value;
     if (argSit && argGoal) renderArguments(argSit, argGoal);
@@ -1017,6 +1445,7 @@
     calcPosition();
     // update copy error text
     document.getElementById('eb-copy-error').textContent = TEXTS[lang].copyErrorMsg;
+    xferRenderNote();
   }
 
   // ============================================================
@@ -1035,7 +1464,8 @@
     });
   }
 
-  function onScenarioChange() {
+  /** keep = { idProměnné: hodnota } k obnovení po přegenerování polí (přepnutí jazyka); výběr scénáře pole vyprázdní. */
+  function onScenarioChange(keep) {
     const scenarioId = document.getElementById('eb-scenario').value;
     currentScenarioId = scenarioId || null;
     if (!scenarioId) {
@@ -1045,12 +1475,12 @@
     }
     const tpl = EMAIL_TEMPLATES.find(t => t.id === scenarioId);
     if (!tpl) return;
-    renderVariables(tpl);
+    renderVariables(tpl, keep && typeof keep === 'object' ? keep : {});
     document.getElementById('eb-variables-section').classList.remove('hidden');
     rebuildEmail();
   }
 
-  function renderVariables(tpl) {
+  function renderVariables(tpl, keep = {}) {
     const grid = document.getElementById('eb-variables-grid');
     grid.innerHTML = '';
     tpl.variables.forEach(v => {
@@ -1059,6 +1489,8 @@
       const lbl = v.label[currentLang] + (v.required ? ' *' : '');
       div.innerHTML = `<label for="var-${v.id}">${lbl}</label><input type="text" id="var-${v.id}" class="input-field" placeholder="${v.placeholder}" oninput="rebuildEmail()">`;
       grid.appendChild(div);
+      // hodnota jen přes .value (nikdy do HTML šablony výše)
+      if (Object.prototype.hasOwnProperty.call(keep, v.id) && keep[v.id] !== '') document.getElementById('var-' + v.id).value = keep[v.id];
     });
   }
 
@@ -1203,14 +1635,18 @@
   // ============================================================
   // 6c RED FLAG CHECKER
   // ============================================================
-  function renderRedFlagCategories() {
+  /**
+   * Překreslí checkboxy v aktuálním jazyce. Označené příznaky se zachovají (výchozí = stav v DOM před překreslením),
+   * takže přepnutí jazyka zaškrtnutí nesmaže.
+   */
+  function renderRedFlagCategories(checkedIds = getCheckedFlags()) {
     const cats = { financial: 'rf-cat-financial', quality: 'rf-cat-quality', 'supply-risk': 'rf-cat-supply-risk', communication: 'rf-cat-communication' };
     Object.entries(cats).forEach(([cat, elId]) => {
       const container = document.getElementById(elId);
       const flags = RED_FLAGS.filter(f => f.category === cat);
       container.innerHTML = flags.map(f => `
         <div class="rf-item">
-          <input type="checkbox" id="${f.id}" data-weight="${f.weight}" onchange="calcRedFlags()">
+          <input type="checkbox" id="${f.id}" data-weight="${f.weight}"${checkedIds.includes(f.id) ? ' checked' : ''} onchange="calcRedFlags()">
           <label for="${f.id}">${f.label[currentLang]}</label>
           <span class="rf-item-weight">${TEXTS[currentLang].weightLabel}: ${f.weight}</span>
         </div>`).join('');
@@ -1314,12 +1750,22 @@
     return { known, total: POSITION_FACTORS.length, complete: true, score, level, missing };
   }
 
+  /**
+   * T6-11: kritický spouštěč podle v8 (alternativy = 0 a zároveň kritický dopad nebo okamžitý tlak).
+   * U nás: žádný alternativní dodavatel (0) a zároveň kritická komodita (3) nebo urgentní časový tlak (3).
+   * Platí i při neúplném vyplnění a další příznivá odpověď ho neschová. Skóre ani verdikt nemění, jen vyvolá upozornění.
+   */
+  function positionCritical(sel) {
+    return sel.alternatives === 0 && (sel.criticality === 3 || sel['time-pressure'] === 3);
+  }
+
   function calcPosition() {
     if (!hasAnySelection()) {
       document.getElementById('pos-result-section').style.display = 'none';
       return;
     }
     renderPositionResult(positionStatus(selections));
+    document.getElementById('pos-critical').classList.toggle('hidden', !positionCritical(selections));
     document.getElementById('pos-result-section').style.display = '';
   }
 
@@ -1365,6 +1811,8 @@
     calcRedFlags();
     // Set initial copy error text
     document.getElementById('eb-copy-error').textContent = TEXTS[currentLang].copyErrorMsg;
+    initRouter();
+    xferBoot();
   });
   </script>
 </body>

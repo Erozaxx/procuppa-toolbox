@@ -126,10 +126,15 @@
       transition: background 0.15s, color 0.15s, border-color 0.15s;
     }
 
-    .lang-btn.active,
-    .lang-btn:hover {
+    .lang-btn.active {
       background: var(--color-primary);
       color: var(--color-primary-text);
+      border-color: var(--color-primary);
+    }
+
+    /* Hover na neaktivním jazyce jen obrys, aby nevypadal jako zvolený (T-017) */
+    .lang-btn:not(.active):hover {
+      color: var(--color-primary);
       border-color: var(--color-primary);
     }
 
@@ -487,6 +492,8 @@
       gap: var(--space-sm);
     }
 
+    .result-row[hidden] { display: none !important; }
+
     .result-row .result-row-label {
       font-size: var(--font-size-sm);
       color: var(--color-text-muted);
@@ -530,6 +537,36 @@
         max-width: 100%;
       }
     }
+
+    /* ===== D2/D2b: odkazy mezi nástroji a přenos hodnot (T-016) ===== */
+    .xfer-box { margin-top: var(--space-md); padding-top: var(--space-md); border-top: 1px solid var(--color-border); }
+    .btn-xfer { display: inline-block; padding: var(--space-xs) var(--space-md); border: 1px solid var(--color-primary); border-radius: var(--radius-sm);
+                background: var(--color-surface); color: var(--color-primary); font: inherit; font-weight: 600; text-decoration: none; cursor: pointer; }
+    .btn-xfer:hover { background: var(--color-accent); color: var(--color-accent-text, var(--color-primary)); }
+    .btn-xfer:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+    .btn-xfer[aria-disabled="true"], .btn-xfer:disabled { opacity: 0.55; cursor: not-allowed; background: var(--color-surface); }
+    .xfer-hint { display: block; margin-top: var(--space-xs); font-size: var(--font-size-sm); color: var(--color-text-muted); }
+    .xfer-note { margin: var(--space-sm) 0; font-size: var(--font-size-sm); }
+    .xfer-note:empty { margin: 0; }
+    .xfer-note.xfer-error { color: var(--color-danger); font-weight: 600; }
+    .xfer-details { margin-top: var(--space-sm); font-size: var(--font-size-sm); }
+    .xfer-details summary { cursor: pointer; font-weight: 600; }
+    .xfer-details > * + * { margin-top: var(--space-sm); }
+    .xfer-details label { display: block; font-weight: 600; }
+    .xfer-json { display: block; width: 100%; box-sizing: border-box; padding: var(--space-sm); font-family: Consolas, monospace; font-size: 0.8rem;
+                 border: 1px solid var(--color-border); border-radius: var(--radius-sm); }
+    .xfer-actions { display: flex; flex-wrap: wrap; gap: var(--space-sm); align-items: center; }
+    .tool-links { margin-top: var(--space-md); font-size: var(--font-size-sm); }
+    .tool-links a { color: var(--color-primary); font-weight: 600; }
+    .xfer-box[hidden], .xfer-box [hidden], .tool-links [hidden], .xfer-note[hidden] { display: none !important; }
+    /* ===== D4: Kopírovat výsledek (T-017) ===== */
+    .copy-result { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-sm); margin-top: var(--space-md); }
+    .copy-result[hidden] { display: none; }
+    .btn-copy-result { padding: var(--space-xs) var(--space-md); border: 1px solid var(--color-primary); border-radius: var(--radius-sm);
+                       background: var(--color-surface); color: var(--color-primary); font: inherit; font-size: var(--font-size-sm); font-weight: 600; cursor: pointer; }
+    .btn-copy-result:hover { background: var(--color-accent); color: var(--color-accent-text, var(--color-primary)); }
+    .btn-copy-result:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+    .copy-result-status { margin: 0; font-size: var(--font-size-sm); color: var(--color-text-muted); }
   </style>
 </head>
 <body>
@@ -642,9 +679,17 @@
                      data-i18n-placeholder="t2a_custom_name_ph">
             </div>
             <div class="input-group">
-              <label for="t2a-custom1-value" data-i18n="t2a_custom1_value">Vlastní položka 1 – jednorázová částka (Kč)</label>
+              <label for="t2a-custom1-value" data-i18n="t2a_custom1_value">Vlastní položka 1 – částka (Kč)</label>
               <input type="text" inputmode="decimal" autocomplete="off" id="t2a-custom1-value" class="input-field" aria-describedby="t2a-custom1-value-err" placeholder="0">
               <span id="t2a-custom1-value-err" class="error-msg" role="alert"></span>
+            </div>
+            <div class="input-group">
+              <label for="t2a-custom1-period" data-i18n="t2a_custom1_period">Vlastní položka 1 – jak často se platí</label>
+              <select id="t2a-custom1-period" class="input-field">
+                <option value="once" data-i18n="t2a_period_once">Jednorázově</option>
+                <option value="annual" data-i18n="t2a_period_annual">Ročně</option>
+                <option value="monthly" data-i18n="t2a_period_monthly">Měsíčně</option>
+              </select>
             </div>
 
             <!-- Volné pole 2 -->
@@ -654,16 +699,31 @@
                      data-i18n-placeholder="t2a_custom_name_ph">
             </div>
             <div class="input-group">
-              <label for="t2a-custom2-value" data-i18n="t2a_custom2_value">Vlastní položka 2 – jednorázová částka (Kč)</label>
+              <label for="t2a-custom2-value" data-i18n="t2a_custom2_value">Vlastní položka 2 – částka (Kč)</label>
               <input type="text" inputmode="decimal" autocomplete="off" id="t2a-custom2-value" class="input-field" aria-describedby="t2a-custom2-value-err" placeholder="0">
               <span id="t2a-custom2-value-err" class="error-msg" role="alert"></span>
+            </div>
+            <div class="input-group">
+              <label for="t2a-custom2-period" data-i18n="t2a_custom2_period">Vlastní položka 2 – jak často se platí</label>
+              <select id="t2a-custom2-period" class="input-field">
+                <option value="once" data-i18n="t2a_period_once">Jednorázově</option>
+                <option value="annual" data-i18n="t2a_period_annual">Ročně</option>
+                <option value="monthly" data-i18n="t2a_period_monthly">Měsíčně</option>
+              </select>
+            </div>
+
+            <!-- T2-2: zůstatková hodnota se od TCO odečte -->
+            <div class="input-group">
+              <label for="t2a-residual" data-i18n="t2a_residual">Zůstatková hodnota na konci životnosti (Kč)</label>
+              <input type="text" inputmode="decimal" autocomplete="off" id="t2a-residual" class="input-field" aria-describedby="t2a-residual-err" placeholder="0">
+              <span id="t2a-residual-err" class="error-msg" role="alert"></span>
             </div>
           </div>
         </div>
 
         <!-- Životnost (volitelné) -->
         <div class="input-group" style="margin-top: var(--space-md);">
-          <label for="t2a-years" data-i18n="t2a_years">Životnost (roky, povinná při ročních nákladech)</label>
+          <label for="t2a-years" data-i18n="t2a_years">Životnost (roky, povinná při ročních a měsíčních nákladech)</label>
           <input type="text" inputmode="decimal" autocomplete="off" id="t2a-years" class="input-field" aria-describedby="t2a-years-err" placeholder="např. 5"
                  data-i18n-placeholder="t2a_years_ph">
           <span id="t2a-years-err" class="error-msg" role="alert"></span>
@@ -672,47 +732,57 @@
         <!-- Vysvětlivka (T2-1): proč se roční položky násobí životností -->
         <details class="tco-howto" style="margin-top: var(--space-md); font-size: var(--font-size-sm);">
           <summary data-i18n="t2a_howto_title">Jak počítáme TCO</summary>
-          <p class="tool-desc" data-i18n="t2a_howto_body">TCO = jednorázové náklady (nákupní cena, doprava, instalace, vlastní položky) + roční náklady (servis, údržba, skladování) × životnost v letech. TCO / rok = TCO ÷ životnost, TCO / měsíc = TCO / rok ÷ 12. Bez ročních nákladů se životnost zadávat nemusí.</p>
+          <p class="tool-desc" data-i18n="t2a_howto_body">TCO = jednorázové náklady (nákupní cena, doprava, instalace) + roční náklady (servis, údržba, skladování) × životnost v letech + měsíční náklady × 12 × životnost − zůstatková hodnota. Vlastní položky se započtou podle zvolené periodicity. TCO / rok = TCO ÷ životnost, TCO / měsíc = TCO / rok ÷ 12. Bez ročních a měsíčních nákladů se životnost zadávat nemusí.</p>
         </details>
 
         <!-- Výsledky -->
         <div class="result-box" id="t2a-result">
-          <div class="result-grid">
-            <div class="result-row">
-              <span class="result-row-label" data-i18n="t2a_result_tco">Celkové TCO</span>
-              <span class="result-row-value" id="t2a-result-tco"></span>
+          <div id="t2a-copy-src">
+            <div class="result-grid">
+              <div class="result-row">
+                <span class="result-row-label" data-i18n="t2a_result_tco">Celkové TCO</span>
+                <span class="result-row-value" id="t2a-result-tco"></span>
+              </div>
+              <div class="result-row">
+                <span class="result-row-label" data-i18n="t2a_result_year">TCO / rok</span>
+                <span class="result-row-value" id="t2a-result-year"></span>
+              </div>
+              <div class="result-row">
+                <span class="result-row-label" data-i18n="t2a_result_month">TCO / měsíc</span>
+                <span class="result-row-value" id="t2a-result-month"></span>
+              </div>
             </div>
-            <div class="result-row">
-              <span class="result-row-label" data-i18n="t2a_result_year">TCO / rok</span>
-              <span class="result-row-value" id="t2a-result-year"></span>
-            </div>
-            <div class="result-row">
-              <span class="result-row-label" data-i18n="t2a_result_month">TCO / měsíc</span>
-              <span class="result-row-value" id="t2a-result-month"></span>
-            </div>
-          </div>
 
-          <div data-i18n="t2a_breakdown_heading"
-               style="font-size: var(--font-size-sm); font-weight: 600; margin: var(--space-sm) 0 var(--space-xs);">
-            Rozpad po složkách
-          </div>
-          <table class="tco-breakdown-table" id="t2a-breakdown-table">
-            <thead>
-              <tr>
-                <th data-i18n="t2a_breakdown_col_name">Položka</th>
-                <th data-i18n="t2a_breakdown_col_value">Kč</th>
-                <th data-i18n="t2a_breakdown_col_pct">%</th>
-              </tr>
-            </thead>
-            <tbody id="t2a-breakdown-body"></tbody>
-          </table>
+            <div data-i18n="t2a_breakdown_heading"
+                 style="font-size: var(--font-size-sm); font-weight: 600; margin: var(--space-sm) 0 var(--space-xs);">
+              Rozpad po složkách
+            </div>
+            <table class="tco-breakdown-table" id="t2a-breakdown-table">
+              <thead>
+                <tr>
+                  <th data-i18n="t2a_breakdown_col_name">Položka</th>
+                  <th data-i18n="t2a_breakdown_col_value">Kč</th>
+                  <th data-i18n="t2a_breakdown_col_pct">%</th>
+                </tr>
+              </thead>
+              <tbody id="t2a-breakdown-body"></tbody>
+            </table>
 
-          <div class="result-interpretation" id="t2a-interpretation"></div>
+            <div class="result-interpretation" id="t2a-interpretation"></div>
+          </div>
+          <!-- D4: kopírování výsledku; je uvnitř výsledku, bez výsledku se tedy nezobrazí -->
+          <div class="copy-result" id="t2a-copy-bar">
+            <button type="button" class="btn-copy-result" id="t2a-copy" data-i18n="copy_result">Kopírovat výsledek</button>
+            <p class="copy-result-status" id="t2a-copy-status" role="status"></p>
+          </div>
 
           <div class="chart-container">
             <canvas id="chart-2a-tco" height="300"></canvas>
           </div>
         </div>
+
+        <!-- D2: TCO je celkový náklad jedné varianty, do 1d (dvě jednotkové ceny) se nepřenáší, jen odkaz -->
+        <p class="tool-links"><a data-tool-link="1d" data-i18n="t2a_link_1d">Porovnat dvě jednotkové ceny a úsporu v kalkulačce úspor ↗</a></p>
 
         <button class="btn-reset" id="t2a-reset" data-i18n="btn_reset">Resetovat</button>
       </div>
@@ -769,29 +839,65 @@
           <span id="t2b-saving-pct-err" class="error-msg" role="alert"></span>
         </div>
 
+        <!-- T2-7: informace o převzetí ze Should-cost -->
+        <p class="tool-desc" id="t2b-model-note" role="status" hidden></p>
+
         <!-- Výsledky -->
         <div class="result-box" id="t2b-result">
-          <div class="t2b-result-grid">
-            <div class="result-row">
-              <span class="result-row-label" data-i18n="t2b_result_label">Cílová cena</span>
-              <span class="result-row-value" id="t2b-result-target"></span>
+          <div id="t2b-copy-src">
+            <div class="t2b-result-grid">
+              <div class="result-row">
+                <span class="result-row-label" data-i18n="t2b_result_label">Cílová cena</span>
+                <span class="result-row-value" id="t2b-result-target"></span>
+              </div>
+              <div class="result-row">
+                <span class="result-row-label" data-i18n="t2b_result_saving_czk_label">Úspora (Kč)</span>
+                <span class="result-row-value" id="t2b-result-saving-czk"></span>
+              </div>
+              <div class="result-row">
+                <span class="result-row-label" data-i18n="t2b_result_saving_pct_label">Úspora (%)</span>
+                <span class="result-row-value" id="t2b-result-saving-pct"></span>
+              </div>
+              <div class="result-row">
+                <span class="result-row-label" data-i18n="t2b_result_ratio_label">Podíl z původní ceny</span>
+                <span class="result-row-value" id="t2b-result-ratio"></span>
+              </div>
+              <!-- T2-7: jen když byl model převzat ze Should-cost -->
+              <div class="result-row" id="t2b-model-row" hidden>
+                <span class="result-row-label" data-i18n="t2b_result_model_label">Should-cost model</span>
+                <span class="result-row-value" id="t2b-result-model"></span>
+              </div>
+              <div class="result-row" id="t2b-model-gap-row" hidden>
+                <span class="result-row-label" data-i18n="t2b_result_model_gap_label">Cílová cena minus model</span>
+                <span class="result-row-value" id="t2b-result-model-gap"></span>
+              </div>
             </div>
-            <div class="result-row">
-              <span class="result-row-label" data-i18n="t2b_result_saving_czk_label">Úspora (Kč)</span>
-              <span class="result-row-value" id="t2b-result-saving-czk"></span>
-            </div>
-            <div class="result-row">
-              <span class="result-row-label" data-i18n="t2b_result_saving_pct_label">Úspora (%)</span>
-              <span class="result-row-value" id="t2b-result-saving-pct"></span>
-            </div>
-            <div class="result-row">
-              <span class="result-row-label" data-i18n="t2b_result_ratio_label">Podíl z původní ceny</span>
-              <span class="result-row-value" id="t2b-result-ratio"></span>
-            </div>
+            <div class="result-interpretation" id="t2b-interpretation"></div>
           </div>
-          <div class="result-interpretation" id="t2b-interpretation"></div>
+          <!-- D4: kopírování výsledku; je uvnitř výsledku, bez výsledku se tedy nezobrazí -->
+          <div class="copy-result" id="t2b-copy-bar">
+            <button type="button" class="btn-copy-result" id="t2b-copy" data-i18n="copy_result">Kopírovat výsledek</button>
+            <p class="copy-result-status" id="t2b-copy-status" role="status"></p>
+          </div>
         </div>
 
+
+        <!-- D2b: přenos hodnot do jiného toolboxu (cookie, při selhání ruční JSON) -->
+        <div class="xfer-box" id="t2b-xfer">
+          <a id="t2b-xfer-btn" class="btn-xfer" data-tool-link="1d" aria-disabled="true" aria-describedby="t2b-xfer-hint" data-i18n="xfer_btn_t1d">Přenést do kalkulačky úspor ↗</a>
+          <span id="t2b-xfer-hint" class="xfer-hint" data-i18n="xfer_need_result_2b">Nejdřív spočítejte cílovou cenu.</span>
+          <p id="t2b-xfer-status" class="xfer-note" role="status"></p>
+          <details id="t2b-xfer-fallback" class="xfer-details">
+            <summary data-i18n="xfer_manual">Přenést ručně (kopírovat data)</summary>
+            <p data-i18n="xfer_fallback_intro">Automatický přenos tady nefunguje (soubor otevřený z disku, vložení do cizí stránky nebo zablokované cookies). Zkopírujte data, otevřete cílový nástroj a vložte je do pole „Vložit data z jiného nástroje“.</p>
+            <label for="t2b-xfer-json" data-i18n="xfer_json_label">Data pro cílový nástroj</label>
+            <textarea id="t2b-xfer-json" class="xfer-json" rows="4" readonly></textarea>
+            <div class="xfer-actions">
+              <button type="button" class="btn-xfer" id="t2b-xfer-copy" data-i18n="xfer_copy">Kopírovat data</button>
+              <a id="t2b-xfer-open" class="btn-xfer" data-tool-link="1d" data-i18n="xfer_open_target">Otevřít cílový nástroj ↗</a>
+            </div>
+          </details>
+        </div>
         <button class="btn-reset" id="t2b-reset" data-i18n="btn_reset">Resetovat</button>
       </div>
     </section>
@@ -830,37 +936,75 @@
           <span id="t2c-overhead-err" class="error-msg" role="alert"></span>
         </div>
 
+        <!-- T2-6b: způsob zadání zisku -->
         <div class="input-group">
-          <label for="t2c-margin" data-i18n="t2c_margin">Zisk dodavatele (částka, Kč)</label>
+          <label for="t2c-profit-mode" data-i18n="t2c_profit_mode">Zisk dodavatele zadávám jako</label>
+          <select id="t2c-profit-mode" class="input-field" aria-describedby="t2c-profit-help">
+            <option value="amount" data-i18n="t2c_profit_mode_amount">Částku</option>
+            <option value="markup" data-i18n="t2c_profit_mode_markup">Přirážku k nákladům (%)</option>
+            <option value="margin" data-i18n="t2c_profit_mode_margin">Marži z prodejní ceny (%)</option>
+          </select>
+          <p class="tool-desc" id="t2c-profit-help" data-i18n="t2c_profit_help_amount">Zisk na jednotku se přičte k nákladům.</p>
+        </div>
+
+        <div class="input-group">
+          <label for="t2c-margin" id="t2c-margin-label" data-i18n="t2c_margin">Zisk dodavatele (částka, Kč)</label>
           <input type="text" inputmode="decimal" autocomplete="off" id="t2c-margin" class="input-field" aria-describedby="t2c-margin-err" placeholder="0">
           <span id="t2c-margin-err" class="error-msg" role="alert"></span>
         </div>
 
+        <!-- T2-7: nabídka dodavatele pro porovnání s modelem -->
+        <div class="input-group">
+          <label for="t2c-offer" data-i18n="t2c_offer">Nabídková cena dodavatele (Kč, nepovinné)</label>
+          <input type="text" inputmode="decimal" autocomplete="off" id="t2c-offer" class="input-field" aria-describedby="t2c-offer-err" placeholder="0">
+          <span id="t2c-offer-err" class="error-msg" role="alert"></span>
+        </div>
+
         <!-- Výsledky -->
         <div class="result-box" id="t2c-result">
-          <div class="result-grid">
-            <div class="result-row">
-              <span class="result-row-label" data-i18n="t2c_result_total">Odhadovaná férová cena</span>
-              <span class="result-row-value" id="t2c-result-total"></span>
+          <div id="t2c-copy-src">
+            <div class="result-grid">
+              <div class="result-row">
+                <span class="result-row-label" data-i18n="t2c_result_total">Odhadovaná férová cena</span>
+                <span class="result-row-value" id="t2c-result-total"></span>
+              </div>
+              <div class="result-row" id="t2c-profit-row">
+                <span class="result-row-label" data-i18n="t2c_result_profit">Zisk dodavatele v modelu</span>
+                <span class="result-row-value" id="t2c-result-profit"></span>
+              </div>
+              <div class="result-row" id="t2c-offer-row" hidden>
+                <span class="result-row-label" data-i18n="t2c_result_offer">Nabídková cena</span>
+                <span class="result-row-value" id="t2c-result-offer"></span>
+              </div>
+              <div class="result-row" id="t2c-gap-row" hidden>
+                <span class="result-row-label" id="t2c-result-gap-label"></span>
+                <span class="result-row-value" id="t2c-result-gap"></span>
+              </div>
             </div>
-          </div>
 
-          <div data-i18n="t2c_breakdown_heading"
-               style="font-size: var(--font-size-sm); font-weight: 600; margin: var(--space-sm) 0 var(--space-xs);">
-            Rozpad po složkách
-          </div>
-          <table class="tco-breakdown-table" id="t2c-breakdown-table">
-            <thead>
-              <tr>
-                <th data-i18n="t2c_breakdown_col_name">Složka</th>
-                <th data-i18n="t2c_breakdown_col_value">Kč</th>
-                <th data-i18n="t2c_breakdown_col_pct">%</th>
-              </tr>
-            </thead>
-            <tbody id="t2c-breakdown-body"></tbody>
-          </table>
+            <div data-i18n="t2c_breakdown_heading"
+                 style="font-size: var(--font-size-sm); font-weight: 600; margin: var(--space-sm) 0 var(--space-xs);">
+              Rozpad po složkách
+            </div>
+            <table class="tco-breakdown-table" id="t2c-breakdown-table">
+              <thead>
+                <tr>
+                  <th data-i18n="t2c_breakdown_col_name">Složka</th>
+                  <th data-i18n="t2c_breakdown_col_value">Kč</th>
+                  <th data-i18n="t2c_breakdown_col_pct">%</th>
+                </tr>
+              </thead>
+              <tbody id="t2c-breakdown-body"></tbody>
+            </table>
 
-          <div class="result-interpretation" id="t2c-interpretation"></div>
+            <div class="result-interpretation" id="t2c-interpretation"></div>
+          </div>
+          <button type="button" class="btn-reset" id="t2c-use-target" data-i18n="t2c_use_target" hidden>Použít v Target price</button>
+          <!-- D4: kopírování výsledku; je uvnitř výsledku, bez výsledku se tedy nezobrazí -->
+          <div class="copy-result" id="t2c-copy-bar">
+            <button type="button" class="btn-copy-result" id="t2c-copy" data-i18n="copy_result">Kopírovat výsledek</button>
+            <p class="copy-result-status" id="t2c-copy-status" role="status"></p>
+          </div>
 
           <div class="chart-container">
             <canvas id="chart-2c-shouldcost" height="300"></canvas>
@@ -901,6 +1045,13 @@
           >%</button>
         </div>
 
+        <!-- T2-9: nabídková cena jen v režimu %, podíly se z ní přepočtou na částky -->
+        <div class="input-group" id="t2d-offer-group" hidden>
+          <label for="t2d-offer" data-i18n="t2d_offer">Nabídková cena (Kč, nepovinné)</label>
+          <input type="text" inputmode="decimal" autocomplete="off" id="t2d-offer" class="input-field" aria-describedby="t2d-offer-err" placeholder="0">
+          <span id="t2d-offer-err" class="error-msg" role="alert"></span>
+        </div>
+
         <!-- Dynamický seznam složek -->
         <div id="t2d-rows-container">
           <!-- Řádky generovány JS -->
@@ -924,6 +1075,10 @@
             <div class="result-row">
               <span class="result-row-label" id="t2d-result-total-label" data-i18n="t2d_result_total">Celková hodnota</span>
               <span class="result-row-value" id="t2d-result-total"></span>
+            </div>
+            <div class="result-row" id="t2d-offer-row" hidden>
+              <span class="result-row-label" data-i18n="t2d_result_offer">Nabídková cena rozdělená podle podílů</span>
+              <span class="result-row-value" id="t2d-result-offer"></span>
             </div>
           </div>
 
@@ -962,6 +1117,18 @@
     /* ===== i18n TEXTS ===== */
     const TEXTS = {
       cs: {
+        // D2/D2b: odkazy a přenos hodnot mezi nástroji (T-016)
+        xfer_manual: 'Přenést ručně (kopírovat data)',
+        xfer_fallback_intro: 'Automatický přenos tady nefunguje (soubor otevřený z disku, vložení do cizí stránky nebo zablokované cookies). Zkopírujte data, otevřete cílový nástroj a vložte je do pole „Vložit data z jiného nástroje“.',
+        xfer_fallback_short: 'Automatický přenos tady nefunguje, data přeneste ručně níže.',
+        xfer_json_label: 'Data pro cílový nástroj',
+        xfer_copy: 'Kopírovat data',
+        xfer_copied: 'Zkopírováno.',
+        xfer_selected: 'Text je označený, zkopírujte ho Ctrl+C (Cmd+C).',
+        xfer_open_target: 'Otevřít cílový nástroj ↗',
+        xfer_btn_t1d: 'Přenést do kalkulačky úspor ↗',
+        xfer_need_result_2b: 'Nejdřív spočítejte cílovou cenu.',
+        t2a_link_1d: 'Porovnat dvě jednotkové ceny a úsporu v kalkulačce úspor ↗',
         // Tab labels
         tab2a: 'TCO',
         tab2b: 'Target price',
@@ -976,6 +1143,9 @@
 
         // Shared buttons
         btn_reset: 'Resetovat',
+        copy_result: 'Kopírovat výsledek',
+        copy_done: 'Výsledek zkopírován.',
+        copy_selected: 'Text je označený, zkopírujte ho Ctrl+C (Cmd+C).',
 
         // Placeholders
         placeholder_msg:    'Bude implementováno v T-006',
@@ -992,17 +1162,26 @@
         t2a_maintenance: 'Údržba/rok ({currency})',
         t2a_storage:     'Skladování/rok ({currency})',
         t2a_custom1_name:  'Vlastní položka 1 – název',
-        t2a_custom1_value: 'Vlastní položka 1 – jednorázová částka ({currency})',
+        t2a_custom1_value: 'Vlastní položka 1 – částka ({currency})',
         t2a_custom2_name:  'Vlastní položka 2 – název',
-        t2a_custom2_value: 'Vlastní položka 2 – jednorázová částka ({currency})',
+        t2a_custom2_value: 'Vlastní položka 2 – částka ({currency})',
+        t2a_custom1_period: 'Vlastní položka 1 – jak často se platí',
+        t2a_custom2_period: 'Vlastní položka 2 – jak často se platí',
+        t2a_period_once:    'Jednorázově',
+        t2a_period_annual:  'Ročně',
+        t2a_period_monthly: 'Měsíčně',
+        t2a_residual:       'Zůstatková hodnota na konci životnosti ({currency})',
+        t2a_residual_row:   'Zůstatková hodnota',
+        t2a_interp_residual: ' Zůstatková hodnota {residual} {currency} je od TCO odečtená, podíly v tabulce jsou z nákladů před odečtením.',
+        err_t2a_residual_exceeds: 'Zůstatková hodnota nesmí být vyšší než součet nákladů.',
         t2a_custom1_default: 'Vlastní položka 1',
         t2a_custom2_default: 'Vlastní položka 2',
         t2a_custom_name_ph: 'např. Pojištění',
-        t2a_years:        'Životnost (roky, povinná při ročních nákladech)',
+        t2a_years:        'Životnost (roky, povinná při ročních a měsíčních nákladech)',
         t2a_years_ph:     'např. 5',
         t2a_howto_title:  'Jak počítáme TCO',
-        t2a_howto_body:   'TCO = jednorázové náklady (nákupní cena, doprava, instalace, vlastní položky) + roční náklady (servis, údržba, skladování) × životnost v letech. TCO / rok = TCO ÷ životnost, TCO / měsíc = TCO / rok ÷ 12. Bez ročních nákladů se životnost zadávat nemusí.',
-        err_t2a_years_required: 'Zadejte životnost, roční náklady se násobí počtem let.',
+        t2a_howto_body:   'TCO = jednorázové náklady (nákupní cena, doprava, instalace) + roční náklady (servis, údržba, skladování) × životnost v letech + měsíční náklady × 12 × životnost − zůstatková hodnota. Vlastní položky se započtou podle zvolené periodicity. TCO / rok = TCO ÷ životnost, TCO / měsíc = TCO / rok ÷ 12. Bez ročních a měsíčních nákladů se životnost zadávat nemusí.',
+        err_t2a_years_required: 'Zadejte životnost, roční a měsíční náklady se násobí počtem let.',
         t2a_ph_zero:      '0',
 
         t2a_optional_label: 'Zobrazit další náklady',
@@ -1034,6 +1213,14 @@
         t2b_result_saving_pct_label: 'Úspora (%)',
         t2b_result_ratio_label: 'Podíl z původní ceny',
         t2b_interp:             'Cílová cena je {target} {currency}, to je úspora {saving} {currency} ({pct} %) oproti aktuální ceně.',
+        t2b_interp_zero:        'Bez úspory: cílová cena se rovná aktuální ceně {target} {currency}.',
+        t2b_result_model_label: 'Should-cost model',
+        t2b_result_model_gap_label: 'Cílová cena proti modelu',
+        t2b_model_note:         'Převzato ze Should-cost: nabídka {offer} {currency}, model {model} {currency}. Úspora je předvyplněná tak, aby cílová cena odpovídala modelu.',
+        t2b_gap_below_costs:    ' Cíl je o {amount} {currency} pod modelem a dokonce pod zadanými náklady bez zisku ({costs} {currency}). Prověřte předpoklady, specifikaci nebo úsporu v procesu.',
+        t2b_gap_below_model:    ' Cíl je o {amount} {currency} pod modelem. Je potřeba najít konkrétní zdroj úspory nebo změnit předpoklad zisku.',
+        t2b_gap_at_model:       ' Cíl odpovídá modelu.',
+        t2b_gap_above_model:    ' Cíl je o {amount} {currency} nad modelem. Podle modelu je prostor vyjednat i nižší cenu.',
 
         // Nástroj 2c: Should-cost
         t2c_title:    'Should-cost kalkulačka',
@@ -1043,6 +1230,25 @@
         t2c_energy:   'Energie ({currency})',
         t2c_overhead: 'Režie ({currency})',
         t2c_margin:   'Zisk dodavatele (částka, {currency})',
+        t2c_margin_markup: 'Přirážka k nákladům (%)',
+        t2c_margin_margin: 'Marže z prodejní ceny (%)',
+        t2c_profit_mode:        'Zisk dodavatele zadávám jako',
+        t2c_profit_mode_amount: 'Částku',
+        t2c_profit_mode_markup: 'Přirážku k nákladům (%)',
+        t2c_profit_mode_margin: 'Marži z prodejní ceny (%)',
+        t2c_profit_help_amount: 'Zisk na jednotku se přičte k nákladům.',
+        t2c_profit_help_markup: 'Procento se počítá z nákladů. Příklad: náklady 100 {currency} + přirážka 20 % = cena 120 {currency}.',
+        t2c_profit_help_margin: 'Procento říká, jakou část prodejní ceny tvoří zisk. Příklad: náklady 100 {currency} a marže 20 % = cena 125 {currency}, zisk 25 {currency} je 20 % ze 125.',
+        t2c_profit_row:   'Zisk dodavatele',
+        t2c_offer:        'Nabídková cena dodavatele ({currency}, nepovinné)',
+        t2c_result_profit: 'Zisk dodavatele v modelu',
+        t2c_result_offer:  'Nabídková cena',
+        t2c_gap_offer_above: 'Nabídka převyšuje model o',
+        t2c_gap_model_above: 'Model převyšuje nabídku o',
+        t2c_gap_equal:       'Nabídka odpovídá modelu',
+        t2c_gap_pct:         '{pct} % nabídky',
+        t2c_gap_interp:      ' Rozdíl mezi nabídkou a modelem je podklad pro otázky na dodavatele, sám o sobě nedokazuje nadměrnou cenu.',
+        t2c_use_target:      'Použít v Target price',
 
         t2c_result_total:       'Odhadovaná férová cena',
         t2c_breakdown_heading:  'Rozpad po složkách',
@@ -1054,10 +1260,13 @@
 
         // Chybové zprávy 2c
         err_t2c_min_one: 'Alespoň jedna složka musí být větší než 0',
+        err_t2c_margin_max: 'Marže musí být menší než 100 %.',
+        err_t2c_profit_needs_costs: 'Pro zisk v procentech doplňte nákladové složky.',
+        err_offer_positive: 'Zadejte nabídkovou cenu větší než 0.',
 
         // Chybové zprávy 2b
         err_t2b_base_required:  'Zadejte aktuální cenu větší než 0',
-        err_t2b_saving_required:'Zadejte úsporu větší než 0',
+        err_t2b_saving_required:'Zadejte požadovanou úsporu (0 nebo více).',
         err_t2b_pct_max:        'Úspora nesmí překročit 100 %',
         err_t2b_saving_exceeds: 'Úspora nesmí být vyšší než aktuální cena.',
 
@@ -1091,6 +1300,9 @@
 
         t2d_interp: 'Celkový rozpad zahrnuje {count} složek v hodnotě {total} {currency}. Největší položkou je {top} ({topPct} %).',
         t2d_interp_pct: 'Celkový rozpad zahrnuje {count} složek. Největší položkou je {top} ({topPct} %).',
+        t2d_interp_offer: ' Z nabídky {offer} {currency} na ni připadá {amount} {currency}.',
+        t2d_offer:        'Nabídková cena ({currency}, nepovinné)',
+        t2d_result_offer: 'Nabídková cena rozdělená podle podílů',
 
         t2d_pct_warning:    'Součet podílů je {sum} %, musí být 100 % (tolerance 0,1 p. b.). Rozpad se nezobrazí.',
         t2d_bar_notice:     'Složek je více než 6 – zobrazuji sloupcový graf pro lepší přehlednost.',
@@ -1100,6 +1312,18 @@
         t2d_err_min_two:        'Zadejte alespoň dvě složky s hodnotou větší než 0',
       },
       en: {
+        // D2/D2b: odkazy a přenos hodnot mezi nástroji (T-016)
+        xfer_manual: 'Transfer manually (copy data)',
+        xfer_fallback_intro: 'Automatic transfer is not available here (file opened from disk, embedded in another site or cookies blocked). Copy the data, open the target tool and paste it into "Paste data from another tool".',
+        xfer_fallback_short: 'Automatic transfer does not work here, transfer the data manually below.',
+        xfer_json_label: 'Data for the target tool',
+        xfer_copy: 'Copy data',
+        xfer_copied: 'Copied.',
+        xfer_selected: 'Text is selected, copy it with Ctrl+C (Cmd+C).',
+        xfer_open_target: 'Open the target tool ↗',
+        xfer_btn_t1d: 'Send to savings calculator ↗',
+        xfer_need_result_2b: 'Calculate the target price first.',
+        t2a_link_1d: 'Compare two unit prices and the saving in the savings calculator ↗',
         // Tab labels
         tab2a: 'TCO',
         tab2b: 'Target price',
@@ -1114,6 +1338,9 @@
 
         // Shared buttons
         btn_reset: 'Reset',
+        copy_result: 'Copy result',
+        copy_done: 'Result copied.',
+        copy_selected: 'Text is selected, copy it with Ctrl+C (Cmd+C).',
 
         // Placeholders
         placeholder_msg:    'Will be implemented in T-006',
@@ -1130,17 +1357,26 @@
         t2a_maintenance: 'Maintenance/year ({currency})',
         t2a_storage:     'Storage/year ({currency})',
         t2a_custom1_name:  'Custom item 1 – name',
-        t2a_custom1_value: 'Custom item 1 – one-off amount ({currency})',
+        t2a_custom1_value: 'Custom item 1 – amount ({currency})',
         t2a_custom2_name:  'Custom item 2 – name',
-        t2a_custom2_value: 'Custom item 2 – one-off amount ({currency})',
+        t2a_custom2_value: 'Custom item 2 – amount ({currency})',
+        t2a_custom1_period: 'Custom item 1 – how often it is paid',
+        t2a_custom2_period: 'Custom item 2 – how often it is paid',
+        t2a_period_once:    'One-off',
+        t2a_period_annual:  'Per year',
+        t2a_period_monthly: 'Per month',
+        t2a_residual:       'Residual value at end of life ({currency})',
+        t2a_residual_row:   'Residual value',
+        t2a_interp_residual: ' The residual value of {residual} {currency} is deducted from TCO; shares in the table refer to costs before the deduction.',
+        err_t2a_residual_exceeds: 'Residual value must not exceed the total costs.',
         t2a_custom1_default: 'Custom item 1',
         t2a_custom2_default: 'Custom item 2',
         t2a_custom_name_ph: 'e.g. Insurance',
-        t2a_years:        'Useful life (years, required with annual costs)',
+        t2a_years:        'Useful life (years, required with annual or monthly costs)',
         t2a_years_ph:     'e.g. 5',
         t2a_howto_title:  'How we calculate TCO',
-        t2a_howto_body:   'TCO = one-off costs (purchase price, freight, installation, custom items) + annual costs (service, maintenance, storage) × useful life in years. TCO / year = TCO ÷ useful life, TCO / month = TCO / year ÷ 12. Without annual costs the useful life is not needed.',
-        err_t2a_years_required: 'Enter the useful life, annual costs are multiplied by the number of years.',
+        t2a_howto_body:   'TCO = one-off costs (purchase price, freight, installation) + annual costs (service, maintenance, storage) × useful life in years + monthly costs × 12 × useful life − residual value. Custom items are counted according to the selected frequency. TCO / year = TCO ÷ useful life, TCO / month = TCO / year ÷ 12. Without annual or monthly costs the useful life is not needed.',
+        err_t2a_years_required: 'Enter the useful life, annual and monthly costs are multiplied by the number of years.',
         t2a_ph_zero:      '0',
 
         t2a_optional_label:      'Show additional costs',
@@ -1172,6 +1408,14 @@
         t2b_result_saving_pct_label: 'Saving (%)',
         t2b_result_ratio_label: 'Share of original price',
         t2b_interp:             'Target price is {target} {currency}, a saving of {saving} {currency} ({pct} %) vs. current price.',
+        t2b_interp_zero:        'No saving: the target price equals the current price of {target} {currency}.',
+        t2b_result_model_label: 'Should-cost model',
+        t2b_result_model_gap_label: 'Target price vs. model',
+        t2b_model_note:         'Taken from Should-cost: offer {offer} {currency}, model {model} {currency}. The saving is prefilled so that the target price equals the model.',
+        t2b_gap_below_costs:    ' The target is {amount} {currency} below the model and even below the entered costs without profit ({costs} {currency}). Check the assumptions, the specification or process savings.',
+        t2b_gap_below_model:    ' The target is {amount} {currency} below the model. A specific source of savings is needed, or a different profit assumption.',
+        t2b_gap_at_model:       ' The target matches the model.',
+        t2b_gap_above_model:    ' The target is {amount} {currency} above the model. According to the model there is room to negotiate a lower price.',
 
         // Tool 2c: Should-cost
         t2c_title:    'Should-cost calculator',
@@ -1181,6 +1425,25 @@
         t2c_energy:   'Energy ({currency})',
         t2c_overhead: 'Overhead ({currency})',
         t2c_margin:   'Supplier profit (amount, {currency})',
+        t2c_margin_markup: 'Markup on costs (%)',
+        t2c_margin_margin: 'Margin on selling price (%)',
+        t2c_profit_mode:        'Supplier profit entered as',
+        t2c_profit_mode_amount: 'Amount',
+        t2c_profit_mode_markup: 'Markup on costs (%)',
+        t2c_profit_mode_margin: 'Margin on selling price (%)',
+        t2c_profit_help_amount: 'The profit per unit is added to the costs.',
+        t2c_profit_help_markup: 'The percentage is applied to costs. Example: costs 100 {currency} + 20 % markup = price 120 {currency}.',
+        t2c_profit_help_margin: 'The percentage is the share of the selling price that is profit. Example: costs 100 {currency} and 20 % margin = price 125 {currency}, profit 25 {currency} is 20 % of 125.',
+        t2c_profit_row:   'Supplier profit',
+        t2c_offer:        'Supplier offer price ({currency}, optional)',
+        t2c_result_profit: 'Supplier profit in the model',
+        t2c_result_offer:  'Offer price',
+        t2c_gap_offer_above: 'Offer exceeds the model by',
+        t2c_gap_model_above: 'Model exceeds the offer by',
+        t2c_gap_equal:       'Offer matches the model',
+        t2c_gap_pct:         '{pct} % of the offer',
+        t2c_gap_interp:      ' The gap between offer and model is a basis for questions to the supplier; on its own it does not prove the price is excessive.',
+        t2c_use_target:      'Use in Target price',
 
         t2c_result_total:       'Estimated fair price',
         t2c_breakdown_heading:  'Breakdown by component',
@@ -1192,10 +1455,13 @@
 
         // Error messages 2c
         err_t2c_min_one: 'At least one component must be greater than 0',
+        err_t2c_margin_max: 'Margin must be less than 100 %.',
+        err_t2c_profit_needs_costs: 'Enter cost components to apply a percentage profit.',
+        err_offer_positive: 'Enter an offer price greater than 0.',
 
         // Error messages 2b
         err_t2b_base_required:  'Enter a current price greater than 0',
-        err_t2b_saving_required:'Enter a saving greater than 0',
+        err_t2b_saving_required:'Enter the required saving (0 or more).',
         err_t2b_pct_max:        'Saving must not exceed 100 %',
         err_t2b_saving_exceeds: 'Saving must not exceed the current price.',
 
@@ -1229,6 +1495,9 @@
 
         t2d_interp: 'The breakdown includes {count} components totalling {total} {currency}. The largest item is {top} ({topPct} %).',
         t2d_interp_pct: 'The breakdown includes {count} components. The largest item is {top} ({topPct} %).',
+        t2d_interp_offer: ' Of the {offer} {currency} offer, it accounts for {amount} {currency}.',
+        t2d_offer:        'Offer price ({currency}, optional)',
+        t2d_result_offer: 'Offer price split by shares',
 
         t2d_pct_warning:    'Shares add up to {sum} %, they must total 100 % (tolerance 0.1 pp). No breakdown is shown.',
         t2d_bar_notice:     'More than 6 components – switching to bar chart for better readability.',
@@ -1240,6 +1509,338 @@
     };
 
     let currentLang = 'cs';
+
+    /* ===== D2: KONFIGURACE ODKAZŮ MEZI NÁSTROJI (pro admina webu) =====
+       Hodnoty mají být stejné ve všech šesti souborech.
+       TOOLBOX_LINKS        adresa každého toolboxu: soubor vedle tohoto, nebo URL stránky CMS. Prázdná hodnota odkaz
+                            (i tlačítko přenosu hodnot do toho toolboxu) skryje.
+       TOOLBOX_LINK_TARGET  '_top' (výchozí; při vložení přes <iframe> otevře celou stránku), '_self' (inline vložení
+                            do stránky CMS), '_blank' (nová karta).
+       TOOLBOX_DEEP_LINK    false = odkaz bez #tool=… otevře výchozí tab. Použít při vložení přes <iframe>, kde by kotva
+                            zůstala na rodičovské stránce; jinak samostatné stránky CMS s <iframe src="…?tool=3b">.
+       Vložení přes <iframe>: přidat allow="clipboard-write", jinak tlačítka kopírování text jen označí.
+       Cookie procuppa_xfer, text pro cookie lištu webu (kategorie technicky nezbytné, souhlas se nevyžaduje):
+         CZ: procuppa_xfer – technicky nezbytná cookie. Vznikne jen po kliknutí na „Přenést do …“ a přenese zadaná čísla
+             do jiného nástroje toolboxu. Neobsahuje osobní údaje, neslouží k měření ani reklamě, platí nejvýš 10 minut
+             a cílový nástroj ji po přečtení hned smaže.
+         EN: procuppa_xfer – strictly necessary cookie. It is set only when you click "Send to …" and carries the numbers
+             you entered to another toolbox tool. It contains no personal data, is not used for analytics or advertising,
+             lasts at most 10 minutes and is deleted as soon as the target tool reads it. */
+    const TOOLBOX_LINKS = {
+      t1: 'toolbox-1-kalkulacky.html',
+      t2: 'toolbox-2-naklady.html',
+      t3: 'toolbox-3-dodavatele.html',
+      t4: 'toolbox-4-logistika.html',
+      t5: 'toolbox-5-finance.html',
+      t6: 'toolbox-6-rychla-pomoc.html',
+    };
+    const TOOLBOX_LINK_TARGET = '_top';   // '_top' | '_self' | '_blank'
+    const TOOLBOX_DEEP_LINK = true;       // false = odkaz bez #tool=… (otevře výchozí tab)
+    const TOOLBOX_TOOLS = ['2a', '2b', '2c', '2d'];   // taby tohoto souboru (router)
+
+    /* ===== D2: ROUTER #tool= A ODKAZY =====
+       Blok mezi značkami ROUTER-SHARED je ve všech šesti toolboxech textově shodný (hlídá iter-013-gates.js, brána R).
+       Každý soubor má vlastní activateToolById(id, { focus, remember }) nad svými taby.
+       Kotva #tool=3b se záměrně neshoduje s id panelu, takže prohlížeč ani CMS na ni po načtení neskočí. */
+    // ROUTER-SHARED-BEGIN
+    const TOOL_ID = /^[1-6][a-f]$/;
+
+    /** Nástroj z adresy: #tool=3b, nebo ?tool=3b (i mezi jinými parametry). Jiné kotvy a tvary → null. */
+    function toolFromLocation() {
+      let hash = '', search = '';
+      try { hash = String(location.hash || ''); search = String(location.search || ''); } catch (e) { return null; }
+      const h = hash.match(/^#tool=([1-6][a-f])$/);
+      if (h) return h[1];
+      const q = search.replace(/^\?/, '').split('&').map(p => p.match(/^tool=([1-6][a-f])$/)).find(Boolean);
+      return q ? q[1] : null;
+    }
+
+    /** Odkaz na nástroj podle TOOLBOX_LINKS a TOOLBOX_DEEP_LINK; '' = odkaz skrýt. */
+    function toolboxHref(tool) {
+      if (!TOOL_ID.test(String(tool))) return '';
+      const file = TOOLBOX_LINKS['t' + String(tool).charAt(0)];
+      if (typeof file !== 'string' || file === '') return '';
+      return TOOLBOX_DEEP_LINK ? file + '#tool=' + tool : file;
+    }
+
+    /** Odkaz <a data-tool-link="1d"> dostane href a target; bez adresy se skryje. → true, když odkaz platí. */
+    function setToolLink(a, tool) {
+      const href = toolboxHref(tool);
+      a.hidden = !href;
+      if (!href) { a.removeAttribute('href'); return false; }
+      a.setAttribute('href', href);
+      a.setAttribute('target', TOOLBOX_LINK_TARGET);
+      if (TOOLBOX_LINK_TARGET === '_blank') a.setAttribute('rel', 'noopener');
+      else a.removeAttribute('rel');
+      return true;
+    }
+
+    /** Výběr tabu uživatelem: kotva v adrese bez nové položky historie (tlačítko Zpět neprochází taby). */
+    function rememberTool(tool) {
+      try { history.replaceState(null, '', '#tool=' + tool); } catch (e) { /* sandbox nebo file:// bez history */ }
+    }
+
+    /** Načtení: tab z adresy bez přesunu fokusu. Změna kotvy (hashchange): tab a fokus na jeho tlačítko. */
+    function initRouter() {
+      document.querySelectorAll('[data-tool-link]').forEach(a => setToolLink(a, a.getAttribute('data-tool-link')));
+      const tool = toolFromLocation();
+      if (tool) activateToolById(tool, { focus: false, remember: false });
+      window.addEventListener('hashchange', () => {
+        const t = toolFromLocation();
+        if (t) activateToolById(t, { focus: true, remember: false });
+      });
+    }
+    // ROUTER-SHARED-END
+
+    /* ===== D2b: PŘEDÁVÁNÍ HODNOT MEZI SOUBORY =====
+       Blok mezi značkami XFER-SHARED je ve všech šesti toolboxech textově shodný
+       (hlídá iter-013-gates.js, G5). Neměnit v jednom souboru bez ostatních.
+       Nezávisí na D1 ani na DOM konkrétního souboru; routy a texty má každý soubor vlastní. */
+    // XFER-SHARED-BEGIN
+    const XFER_COOKIE = 'procuppa_xfer';
+    const XFER_VERSION = 1;
+    const XFER_MAX_AGE = 600;      // s, cookie i kontrola ts
+    const XFER_MAX_BYTES = 1024;   // délka zakódované hodnoty cookie
+    const XFER_MAX_PASTE = 2000;   // znaků ve vkládacím poli
+    const XFER_MAX_DP = 6;         // desetinná místa čísla v payloadu
+    const XFER_ID = /^t([1-6])-\1[a-d]$/;
+    const xferHas = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
+
+    function xferAttrs(maxAge) {
+      return '; path=/; max-age=' + maxAge + '; SameSite=Lax' + (location.protocol === 'https:' ? '; Secure' : '');
+    }
+
+    /** Surová (zakódovaná) hodnota cookie, nebo null. */
+    function xferRead() {
+      let all = '';
+      try { all = String(document.cookie || ''); } catch (e) { return null; }
+      const hit = all.split(/;\s*/).find(c => c.indexOf(XFER_COOKIE + '=') === 0);
+      return hit ? hit.slice(XFER_COOKIE.length + 1) : null;
+    }
+
+    function xferClear() {
+      try { document.cookie = XFER_COOKIE + '=' + xferAttrs(0); } catch (e) { /* cookies zablokované */ }
+    }
+
+    function xferMake(from, to, values, now = Date.now()) {
+      return { v: XFER_VERSION, from, to, ts: now, values };
+    }
+
+    /** Zápis a zpětné čtení. → { ok, reason?, json }; json se při neúspěchu nabídne ke zkopírování. */
+    function xferSend(payload) {
+      const json = JSON.stringify(payload);
+      const enc = encodeURIComponent(json);
+      if (enc.length > XFER_MAX_BYTES) return { ok: false, reason: 'tooLarge', json };
+      try { document.cookie = XFER_COOKIE + '=' + enc + xferAttrs(XFER_MAX_AGE); } catch (e) { return { ok: false, reason: 'blocked', json }; }
+      return xferRead() === enc ? { ok: true, json } : { ok: false, reason: 'blocked', json };
+    }
+
+    /** Text (cookie nebo vložený JSON) → { payload } | { error }. */
+    function xferParse(text) {
+      if (typeof text !== 'string' || text.trim() === '') return { error: 'empty' };
+      if (text.length > XFER_MAX_PASTE) return { error: 'tooLarge' };
+      let p;
+      try { p = JSON.parse(text); } catch (e) { return { error: 'badJson' }; }
+      if (!p || typeof p !== 'object' || Array.isArray(p)) return { error: 'badJson' };
+      if (p.v !== XFER_VERSION) return { error: 'version' };
+      if (typeof p.from !== 'string' || typeof p.to !== 'string' || !XFER_ID.test(p.from) || !XFER_ID.test(p.to)) return { error: 'badRoute' };
+      if (typeof p.ts !== 'number' || !Number.isFinite(p.ts)) return { error: 'badJson' };
+      if (!p.values || typeof p.values !== 'object' || Array.isArray(p.values)) return { error: 'badValues' };
+      return { payload: p };
+    }
+
+    function xferNumError(v, spec) {
+      if (typeof v !== 'number' || !Number.isFinite(v)) return 'badValue';
+      if (Number(v.toFixed(spec.int ? 0 : XFER_MAX_DP)) !== v) return 'badValue';
+      if (v < spec.min || v > spec.max) return 'range';
+      return null;
+    }
+
+    /** Whitelist cíle. → { routeKey, route, fields: [{ key, id, type, value }] } | { error, key? }. */
+    function xferCheck(payload, routes, self) {
+      if (payload.to.slice(0, 2) !== self) return { error: 'otherFile' };
+      const routeKey = payload.from + '>' + payload.to;
+      if (!xferHas(routes, routeKey)) return { error: 'badRoute' };
+      const route = routes[routeKey];
+      const vals = payload.values;
+      for (const k of Object.keys(vals)) if (!xferHas(route.fields, k)) return { error: 'unknownKey', key: k };
+      const fields = [];
+      for (const k of Object.keys(route.fields)) {
+        const spec = route.fields[k];
+        if (!xferHas(vals, k)) { if (spec.required) return { error: 'missing', key: k }; continue; }
+        const v = vals[k];
+        const err = spec.type === 'bool' ? (typeof v === 'boolean' ? null : 'badValue')
+          : spec.type === 'enum' ? (spec.values.indexOf(v) >= 0 ? null : 'badValue')
+          : xferNumError(v, spec);
+        if (err) return { error: err, key: k };
+        fields.push({ key: k, id: spec.id || null, type: spec.type, value: v });
+      }
+      return { routeKey, route, fields };
+    }
+
+    /** Kanonické číslo → text pole v daném jazyce (D1 ho přečte zpět beze změny). */
+    function xferFieldText(n, lang) {
+      const s = String(n);
+      return lang === 'cs' ? s.replace('.', ',') : s;
+    }
+
+    /** Vše, nebo nic. Jen .value a .checked, žádné vkládání HTML. → true | false (chybí prvek). */
+    function xferApply(fields, lang) {
+      const els = fields.map(f => (f.id ? document.getElementById(f.id) : null));
+      if (fields.some((f, i) => f.id && !els[i])) return false;
+      fields.forEach((f, i) => {
+        if (!f.id) return;
+        if (f.type === 'bool') els[i].checked = f.value;
+        else if (f.type === 'enum') els[i].value = f.value;
+        else els[i].value = xferFieldText(f.value, lang);
+      });
+      return true;
+    }
+
+    /** Při načtení: cookie pro tento soubor přečíst a hned smazat (jednorázově, i neplatnou).
+        Cookie jiného souboru nechat být. → null | { payload } | { error }. */
+    function xferTakeCookie(self, now = Date.now()) {
+      const raw = xferRead();
+      if (raw === null) return null;
+      let text;
+      try { text = decodeURIComponent(raw); } catch (e) { xferClear(); return { error: 'badJson' }; }
+      const r = xferParse(text);
+      if (r.payload && r.payload.to.slice(0, 2) !== self) return null;
+      xferClear();
+      if (r.error) return r;
+      if (now - r.payload.ts > XFER_MAX_AGE * 1000 || r.payload.ts - now > 60000) return { error: 'expired' };
+      return r;
+    }
+
+    /** Schránka pro D4 i pro fallback JSON. → Promise<'copied' | 'selected'>.
+        selectEl: textarea/input se označí přes select(), jiný prvek přes Range. */
+    function copyText(text, selectEl) {
+      const fallback = () => {
+        if (!selectEl) return 'selected';
+        try {
+          if (typeof selectEl.select === 'function') { selectEl.focus(); selectEl.select(); }
+          else { const r = document.createRange(); r.selectNodeContents(selectEl); const s = window.getSelection(); s.removeAllRanges(); s.addRange(r); }
+          if (document.execCommand && document.execCommand('copy')) return 'copied';
+        } catch (e) { /* označení zůstane, uživatel zkopíruje ručně */ }
+        return 'selected';
+      };
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(text).then(() => 'copied', fallback);
+      } catch (e) { /* iframe bez clipboard-write */ }
+      return Promise.resolve(fallback());
+    }
+    // XFER-SHARED-END
+
+    /* ===== D4: KOPÍROVAT VÝSLEDEK (T-017) =====
+       Tenká obálka nad copyText z XFER-SHARED, druhá implementace schránky nevzniká. Tlačítko a hláška
+       (role="status") leží uvnitř prvku, který výsledek ukazuje a skrývá, takže bez výsledku nejsou vidět.
+       Kopíruje se innerText obsahu <p>-copy-src: jen viditelný text výsledku, bez tlačítek a grafů. */
+    const COPY_RESULTS = [
+      { btn: 't2a-copy', src: 't2a-copy-src', status: 't2a-copy-status' },
+      { btn: 't2b-copy', src: 't2b-copy-src', status: 't2b-copy-status' },
+      { btn: 't2c-copy', src: 't2c-copy-src', status: 't2c-copy-status' },
+    ];
+    const COPY_STATUS_MS = { copied: 3000, selected: 8000 };
+    const copyStatusTimers = {};
+
+    /** Viditelný text výsledku po řádcích, bez prázdných řádků a okrajových mezer. */
+    function copyResultText(el) {
+      return String(el.innerText || '').split('\n').map(s => s.trim()).filter(Boolean).join('\n');
+    }
+
+    /** D4: zkopíruje výsledek `resultBoxId` a ohlásí to v `feedbackId`. → Promise<'copied' | 'selected'>. */
+    function copyResult(resultBoxId, feedbackId) {
+      const box = document.getElementById(resultBoxId);
+      const status = document.getElementById(feedbackId);
+      return copyText(copyResultText(box), box)
+        .catch(() => 'selected')
+        .then(r => {
+          const T = TEXTS[currentLang];
+          status.textContent = r === 'copied' ? T.copy_done : T.copy_selected;
+          clearTimeout(copyStatusTimers[feedbackId]);
+          copyStatusTimers[feedbackId] = setTimeout(() => { status.textContent = ''; }, COPY_STATUS_MS[r] || COPY_STATUS_MS.selected);
+          return r;
+        });
+    }
+
+    function initCopyResults() {
+      COPY_RESULTS.forEach(c => document.getElementById(c.btn).addEventListener('click', () => copyResult(c.src, c.status)));
+    }
+
+    /* ===== D2b: ZDROJ PŘENOSU – toolbox-2, 2b Target price → toolbox-1, 1d (mapa převodů D2b, řádky 1–3) ===== */
+    let t2bXferResult = null;   // { base, targetPrice, currency } posledního platného výsledku 2b, jinak null
+    const XFER_SOURCES = {
+      t2b: { from: 't2-2b', to: 't1-1d', tool: '1d', need: 'xfer_need_result_2b',
+             values: () => (t2bXferResult ? xferValuesT2b(t2bXferResult) : null) },
+    };
+
+    /** Hodnoty z výsledku targetPrice() (ne z textu v DOM), bez float šumu. */
+    function xferValuesT2b({ base, targetPrice, currency }) {
+      return { orig: xferRound(base), new: xferRound(targetPrice), cur: currency };
+    }
+
+    /* ===== D2b: ZDROJ PŘENOSU – obsluha (stejná v toolbox-2 a toolbox-3) =====
+       Prvky s prefixem nástroje p: <p>-xfer (blok), -xfer-btn (odkaz „Přenést do …“), -xfer-hint, -xfer-status,
+       -xfer-fallback (<details>), -xfer-json (readonly textarea), -xfer-copy. Hodnoty jdou z výsledku výpočtu,
+       nikdy z textu v DOM. */
+
+    /** Stav tlačítka: aktivní jen s platnými hodnotami. JSON pro ruční přenos je vždy aktuální. → values | null. */
+    function xferSourceRefresh(p) {
+      const src = XFER_SOURCES[p];
+      const values = src.values();
+      const ok = values !== null;
+      document.getElementById(p + '-xfer-btn').setAttribute('aria-disabled', ok ? 'false' : 'true');
+      document.getElementById(p + '-xfer-hint').hidden = ok;
+      document.getElementById(p + '-xfer-copy').disabled = !ok;
+      document.getElementById(p + '-xfer-json').value = ok ? JSON.stringify(xferMake(src.from, src.to, values)) : '';
+      if (!ok) document.getElementById(p + '-xfer-status').textContent = '';
+      return values;
+    }
+
+    /** Klik na „Přenést do …“: zápis cookie se zpětným čtením. OK → odkaz naviguje; jinak zůstat a otevřít ruční přenos.
+        → 'disabled' | 'sent' | 'fallback'. */
+    function xferSourceClick(p, e) {
+      const src = XFER_SOURCES[p], T = TEXTS[currentLang];
+      const status = document.getElementById(p + '-xfer-status');
+      const values = xferSourceRefresh(p);
+      if (values === null) {
+        if (e) e.preventDefault();
+        status.textContent = T[src.need];
+        return 'disabled';
+      }
+      const res = xferSend(xferMake(src.from, src.to, values));
+      document.getElementById(p + '-xfer-json').value = res.json;
+      if (res.ok) { status.textContent = ''; return 'sent'; }
+      if (e) e.preventDefault();
+      document.getElementById(p + '-xfer-fallback').open = true;
+      status.textContent = T.xfer_fallback_short;
+      document.getElementById(p + '-xfer-json').focus();
+      return 'fallback';
+    }
+
+    /** „Kopírovat data“ → Promise<'copied' | 'selected' | 'disabled'>. */
+    function xferSourceCopy(p) {
+      const T = TEXTS[currentLang];
+      const status = document.getElementById(p + '-xfer-status');
+      const ta = document.getElementById(p + '-xfer-json');
+      if (xferSourceRefresh(p) === null) { status.textContent = T[XFER_SOURCES[p].need]; return Promise.resolve('disabled'); }
+      return copyText(ta.value, ta).then(r => { status.textContent = r === 'copied' ? T.xfer_copied : T.xfer_selected; return r; });
+    }
+
+    /** Po routeru: obsluha tlačítek; bez adresy cílového toolboxu (TOOLBOX_LINKS) se celý blok skryje. */
+    function xferSourceInit() {
+      Object.keys(XFER_SOURCES).forEach(p => {
+        const box = document.getElementById(p + '-xfer');
+        if (!toolboxHref(XFER_SOURCES[p].tool)) { box.hidden = true; return; }
+        document.getElementById(p + '-xfer-btn').addEventListener('click', e => xferSourceClick(p, e));
+        document.getElementById(p + '-xfer-copy').addEventListener('click', () => xferSourceCopy(p));
+        xferSourceRefresh(p);
+      });
+    }
+
+    /** Číslo pro payload bez float šumu (nejvýš XFER_MAX_DP desetinných míst). */
+    function xferRound(x) { return Number(x.toFixed(XFER_MAX_DP)); }
+
 
     /* ===== CURRENCY STATE ===== */
     let currentCurrency = 'CZK';
@@ -1505,24 +2106,39 @@
     });
 
     /**
-     * T2-1, T2-12: TCO jako čistá funkce (bez DOM).
-     *  oneTime: [{ key, name, value }] jednorázové náklady, započtou se jednou
-     *  annual:  [{ key, name, value }] roční náklady, násobí se životností
-     *  years:   životnost v letech, nebo null (nezadaná)
-     * Roční položka > 0 bez životnosti → { error: 'yearsRequired' }. Bez ročních položek se
-     * životnost nepotřebuje; perYear/perMonth jsou pak null.
-     * Vrací { items: [{ key, name, value, annual }] (částky za celé období, jen > 0), total, perYear, perMonth }.
+     * T2-1, T2-12, T2-2: TCO jako čistá funkce (bez DOM).
+     *  oneTime:  [{ key, name, value }] jednorázové náklady, započtou se jednou
+     *  annual:   [{ key, name, value }] roční náklady, násobí se životností
+     *  monthly:  [{ key, name, value }] měsíční náklady, násobí se 12 × životnost (T2-2)
+     *  residual: zůstatková hodnota na konci životnosti, od TCO se odečte (T2-2)
+     *  years:    životnost v letech, nebo null (nezadaná)
+     * Roční nebo měsíční položka > 0 bez životnosti → { error: 'yearsRequired' }. Bez nich se
+     * životnost nepotřebuje; perYear/perMonth jsou pak null. Zůstatková hodnota vyšší než součet
+     * nákladů → { error: 'residualExceeds' } (TCO by vyšlo záporné).
+     * Vrací { items: [{ key, name, value, annual, monthly }] (částky za celé období, jen > 0),
+     *         gross (náklady před odečtením zůstatku), residual, total, perYear, perMonth }.
      */
-    function tcoModel({ oneTime, annual, years }) {
+    function tcoModel({ oneTime, annual, monthly = [], residual = 0, years }) {
+      if (monthly.some(i => i.value > 0) && years === null) return { error: 'yearsRequired' };
       const hasAnnual = annual.some(i => i.value > 0);
       if (hasAnnual && years === null) return { error: 'yearsRequired' };
       const items = [
         ...oneTime.map(i => ({ key: i.key, name: i.name, value: i.value, annual: false })),
         ...annual.map(i => ({ key: i.key, name: i.name, value: i.value * years, annual: true })),
       ].filter(i => i.value > 0);
-      const total = items.reduce((sum, i) => sum + i.value, 0);
+      monthly.filter(i => i.value > 0).forEach(i =>
+        items.push({ key: i.key, name: i.name, value: i.value * 12 * years, annual: false, monthly: true }));
+      const gross = items.reduce((sum, i) => sum + i.value, 0);
+      if (residual > gross) return { error: 'residualExceeds' };
+      const total = gross - residual;
       const perYear = years === null ? null : total / years;
-      return { items, total, perYear, perMonth: perYear === null ? null : perYear / 12 };
+      return { items, gross, residual, total, perYear, perMonth: perYear === null ? null : perYear / 12 };
+    }
+
+    /** Hodnota selectu periodicity vlastní položky; neznámá nebo prázdná = jednorázově. */
+    function customPeriod(id) {
+      const v = document.getElementById(id).value;
+      return v === 'annual' || v === 'monthly' ? v : 'once';
     }
 
     /** Popisek pole bez „({currency})“ – název položky v tabulce a grafu. */
@@ -1537,7 +2153,7 @@
       // Všechna částková pole: nepovinná, prázdné = 0, vyplněné číslo ≥ 0
       const amountIds = ['t2a-purchase', 't2a-transport', 't2a-install',
                          't2a-service', 't2a-maintenance', 't2a-storage',
-                         't2a-custom1-value', 't2a-custom2-value'];
+                         't2a-custom1-value', 't2a-custom2-value', 't2a-residual'];
       amountIds.forEach(id => {
         clearError(id);
         const err = validateOptionalPositive(document.getElementById(id).value);
@@ -1561,37 +2177,42 @@
       const yearsNum = parseNum(yearsRaw);
       const years = Number.isNaN(yearsNum) ? null : yearsNum;
 
-      const model = tcoModel({
-        oneTime: [
-          { key: 'purchase',  name: itemName(T, 't2a_purchase'),  value: val('t2a-purchase') },
-          { key: 'transport', name: itemName(T, 't2a_transport'), value: val('t2a-transport') },
-          { key: 'install',   name: itemName(T, 't2a_install'),   value: val('t2a-install') },
-          { key: 'custom1',   name: custom1name,                  value: val('t2a-custom1-value') },
-          { key: 'custom2',   name: custom2name,                  value: val('t2a-custom2-value') },
-        ],
-        annual: [
-          { key: 'service',     name: itemName(T, 't2a_service'),     value: val('t2a-service') },
-          { key: 'maintenance', name: itemName(T, 't2a_maintenance'), value: val('t2a-maintenance') },
-          { key: 'storage',     name: itemName(T, 't2a_storage'),     value: val('t2a-storage') },
-        ],
-        years,
-      });
+      // T2-2: vlastní položky podle zvolené periodicity
+      const oneTime = [
+        { key: 'purchase',  name: itemName(T, 't2a_purchase'),  value: val('t2a-purchase') },
+        { key: 'transport', name: itemName(T, 't2a_transport'), value: val('t2a-transport') },
+        { key: 'install',   name: itemName(T, 't2a_install'),   value: val('t2a-install') },
+      ];
+      const annual = [
+        { key: 'service',     name: itemName(T, 't2a_service'),     value: val('t2a-service') },
+        { key: 'maintenance', name: itemName(T, 't2a_maintenance'), value: val('t2a-maintenance') },
+        { key: 'storage',     name: itemName(T, 't2a_storage'),     value: val('t2a-storage') },
+      ];
+      const monthly = [];
+      const byPeriod = { once: oneTime, annual, monthly };
+      byPeriod[customPeriod('t2a-custom1-period')].push({ key: 'custom1', name: custom1name, value: val('t2a-custom1-value') });
+      byPeriod[customPeriod('t2a-custom2-period')].push({ key: 'custom2', name: custom2name, value: val('t2a-custom2-value') });
+
+      const model = tcoModel({ oneTime, annual, monthly, residual: val('t2a-residual'), years });
 
       if (model.error) {
-        showError('t2a-years', T.err_t2a_years_required);
+        if (model.error === 'residualExceeds') showError('t2a-residual', T.err_t2a_residual_exceeds);
+        else showError('t2a-years', T.err_t2a_years_required);
         document.getElementById('t2a-result').style.display = 'none';
         return;
       }
-      if (model.total <= 0) {
+      if (model.gross <= 0) {
         document.getElementById('t2a-result').style.display = 'none';
         return;
       }
 
-      const { total: tco, perYear, perMonth } = model;
+      const { total: tco, gross, residual, perYear, perMonth } = model;
+      const yearsTxt = years === null ? '' : formatPlainNumber(years);
       const allItems = model.items.map(i => ({
-        name: i.annual ? i.name + ' × ' + formatPlainNumber(years) : i.name,
+        name: i.monthly ? i.name + ' × 12 × ' + yearsTxt : i.annual ? i.name + ' × ' + yearsTxt : i.name,
         value: i.value
       }));
+      const rows = residual > 0 ? [...allItems, { name: T.t2a_residual_row, value: -residual }] : allItems;
 
       // Výsledky – hodnoty (bez životnosti se na rok a měsíc nepřepočítává)
       const sym = CURRENCY_CONFIG[currentCurrency].symbol;
@@ -1599,11 +2220,11 @@
       document.getElementById('t2a-result-year').textContent  = perYear === null ? '—' : formatCurrency(perYear, 0) + ' ' + sym;
       document.getElementById('t2a-result-month').textContent = perMonth === null ? '—' : formatCurrency(perMonth, 0) + ' ' + sym;
 
-      // Breakdown tabulka – částky za celé období
+      // Breakdown tabulka – částky za celé období, podíly z nákladů před odečtením zůstatku
       const tbody = document.getElementById('t2a-breakdown-body');
       tbody.innerHTML = '';
-      allItems.forEach(item => {
-        const pct = (item.value / tco) * 100;
+      rows.forEach(item => {
+        const pct = (item.value / gross) * 100;
         const tr = document.createElement('tr');
         tr.innerHTML =
           '<td>' + escHtml(item.name) + '</td>' +
@@ -1614,21 +2235,22 @@
 
       // Interpretační věta
       const topItem = allItems.reduce((a, b) => a.value >= b.value ? a : b);
-      const topPct  = ((topItem.value / tco) * 100).toFixed(1);
+      const topPct  = ((topItem.value / gross) * 100).toFixed(1);
+      const residualTxt = residual > 0 ? T.t2a_interp_residual.replace('{residual}', formatCurrency(residual, 0)) : '';
       document.getElementById('t2a-interpretation').textContent =
-        T.t2a_interp
+        (T.t2a_interp
           .replace('{tco}',      formatCurrency(tco, 0))
           .replace('{top}',      topItem.name)
-          .replace('{topPct}',   topPct)
+          .replace('{topPct}',   topPct) + residualTxt)
           .replace(/\{currency\}/g, sym);
 
       // Zobrazit result box
       document.getElementById('t2a-result').style.display = 'block';
 
-      // Chart – z částek za celé období (stejné jako tabulka)
+      // Chart – z částek za celé období (stejné jako tabulka), zůstatková hodnota jako záporný sloupec
       renderTcoChart({
-        labels: allItems.map(i => i.name),
-        values: allItems.map(i => i.value)
+        labels: rows.map(i => i.name),
+        values: rows.map(i => i.value)
       });
     }
 
@@ -1640,9 +2262,12 @@
       });
       // Reset volitelných polí
       ['t2a-service', 't2a-maintenance', 't2a-storage',
-       't2a-custom1-value', 't2a-custom2-value'].forEach(id => {
+       't2a-custom1-value', 't2a-custom2-value', 't2a-residual'].forEach(id => {
         document.getElementById(id).value = '';
         clearError(id);
+      });
+      ['t2a-custom1-period', 't2a-custom2-period'].forEach(id => {
+        document.getElementById(id).value = 'once';
       });
       // Reset textových polí
       ['t2a-custom1-name', 't2a-custom2-name'].forEach(id => {
@@ -1662,8 +2287,11 @@
     // Event listenery – real-time přepočet
     ['t2a-purchase', 't2a-transport', 't2a-install',
      't2a-service', 't2a-maintenance', 't2a-storage',
-     't2a-custom1-value', 't2a-custom2-value', 't2a-years'].forEach(id => {
+     't2a-custom1-value', 't2a-custom2-value', 't2a-residual', 't2a-years'].forEach(id => {
       document.getElementById(id).addEventListener('input', calcTco);
+    });
+    ['t2a-custom1-period', 't2a-custom2-period'].forEach(id => {
+      document.getElementById(id).addEventListener('change', calcTco);
     });
     ['t2a-custom1-name', 't2a-custom2-name'].forEach(id => {
       document.getElementById(id).addEventListener('input', calcTco);
@@ -1703,29 +2331,61 @@
     }
 
     /**
-     * T2-4: cílová cena jako čistá funkce. mode 'czk' bere úsporu v penězích, 'pct' v procentech.
+     * T2-4, T2-5: cílová cena jako čistá funkce. mode 'czk' bere úsporu v penězích, 'pct' v procentech.
+     * Úspora 0 je přípustná (cílová cena = aktuální cena), záporná ne.
      * Úspora vyšší než cena (nebo nad 100 %) → chyba, cílová cena nikdy nevyjde záporná.
      * Vrací { targetPrice, saving, pct } nebo { error, field }.
      */
     function targetPrice({ base, mode, saving, pct }) {
       if (!(base > 0)) return { error: 'baseRequired', field: 'base' };
       if (mode === 'czk') {
-        if (!(saving > 0)) return { error: 'savingRequired', field: 'saving' };
+        if (!Number.isFinite(saving)) return { error: 'savingRequired', field: 'saving' };
+        if (saving < 0) return { error: 'savingNegative', field: 'saving' };
         if (saving > base) return { error: 'savingExceeds', field: 'saving' };
         return { targetPrice: base - saving, saving, pct: (saving / base) * 100 };
       }
-      if (!(pct > 0)) return { error: 'savingRequired', field: 'saving' };
+      if (!Number.isFinite(pct)) return { error: 'savingRequired', field: 'saving' };
+      if (pct < 0) return { error: 'savingNegative', field: 'saving' };
       if (pct > 100) return { error: 'pctMax', field: 'saving' };
       const s = base * (pct / 100);
       return { targetPrice: base - s, saving: s, pct };
     }
 
+    /** T2-7: model převzatý ze Should-cost tlačítkem „Použít v Target price“, nebo null. */
+    let targetModelRef = null; // { offer, model, costSum }
+
+    /**
+     * T2-7: cílová cena proti should-cost modelu (čistá funkce, částky na haléře).
+     * → { gap: cílová cena − model, status: 'belowCosts' | 'belowModel' | 'atModel' | 'aboveModel' }.
+     * belowCosts = cíl je pod náklady bez zisku (costSum), tedy i pod modelem.
+     */
+    function targetVsModel({ targetPrice, model, costSum }) {
+      const cents = x => Math.round(x * 100);
+      const gap = (cents(targetPrice) - cents(model)) / 100;
+      const status = cents(targetPrice) < cents(costSum) ? 'belowCosts'
+        : gap < 0 ? 'belowModel' : gap > 0 ? 'aboveModel' : 'atModel';
+      return { gap, status };
+    }
+
+    function renderModelNote() {
+      const note = document.getElementById('t2b-model-note');
+      if (!targetModelRef) { note.hidden = true; note.textContent = ''; return; }
+      const sym = CURRENCY_CONFIG[currentCurrency].symbol;
+      note.textContent = TEXTS[currentLang].t2b_model_note
+        .replace('{offer}', formatCurrency(targetModelRef.offer, 2))
+        .replace('{model}', formatCurrency(targetModelRef.model, 2))
+        .replace(/\{currency\}/g, sym);
+      note.hidden = false;
+    }
+
     function calcTargetPrice() {
       const T = TEXTS[currentLang];
+      t2bXferResult = null;
+      renderModelNote();
       const savingId = targetPriceMode === 'czk' ? 't2b-saving-czk' : 't2b-saving-pct';
       const baseRaw = document.getElementById('t2b-base-price').value;
       const savingRaw = document.getElementById(savingId).value;
-      const hide = () => { document.getElementById('t2b-result').style.display = 'none'; };
+      const hide = () => { document.getElementById('t2b-result').style.display = 'none'; xferSourceRefresh('t2b'); };
 
       clearError('t2b-base-price');
       clearError(savingId);
@@ -1749,6 +2409,7 @@
         const msg = {
           baseRequired: T.err_t2b_base_required,
           savingRequired: T.err_t2b_saving_required,
+          savingNegative: T.err_negativeNotAllowed,
           savingExceeds: T.err_t2b_saving_exceeds,
           pctMax: T.err_t2b_pct_max,
         }[res.error];
@@ -1760,7 +2421,9 @@
         return;
       }
 
+      t2bXferResult = { base, targetPrice: res.targetPrice, currency: currentCurrency };
       renderTargetPrice({ base, saving: res.saving, targetPrice: res.targetPrice, pct: res.pct });
+      xferSourceRefresh('t2b');
     }
 
     function renderTargetPrice({ base, saving, targetPrice, pct }) {
@@ -1777,13 +2440,32 @@
       document.getElementById('t2b-result-ratio').textContent =
         ratio.toFixed(2) + ' %';
 
-      document.getElementById('t2b-interpretation').textContent =
-        T.t2b_interp
-          .replace('{target}', formatCurrency(targetPrice, 2))
-          .replace('{saving}', formatCurrency(saving, 2))
-          .replace('{pct}',    pct.toFixed(2))
-          .replace(/\{currency\}/g, sym);
+      let interp = (saving === 0 ? T.t2b_interp_zero : T.t2b_interp)
+        .replace('{target}', formatCurrency(targetPrice, 2))
+        .replace('{saving}', formatCurrency(saving, 2))
+        .replace('{pct}',    pct.toFixed(2));
 
+      // T2-7: porovnání s modelem převzatým ze Should-cost
+      const modelRow = document.getElementById('t2b-model-row');
+      const modelGapRow = document.getElementById('t2b-model-gap-row');
+      if (targetModelRef) {
+        const cmp = targetVsModel({ targetPrice, model: targetModelRef.model, costSum: targetModelRef.costSum });
+        document.getElementById('t2b-result-model').textContent = formatCurrency(targetModelRef.model, 2) + ' ' + sym;
+        document.getElementById('t2b-result-model-gap').textContent =
+          (cmp.gap > 0 ? '+' : '') + formatCurrency(cmp.gap, 2) + ' ' + sym;
+        const key = { belowCosts: 't2b_gap_below_costs', belowModel: 't2b_gap_below_model',
+                      atModel: 't2b_gap_at_model', aboveModel: 't2b_gap_above_model' }[cmp.status];
+        interp += T[key]
+          .replace('{amount}', formatCurrency(Math.abs(cmp.gap), 2))
+          .replace('{costs}', formatCurrency(targetModelRef.costSum, 2));
+        modelRow.hidden = false;
+        modelGapRow.hidden = false;
+      } else {
+        modelRow.hidden = true;
+        modelGapRow.hidden = true;
+      }
+
+      document.getElementById('t2b-interpretation').textContent = interp.replace(/\{currency\}/g, sym);
       document.getElementById('t2b-result').style.display = 'block';
     }
 
@@ -1792,8 +2474,13 @@
         document.getElementById(id).value = '';
         clearError(id);
       });
+      targetModelRef = null;
+      document.getElementById('t2b-model-row').hidden = true;
+      document.getElementById('t2b-model-gap-row').hidden = true;
       setTargetPriceMode('czk');
       document.getElementById('t2b-result').style.display = 'none';
+      t2bXferResult = null;
+      xferSourceRefresh('t2b');
     }
 
     // Event listenery – mode switcher
@@ -1856,9 +2543,93 @@
        NÁSTROJ 2c: Should-cost kalkulačka
        =================================================== */
 
+    /**
+     * T2-6b: should-cost model jako čistá funkce.
+     *  costs:      nákladové složky (čísla ≥ 0)
+     *  profit:     zisk jako částka ('amount'), přirážka k nákladům v % ('markup') nebo marže z ceny v % ('margin')
+     * amount: model = náklady + zisk; markup: náklady × (1 + p/100); margin: náklady ÷ (1 − p/100).
+     * Marže ≥ 100 % → { error: 'marginMax' }; zisk v % bez nákladů → { error: 'profitNeedsCosts' }.
+     * Vrací { sum, model, profitValue }.
+     */
+    function shouldCostModel({ costs, profit, profitMode }) {
+      const sum = costs.reduce((acc, c) => acc + c, 0);
+      if (profitMode === 'margin' && profit >= 100) return { error: 'marginMax' };
+      if (profitMode !== 'amount' && profit > 0 && !(sum > 0)) return { error: 'profitNeedsCosts' };
+      const model = profitMode === 'margin' ? sum / (1 - profit / 100)
+        : profitMode === 'markup' ? sum * (1 + profit / 100)
+        : sum + profit;
+      return { sum, model, profitValue: model - sum };
+    }
+
+    /**
+     * T2-7: rozdíl nabídky proti modelu (čistá funkce, na haléře).
+     * → { gap: nabídka − model, pctOfOffer, direction: 'offerAbove' | 'modelAbove' | 'equal' }.
+     */
+    function offerGap({ offer, model }) {
+      const gap = (Math.round(offer * 100) - Math.round(model * 100)) / 100;
+      return { gap, pctOfOffer: (gap / offer) * 100,
+        direction: gap > 0 ? 'offerAbove' : gap < 0 ? 'modelAbove' : 'equal' };
+    }
+
+    /** Nepovinná nabídková cena (2c, 2d): prázdná → { value: null }, jinak číslo > 0, jinak { error }. */
+    function readOptionalOffer(id) {
+      const raw = document.getElementById(id).value;
+      const err = validateNumeric(raw, { required: false, allowNegative: true });
+      if (err) return { error: err };
+      if (raw.trim() === '') return { value: null };
+      const v = parseNum(raw);
+      if (!(v > 0)) return { error: TEXTS[currentLang].err_offer_positive };
+      return { value: v };
+    }
+
+    /** Číslo do vstupního pole v aktuálním jazyce, bez oddělovačů tisíců, na 2 desetinná místa (parser ho přijme). */
+    function formatInputNumber(n) {
+      return new Intl.NumberFormat(TEXTS[currentLang].numLocale, { useGrouping: false, maximumFractionDigits: 2 }).format(n);
+    }
+
+    const PROFIT_MODE_KEYS = {
+      amount: { label: 't2c_margin',        help: 't2c_profit_help_amount' },
+      markup: { label: 't2c_margin_markup', help: 't2c_profit_help_markup' },
+      margin: { label: 't2c_margin_margin', help: 't2c_profit_help_margin' },
+    };
+
+    function profitModeValue() {
+      const v = document.getElementById('t2c-profit-mode').value;
+      return PROFIT_MODE_KEYS[v] ? v : 'amount';
+    }
+
+    /** Popisek pole zisku a nápověda podle zvoleného způsobu; data-i18n se přepne, aby je přeložil i setLang. */
+    function applyProfitModeTexts() {
+      const keys = PROFIT_MODE_KEYS[profitModeValue()];
+      const T = TEXTS[currentLang];
+      const sym = CURRENCY_CONFIG[currentCurrency].symbol;
+      const label = document.getElementById('t2c-margin-label');
+      const help = document.getElementById('t2c-profit-help');
+      label.setAttribute('data-i18n', keys.label);
+      label.textContent = T[keys.label].replace(/\{currency\}/g, sym);
+      help.setAttribute('data-i18n', keys.help);
+      help.textContent = T[keys.help].replace(/\{currency\}/g, sym);
+    }
+
+    /** Změna způsobu zisku: hodnota se smaže, aby se 20 Kč tiše nezměnilo na 20 %. */
+    function setProfitMode() {
+      document.getElementById('t2c-margin').value = '';
+      clearError('t2c-margin');
+      applyProfitModeTexts();
+      calcShouldcost();
+    }
+
+    /** Poslední platný výsledek 2c s nabídkou, pro tlačítko „Použít v Target price“. */
+    let shouldcostLast = null; // { offer, model, costSum }
+
     function calcShouldcost() {
       const T = TEXTS[currentLang];
       let hasError = false;
+      const hide = () => {
+        document.getElementById('t2c-result').style.display = 'none';
+        document.getElementById('t2c-use-target').hidden = true;
+        shouldcostLast = null;
+      };
 
       // Validace: všechna pole musí být >= 0 pokud vyplněna
       const ids = ['t2c-material', 't2c-labor', 't2c-energy', 't2c-overhead', 't2c-margin'];
@@ -1869,46 +2640,52 @@
         if (err) { showError(id, err); hasError = true; }
       });
 
-      if (hasError) {
-        document.getElementById('t2c-result').style.display = 'none';
-        return;
-      }
+      clearError('t2c-offer');
+      const offer = readOptionalOffer('t2c-offer');
+      if (offer.error) { showError('t2c-offer', offer.error); hasError = true; }
+
+      if (hasError) { hide(); return; }
 
       const material = safeNum(document.getElementById('t2c-material').value);
       const labor    = safeNum(document.getElementById('t2c-labor').value);
       const energy   = safeNum(document.getElementById('t2c-energy').value);
       const overhead = safeNum(document.getElementById('t2c-overhead').value);
-      const margin   = safeNum(document.getElementById('t2c-margin').value);
+      const profit   = safeNum(document.getElementById('t2c-margin').value);
 
-      const total = material + labor + energy + overhead + margin;
-
-      // Validace: alespoň jedna složka > 0
-      if (total <= 0) {
-        document.getElementById('t2c-result').style.display = 'none';
+      const res = shouldCostModel({ costs: [material, labor, energy, overhead], profit, profitMode: profitModeValue() });
+      if (res.error) {
+        showError('t2c-margin', res.error === 'marginMax' ? T.err_t2c_margin_max : T.err_t2c_profit_needs_costs);
+        hide();
         return;
       }
 
-      // Sestavit seznam složek (přeskočit nulové pro graf a tabulku)
+      // Validace: model musí být > 0
+      if (res.model <= 0) { hide(); return; }
+
+      // Sestavit seznam složek (přeskočit nulové pro graf)
       const allItems = [
-        { name: T.t2c_material, value: material },
-        { name: T.t2c_labor,    value: labor },
-        { name: T.t2c_energy,   value: energy },
-        { name: T.t2c_overhead, value: overhead },
-        { name: T.t2c_margin,   value: margin },
+        { name: itemName(T, 't2c_material'), value: material },
+        { name: itemName(T, 't2c_labor'),    value: labor },
+        { name: itemName(T, 't2c_energy'),   value: energy },
+        { name: itemName(T, 't2c_overhead'), value: overhead },
+        { name: T.t2c_profit_row,            value: res.profitValue },
       ];
 
       const nonZeroItems = allItems.filter(item => item.value > 0);
 
-      renderShouldcost({ total, allItems, nonZeroItems });
+      renderShouldcost({ total: res.model, allItems, nonZeroItems, profitValue: res.profitValue,
+        offer: offer.value, costSum: res.sum });
     }
 
-    function renderShouldcost({ total, allItems, nonZeroItems }) {
+    function renderShouldcost({ total, allItems, nonZeroItems, profitValue, offer, costSum }) {
       const T = TEXTS[currentLang];
 
       // Celková cena
       const sym = CURRENCY_CONFIG[currentCurrency].symbol;
       document.getElementById('t2c-result-total').textContent =
-        formatCurrency(total, 0) + ' ' + sym;
+        formatCurrency(total, 2) + ' ' + sym;
+      document.getElementById('t2c-result-profit').textContent =
+        formatCurrency(profitValue, 2) + ' ' + sym;
 
       // Breakdown tabulka
       const tbody = document.getElementById('t2c-breakdown-body');
@@ -1918,7 +2695,7 @@
         const tr = document.createElement('tr');
         tr.innerHTML =
           '<td>' + escHtml(item.name) + '</td>' +
-          '<td>' + formatCurrency(item.value, 0) + '</td>' +
+          '<td>' + formatCurrency(item.value, 2) + '</td>' +
           '<td style="text-align:right">' + pct.toFixed(1) + ' %</td>';
         tbody.appendChild(tr);
       });
@@ -1926,12 +2703,35 @@
       // Interpretační věta – největší složka
       const topItem = nonZeroItems.reduce((a, b) => a.value >= b.value ? a : b);
       const topPct  = ((topItem.value / total) * 100).toFixed(1);
-      document.getElementById('t2c-interpretation').textContent =
-        T.t2c_interp
-          .replace('{total}',  formatCurrency(total, 0))
-          .replace('{top}',    topItem.name)
-          .replace('{topPct}', topPct)
-          .replace(/\{currency\}/g, sym);
+      let interp = T.t2c_interp
+        .replace('{total}',  formatCurrency(total, 2))
+        .replace('{top}',    topItem.name)
+        .replace('{topPct}', topPct);
+
+      // T2-7: rozdíl nabídky proti modelu
+      const offerRow = document.getElementById('t2c-offer-row');
+      const gapRow = document.getElementById('t2c-gap-row');
+      const useBtn = document.getElementById('t2c-use-target');
+      if (offer !== null) {
+        const g = offerGap({ offer, model: total });
+        document.getElementById('t2c-result-offer').textContent = formatCurrency(offer, 2) + ' ' + sym;
+        document.getElementById('t2c-result-gap-label').textContent =
+          { offerAbove: T.t2c_gap_offer_above, modelAbove: T.t2c_gap_model_above, equal: T.t2c_gap_equal }[g.direction];
+        document.getElementById('t2c-result-gap').textContent = formatCurrency(Math.abs(g.gap), 2) + ' ' + sym
+          + ' (' + T.t2c_gap_pct.replace('{pct}', formatPlainNumber(Math.round(Math.abs(g.pctOfOffer) * 10) / 10)) + ')';
+        interp += T.t2c_gap_interp;
+        offerRow.hidden = false;
+        gapRow.hidden = false;
+        useBtn.hidden = false;
+        shouldcostLast = { offer, model: total, costSum };
+      } else {
+        offerRow.hidden = true;
+        gapRow.hidden = true;
+        useBtn.hidden = true;
+        shouldcostLast = null;
+      }
+
+      document.getElementById('t2c-interpretation').textContent = interp.replace(/\{currency\}/g, sym);
 
       // Zobrazit result box
       document.getElementById('t2c-result').style.display = 'block';
@@ -1944,19 +2744,50 @@
       });
     }
 
+    /** Aktivuje tab podle id panelu (např. 'tab-2b') a přesune na jeho tlačítko fokus. */
+    function showTab(panelId) {
+      const btn = document.getElementById('tab-btn-' + panelId.replace('tab-', ''));
+      if (!btn) return;
+      const nav = document.querySelector('.tab-nav');
+      activateTab(btn, Array.from(nav.querySelectorAll('.tab-btn')), document.querySelectorAll('.tool-panel'));
+      btn.focus();
+    }
+
+    /**
+     * T2-7: „Použít v Target price“ (uvnitř souboru, bez ukládání). Aktuální cena = nabídka,
+     * úspora v penězích = nabídka − model (nejméně 0), model se v Target price ukáže pro porovnání cíle.
+     */
+    function useInTargetPrice() {
+      if (!shouldcostLast) return;
+      const r2 = x => Math.round(x * 100) / 100;
+      targetModelRef = { offer: r2(shouldcostLast.offer), model: r2(shouldcostLast.model), costSum: r2(shouldcostLast.costSum) };
+      setTargetPriceMode('czk');
+      document.getElementById('t2b-base-price').value = formatInputNumber(targetModelRef.offer);
+      document.getElementById('t2b-saving-czk').value =
+        formatInputNumber(Math.max(0, r2(targetModelRef.offer - targetModelRef.model)));
+      calcTargetPrice();
+      showTab('tab-2b');
+    }
+
     function resetShouldcost() {
-      ['t2c-material', 't2c-labor', 't2c-energy', 't2c-overhead', 't2c-margin'].forEach(id => {
+      ['t2c-material', 't2c-labor', 't2c-energy', 't2c-overhead', 't2c-margin', 't2c-offer'].forEach(id => {
         document.getElementById(id).value = '';
         clearError(id);
       });
+      document.getElementById('t2c-profit-mode').value = 'amount';
+      applyProfitModeTexts();
       document.getElementById('t2c-result').style.display = 'none';
+      document.getElementById('t2c-use-target').hidden = true;
+      shouldcostLast = null;
       chartShouldcost = destroyChart(chartShouldcost);
     }
 
     // Event listenery – real-time přepočet
-    ['t2c-material', 't2c-labor', 't2c-energy', 't2c-overhead', 't2c-margin'].forEach(id => {
+    ['t2c-material', 't2c-labor', 't2c-energy', 't2c-overhead', 't2c-margin', 't2c-offer'].forEach(id => {
       document.getElementById(id).addEventListener('input', calcShouldcost);
     });
+    document.getElementById('t2c-profit-mode').addEventListener('change', setProfitMode);
+    document.getElementById('t2c-use-target').addEventListener('click', useInTargetPrice);
 
     document.getElementById('t2c-reset').addEventListener('click', resetShouldcost);
 
@@ -2095,6 +2926,13 @@
         btn.setAttribute('aria-pressed', String(isActive));
       });
 
+      // T2-9: nabídková cena jen v režimu %
+      document.getElementById('t2d-offer-group').hidden = (mode !== 'pct');
+      if (mode !== 'pct') {
+        document.getElementById('t2d-offer').value = '';
+        clearError('t2d-offer');
+      }
+
       // Zachovat hodnoty a překreslit řádky
       const savedNames  = collectRowValues('t2d-name-');
       const savedValues = collectRowValues('t2d-value-');
@@ -2169,6 +3007,15 @@
         }
       }
 
+      // T2-9: nepovinná nabídková cena v režimu %
+      let offer = null;
+      if (!isCzk) {
+        clearError('t2d-offer');
+        const o = readOptionalOffer('t2d-offer');
+        if (o.error) { showError('t2d-offer', o.error); hasError = true; }
+        else offer = o.value;
+      }
+
       const pctWarningEl = document.getElementById('t2d-pct-warning');
       const hideAll = () => {
         document.getElementById('t2d-result').style.display = 'none';
@@ -2193,7 +3040,15 @@
       }
       pctWarningEl.style.display = 'none';
 
-      renderBreakdown({ items, isCzk });
+      renderBreakdown({ items, isCzk, offer });
+    }
+
+    /**
+     * T2-9: podíly v % z nabídkové ceny → částky (čistá funkce), každá zaokrouhlená na haléře.
+     * Součet částek se od nabídky může lišit v mezích tolerance součtu podílů (0,1 p. b.).
+     */
+    function percentToAmounts({ offer, percents }) {
+      return percents.map(p => Math.round(offer * p) / 100);
     }
 
     /** T2-8: čistá kontrola součtu podílů. V režimu Kč vždy OK. → { sum } nebo { error: 'pctSum', sum }. */
@@ -2205,9 +3060,11 @@
     }
 
     /* --- Render výsledků --- */
-    function renderBreakdown({ items, isCzk }) {
+    function renderBreakdown({ items, isCzk, offer = null }) {
       const T = TEXTS[currentLang];
       const total = items.reduce((acc, it) => acc + it.value, 0);
+      const withAmounts = !isCzk && offer !== null;
+      const amounts = withAmounts ? percentToAmounts({ offer, percents: items.map(it => it.value) }) : null;
 
       // Celkový součet
       const totalEl = document.getElementById('t2d-result-total');
@@ -2221,11 +3078,14 @@
         if (totalLabelEl) totalLabelEl.textContent = T.t2d_result_total;
       }
 
-      // Sloupec Kč – skrýt v % mode
+      // Sloupec Kč – v % mode jen s nabídkovou cenou (T2-9)
       const colValueHeader = document.getElementById('t2d-col-value-header');
       if (colValueHeader) {
-        colValueHeader.style.display = isCzk ? '' : 'none';
+        colValueHeader.style.display = (isCzk || withAmounts) ? '' : 'none';
       }
+      const sym2d = CURRENCY_CONFIG[currentCurrency].symbol;
+      document.getElementById('t2d-offer-row').hidden = !withAmounts;
+      document.getElementById('t2d-result-offer').textContent = withAmounts ? formatCurrency(offer, 2) + ' ' + sym2d : '';
 
       // Breakdown tabulka
       const tbody = document.getElementById('t2d-breakdown-body');
@@ -2244,12 +3104,13 @@
           tbody.appendChild(tr);
         });
       } else {
-        // % mode: hodnoty jsou přímo %
+        // % mode: hodnoty jsou přímo %, s nabídkovou cenou i částky (T2-9)
         pctValues = items.map(it => it.value);
-        items.forEach((it) => {
+        items.forEach((it, idx) => {
           const tr = document.createElement('tr');
           tr.innerHTML =
             '<td>' + escHtml(it.name) + '</td>' +
+            (withAmounts ? '<td>' + formatCurrency(amounts[idx], 2) + '</td>' : '') +
             '<td style="text-align:right">' + it.value.toFixed(1) + ' %</td>';
           tbody.appendChild(tr);
         });
@@ -2270,6 +3131,12 @@
         .replace(/\{currency\}/g, currSym2d);
       if (isCzk) {
         interp = interp.replace('{total}', formatCurrency(total, 0));
+      }
+      if (withAmounts) {
+        interp += T.t2d_interp_offer
+          .replace('{offer}', formatCurrency(offer, 2))
+          .replace('{amount}', formatCurrency(amounts[items.indexOf(topItem)], 2))
+          .replace(/\{currency\}/g, currSym2d);
       }
       document.getElementById('t2d-interpretation').textContent = interp;
 
@@ -2383,8 +3250,12 @@
         btn.setAttribute('aria-pressed', String(isActive));
       });
 
-      // Reset počtu řádků na 3
+      // Reset počtu řádků na 3, nabídková cena jen v režimu %
       breakdownRowCount = 3;
+      document.getElementById('t2d-offer').value = '';
+      clearError('t2d-offer');
+      document.getElementById('t2d-offer-group').hidden = true;
+      document.getElementById('t2d-offer-row').hidden = true;
 
       // Skrýt výsledky a varování
       document.getElementById('t2d-result').style.display = 'none';
@@ -2404,6 +3275,7 @@
       document.getElementById('t2d-add-row').addEventListener('click', addBreakdownRow);
       document.getElementById('t2d-remove-row').addEventListener('click', removeBreakdownRow);
       document.getElementById('t2d-reset').addEventListener('click', resetBreakdown);
+      document.getElementById('t2d-offer').addEventListener('input', calcBreakdown);
     }
 
     /* ===== i18n ===== */
@@ -2513,6 +3385,7 @@
         const btn = e.target.closest('.tab-btn');
         if (!btn) return;
         activateTab(btn, buttons, panels);
+        rememberTool(btn.id.replace('tab-btn-', ''));
       });
 
       nav.addEventListener('keydown', (e) => {
@@ -2535,6 +3408,7 @@
           e.preventDefault();
           buttons[targetIndex].focus();
           activateTab(buttons[targetIndex], buttons, panels);
+          rememberTool(buttons[targetIndex].id.replace('tab-btn-', ''));
         }
       });
     }
@@ -2561,6 +3435,19 @@
       }
     }
 
+    /** D2: aktivuje tab podle id nástroje ('1d'). focus = fokus na tlačítko tabu, remember = kotva #tool= v adrese.
+        → false, když tab v tomto souboru není. */
+    function activateToolById(id, { focus = false, remember = true } = {}) {
+      if (TOOLBOX_TOOLS.indexOf(id) < 0) return false;
+      const btn = document.getElementById('tab-btn-' + id);
+      const nav = document.querySelector('.tab-nav');
+      if (!btn || !nav) return false;
+      activateTab(btn, Array.from(nav.querySelectorAll('.tab-btn')), document.querySelectorAll('.tool-panel'));
+      if (focus) btn.focus();
+      if (remember) rememberTool(id);
+      return true;
+    }
+
     /* ===== LANG SWITCHER ===== */
     function initLangSwitcher() {
       document.querySelectorAll('.lang-btn').forEach(btn => {
@@ -2585,6 +3472,9 @@
     initBreakdown();
     setLang('cs');
     setCurrency('CZK');
+    initCopyResults();
+    initRouter();
+    xferSourceInit();
   </script>
 </body>
 </html>

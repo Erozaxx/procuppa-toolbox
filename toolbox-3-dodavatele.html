@@ -126,10 +126,15 @@
       transition: background 0.15s, color 0.15s, border-color 0.15s;
     }
 
-    .lang-btn.active,
-    .lang-btn:hover {
+    .lang-btn.active {
       background: var(--color-primary);
       color: var(--color-primary-text);
+      border-color: var(--color-primary);
+    }
+
+    /* Hover na neaktivním jazyce jen obrys, aby nevypadal jako zvolený (T-017) */
+    .lang-btn:not(.active):hover {
+      color: var(--color-primary);
       border-color: var(--color-primary);
     }
 
@@ -640,6 +645,48 @@
       margin-bottom: var(--space-sm);
     }
 
+    /* ===== SIGNÁLY A UPOZORNĚNÍ (B5) ===== */
+    .signal-list {
+      display: none;
+      margin: var(--space-sm) 0;
+    }
+
+    .signal-box {
+      border-left: 4px solid var(--color-border);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      background: var(--color-surface);
+      padding: var(--space-xs) var(--space-sm);
+      margin-bottom: var(--space-xs);
+      font-size: var(--font-size-sm);
+      color: var(--color-text);
+    }
+
+    .signal-box.critical {
+      border-left-color: var(--color-danger);
+      background: #FEE2E2;
+      color: #991B1B;
+    }
+
+    .signal-box.attention {
+      border-left-color: var(--color-warning);
+      background: #FEF9C3;
+      color: #92400E;
+    }
+
+    .field-hint {
+      display: block;
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+      margin-top: var(--space-xs);
+    }
+
+    .subsection-heading {
+      font-size: var(--font-size-sm);
+      font-weight: 700;
+      margin: var(--space-md) 0 var(--space-xs);
+      color: var(--color-text);
+    }
+
     /* ===== RESPONSIVE ===== */
     @media (max-width: 768px) {
       .tab-nav {
@@ -675,6 +722,36 @@
         max-width: 100%;
       }
     }
+
+    /* ===== D2/D2b: odkazy mezi nástroji a přenos hodnot (T-016) ===== */
+    .xfer-box { margin-top: var(--space-md); padding-top: var(--space-md); border-top: 1px solid var(--color-border); }
+    .btn-xfer { display: inline-block; padding: var(--space-xs) var(--space-md); border: 1px solid var(--color-primary); border-radius: var(--radius-sm);
+                background: var(--color-surface); color: var(--color-primary); font: inherit; font-weight: 600; text-decoration: none; cursor: pointer; }
+    .btn-xfer:hover { background: var(--color-accent); color: var(--color-accent-text, var(--color-primary)); }
+    .btn-xfer:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+    .btn-xfer[aria-disabled="true"], .btn-xfer:disabled { opacity: 0.55; cursor: not-allowed; background: var(--color-surface); }
+    .xfer-hint { display: block; margin-top: var(--space-xs); font-size: var(--font-size-sm); color: var(--color-text-muted); }
+    .xfer-note { margin: var(--space-sm) 0; font-size: var(--font-size-sm); }
+    .xfer-note:empty { margin: 0; }
+    .xfer-note.xfer-error { color: var(--color-danger); font-weight: 600; }
+    .xfer-details { margin-top: var(--space-sm); font-size: var(--font-size-sm); }
+    .xfer-details summary { cursor: pointer; font-weight: 600; }
+    .xfer-details > * + * { margin-top: var(--space-sm); }
+    .xfer-details label { display: block; font-weight: 600; }
+    .xfer-json { display: block; width: 100%; box-sizing: border-box; padding: var(--space-sm); font-family: Consolas, monospace; font-size: 0.8rem;
+                 border: 1px solid var(--color-border); border-radius: var(--radius-sm); }
+    .xfer-actions { display: flex; flex-wrap: wrap; gap: var(--space-sm); align-items: center; }
+    .tool-links { margin-top: var(--space-md); font-size: var(--font-size-sm); }
+    .tool-links a { color: var(--color-primary); font-weight: 600; }
+    .xfer-box[hidden], .xfer-box [hidden], .tool-links [hidden], .xfer-note[hidden] { display: none !important; }
+    /* ===== D4: Kopírovat výsledek (T-017) ===== */
+    .copy-result { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-sm); margin-top: var(--space-md); }
+    .copy-result[hidden] { display: none; }
+    .btn-copy-result { padding: var(--space-xs) var(--space-md); border: 1px solid var(--color-primary); border-radius: var(--radius-sm);
+                       background: var(--color-surface); color: var(--color-primary); font: inherit; font-size: var(--font-size-sm); font-weight: 600; cursor: pointer; }
+    .btn-copy-result:hover { background: var(--color-accent); color: var(--color-accent-text, var(--color-primary)); }
+    .btn-copy-result:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+    .copy-result-status { margin: 0; font-size: var(--font-size-sm); color: var(--color-text-muted); }
   </style>
 </head>
 <body>
@@ -726,7 +803,7 @@
       <div class="tool-card">
         <h2 data-i18n="t3a_title">Hodnocení dodavatele</h2>
         <p class="tool-desc" data-i18n="t3a_desc">
-          Ohodnoťte dodavatele v 5 kritériích (skóre 1–5, nebo ponechte „neověřeno“) a nastavte váhy (1–3, váha 0 kritérium vyřadí). Celkové skóre a verdikt se ukážou, až když jsou ohodnocena všechna kritéria s kladnou vahou.
+          Ohodnoťte dodavatele v 5 kritériích (skóre 1–5, nebo ponechte „neověřeno“) a nastavte váhy (1–3, váha 0 kritérium vyřadí). Celkové skóre a verdikt se ukážou, až když jsou ohodnocena všechna kritéria s kladnou vahou. Závažné selhání a slabá kvalita se ukážou jako samostatné upozornění, průměr nemění.
         </p>
 
         <!-- Criteria grid header -->
@@ -849,6 +926,16 @@
           </div>
         </div><!-- /criteria-grid -->
 
+        <!-- T3-4: závažné selhání (průměr nemění, ukáže se jako samostatné upozornění) -->
+        <div class="input-group">
+          <label for="t3a-serious" data-i18n="t3a_lbl_serious">Závažné selhání v hodnoceném období (kvalita, bezpečnost, smluvní povinnost)</label>
+          <select id="t3a-serious" class="select-field" onchange="calcScorecard()">
+            <option value="" data-i18n="t3a_opt_unverified" selected>— neověřeno —</option>
+            <option value="no" data-i18n="t3a_opt_serious_no">Ne, nedošlo</option>
+            <option value="yes" data-i18n="t3a_opt_serious_yes">Ano, došlo</option>
+          </select>
+        </div>
+
         <!-- Error: totalWeight = 0 -->
         <span id="t3a-weight-err" class="error-msg" role="alert"></span>
 
@@ -863,6 +950,9 @@
             <span class="risk-badge" id="t3a-verdict-badge"></span>
           </div>
           <div class="result-interpretation" id="t3a-note"></div>
+
+          <!-- T3-4: upozornění nezávislá na průměru -->
+          <div class="signal-list" id="t3a-alerts" role="status" aria-live="polite"></div>
 
           <div class="section-divider"></div>
 
@@ -969,6 +1059,9 @@
             <div class="progress-bar-fill" id="t3b-progress-bar" style="width:0%"></div>
           </div>
 
+          <!-- T3-6: kritický spouštěč nezávislý na skóre -->
+          <div class="signal-list" id="t3b-critical" role="status" aria-live="polite"></div>
+
           <div class="section-divider"></div>
 
           <!-- Red flags -->
@@ -985,6 +1078,25 @@
 
         </div><!-- /result-box -->
 
+
+        <!-- D2b: přenos hodnot do jiného toolboxu (cookie, při selhání ruční JSON) -->
+        <div class="xfer-box" id="t3b-xfer">
+          <a id="t3b-xfer-btn" class="btn-xfer" data-tool-link="6c" aria-disabled="true" aria-describedby="t3b-xfer-hint" data-i18n="xfer_btn_t6c">Přenést do kontroly varovných signálů ↗</a>
+          <span id="t3b-xfer-hint" class="xfer-hint" data-i18n="xfer_need_result_3b">Vyplňte počet dodavatelů a kritičnost nebo region.</span>
+          <p id="t3b-xfer-status" class="xfer-note" role="status"></p>
+          <details id="t3b-xfer-fallback" class="xfer-details">
+            <summary data-i18n="xfer_manual">Přenést ručně (kopírovat data)</summary>
+            <p data-i18n="xfer_fallback_intro">Automatický přenos tady nefunguje (soubor otevřený z disku, vložení do cizí stránky nebo zablokované cookies). Zkopírujte data, otevřete cílový nástroj a vložte je do pole „Vložit data z jiného nástroje“.</p>
+            <label for="t3b-xfer-json" data-i18n="xfer_json_label">Data pro cílový nástroj</label>
+            <textarea id="t3b-xfer-json" class="xfer-json" rows="4" readonly></textarea>
+            <div class="xfer-actions">
+              <button type="button" class="btn-xfer" id="t3b-xfer-copy" data-i18n="xfer_copy">Kopírovat data</button>
+              <a id="t3b-xfer-open" class="btn-xfer" data-tool-link="6c" data-i18n="xfer_open_target">Otevřít cílový nástroj ↗</a>
+            </div>
+          </details>
+        </div>
+        <p class="tool-links"><button type="button" class="btn-xfer" id="t3b-to-3c" data-i18n="t3b_to_3c">Pokračovat na závislost →</button></p>
+
         <button class="btn-reset" id="t3b-reset" data-i18n="btn_reset">Resetovat</button>
       </div>
     </section>
@@ -996,7 +1108,7 @@
       <div class="tool-card">
         <h2 data-i18n="t3c_title">Míra závislosti na dodavateli</h2>
         <p class="tool-desc" data-i18n="t3c_desc">
-          Zadejte 4 parametry. Nástroj vypočítá kompozitní index závislosti (0–100) a doporučení pro diverzifikaci.
+          Zadejte 4 povinné parametry, pokrytí výpadku je nepovinné. Nástroj vypočítá kompozitní index závislosti (0–100), kritické signály a doporučení pro diverzifikaci.
         </p>
 
         <!-- Vstup 1: Podíl spendu (%) -->
@@ -1039,6 +1151,16 @@
           <span id="t3c-criticality-err" class="error-msg" role="alert"></span>
         </div>
 
+        <!-- Vstup 5 (T3-9, nepovinný): pokrytí výpadku (týdny) -->
+        <div class="input-group">
+          <label for="t3c-cover" data-i18n="t3c_lbl_cover">Pokrytí výpadku (týdny, nepovinné)</label>
+          <input type="text" inputmode="decimal" autocomplete="off" id="t3c-cover" class="input-field"
+                 aria-describedby="t3c-cover-err" placeholder="2, 6, …"
+                 oninput="calcDependency()">
+          <span class="field-hint" data-i18n="t3c_hint_cover">Na kolik týdnů výpadek překlene použitelná zásoba nebo jiná zajištěná dodávka. Prázdné pole = neověřeno, mezera se nepočítá.</span>
+          <span id="t3c-cover-err" class="error-msg" role="alert"></span>
+        </div>
+
         <!-- Result box -->
         <div class="result-box" id="t3c-result" style="display:none;">
 
@@ -1055,6 +1177,9 @@
           <div class="progress-bar-container" aria-hidden="true">
             <div class="progress-bar-fill" id="t3c-progress-bar" style="width:0%"></div>
           </div>
+
+          <!-- T3-9: kritický signál a mezera mezi náhradou a pokrytím -->
+          <div class="signal-list" id="t3c-signals" role="status" aria-live="polite"></div>
 
           <div class="section-divider"></div>
 
@@ -1073,6 +1198,24 @@
 
         </div><!-- /result-box -->
 
+
+        <!-- D2b: přenos hodnot do jiného toolboxu (cookie, při selhání ruční JSON) -->
+        <div class="xfer-box" id="t3c-xfer">
+          <a id="t3c-xfer-btn" class="btn-xfer" data-tool-link="6c" aria-disabled="true" aria-describedby="t3c-xfer-hint" data-i18n="xfer_btn_t6c">Přenést do kontroly varovných signálů ↗</a>
+          <span id="t3c-xfer-hint" class="xfer-hint" data-i18n="xfer_need_result_3c">Vyplňte alternativy a kritičnost.</span>
+          <p id="t3c-xfer-status" class="xfer-note" role="status"></p>
+          <details id="t3c-xfer-fallback" class="xfer-details">
+            <summary data-i18n="xfer_manual">Přenést ručně (kopírovat data)</summary>
+            <p data-i18n="xfer_fallback_intro">Automatický přenos tady nefunguje (soubor otevřený z disku, vložení do cizí stránky nebo zablokované cookies). Zkopírujte data, otevřete cílový nástroj a vložte je do pole „Vložit data z jiného nástroje“.</p>
+            <label for="t3c-xfer-json" data-i18n="xfer_json_label">Data pro cílový nástroj</label>
+            <textarea id="t3c-xfer-json" class="xfer-json" rows="4" readonly></textarea>
+            <div class="xfer-actions">
+              <button type="button" class="btn-xfer" id="t3c-xfer-copy" data-i18n="xfer_copy">Kopírovat data</button>
+              <a id="t3c-xfer-open" class="btn-xfer" data-tool-link="6c" data-i18n="xfer_open_target">Otevřít cílový nástroj ↗</a>
+            </div>
+          </details>
+        </div>
+
         <button class="btn-reset" id="t3c-reset" data-i18n="btn_reset">Resetovat</button>
       </div>
     </section>
@@ -1084,7 +1227,7 @@
       <div class="tool-card">
         <h2 data-i18n="t3d_title">Srovnání nákladů – dual vs. single sourcing</h2>
         <p class="tool-desc" data-i18n="t3d_desc">
-          Zadejte ceny obou dodavatelů, celkový objem a podíl dodavatele A. Nástroj zobrazí celkové náklady a srovnání s alternativami single sourcingu.
+          Zadejte ceny obou dodavatelů, celkový objem a podíl dodavatele A, případně dopravu, zavedení B a vícenáklady řízení. Nástroj zobrazí celkové náklady, srovnání se single sourcingem a se současným dodavatelem A.
         </p>
 
         <!-- Vstup 1: Cena dodavatele A -->
@@ -1137,35 +1280,103 @@
           <span id="t3d-splitA-err" class="error-msg" role="alert"></span>
         </div>
 
+        <!-- T3-10: doplňkové náklady a vlastní odhad přínosu (nepovinné) -->
+        <div class="subsection-heading" data-i18n="t3d_extra_heading">Doplňkové náklady a přínos (nepovinné)</div>
+        <p class="field-hint" data-i18n="t3d_extra_hint" style="margin-bottom:var(--space-sm);">Prázdné pole = 0. Všechny částky platí pro stejné období jako celkový objem. Odhad snížení ztráty zadejte jen tehdy, když ho umíte doložit.</p>
+
+        <div class="input-group">
+          <label for="t3d-freightA">
+            <span data-i18n="t3d_lbl_freightA">Doprava/ks – dodavatel A</span>
+            (<span data-currency-label>Kč</span>)
+          </label>
+          <input type="text" inputmode="decimal" autocomplete="off" id="t3d-freightA" class="input-field"
+                 aria-describedby="t3d-freightA-err" placeholder="0"
+                 oninput="calcDualSourcing()">
+          <span id="t3d-freightA-err" class="error-msg" role="alert"></span>
+        </div>
+
+        <div class="input-group">
+          <label for="t3d-freightB">
+            <span data-i18n="t3d_lbl_freightB">Doprava/ks – dodavatel B</span>
+            (<span data-currency-label>Kč</span>)
+          </label>
+          <input type="text" inputmode="decimal" autocomplete="off" id="t3d-freightB" class="input-field"
+                 aria-describedby="t3d-freightB-err" placeholder="0"
+                 oninput="calcDualSourcing()">
+          <span id="t3d-freightB-err" class="error-msg" role="alert"></span>
+        </div>
+
+        <div class="input-group">
+          <label for="t3d-setup">
+            <span data-i18n="t3d_lbl_setup">Jednorázové zavedení dodavatele B</span>
+            (<span data-currency-label>Kč</span>)
+          </label>
+          <input type="text" inputmode="decimal" autocomplete="off" id="t3d-setup" class="input-field"
+                 aria-describedby="t3d-setup-err" placeholder="0"
+                 oninput="calcDualSourcing()">
+          <span id="t3d-setup-err" class="error-msg" role="alert"></span>
+        </div>
+
+        <div class="input-group">
+          <label for="t3d-coord">
+            <span data-i18n="t3d_lbl_coord">Vícenáklady řízení dvou zdrojů</span>
+            (<span data-currency-label>Kč</span>)
+          </label>
+          <input type="text" inputmode="decimal" autocomplete="off" id="t3d-coord" class="input-field"
+                 aria-describedby="t3d-coord-err" placeholder="0"
+                 oninput="calcDualSourcing()">
+          <span id="t3d-coord-err" class="error-msg" role="alert"></span>
+        </div>
+
+        <div class="input-group">
+          <label for="t3d-avoided">
+            <span data-i18n="t3d_lbl_avoided">Vlastní odhad snížení očekávané ztráty</span>
+            (<span data-currency-label>Kč</span>)
+          </label>
+          <input type="text" inputmode="decimal" autocomplete="off" id="t3d-avoided" class="input-field"
+                 aria-describedby="t3d-avoided-err"
+                 oninput="calcDualSourcing()">
+          <span id="t3d-avoided-err" class="error-msg" role="alert"></span>
+        </div>
+
         <!-- Result box -->
         <div class="result-box" id="t3d-result" style="display:none;">
 
-          <!-- Celkové náklady dual sourcing -->
-          <div style="display:flex; align-items:center; gap:var(--space-md); flex-wrap:wrap; margin-bottom:var(--space-sm);">
-            <div>
-              <div class="result-value" id="t3d-total-dual">–</div>
-              <div class="result-label" data-i18n="t3d_result_total_dual">Celkové náklady – Dual sourcing</div>
+          <div id="t3d-copy-src">
+            <!-- Celkové náklady dual sourcing -->
+            <div style="display:flex; align-items:center; gap:var(--space-md); flex-wrap:wrap; margin-bottom:var(--space-sm);">
+              <div>
+                <div class="result-value" id="t3d-total-dual">–</div>
+                <div class="result-label" data-i18n="t3d_result_total_dual">Celkové náklady – Dual sourcing</div>
+              </div>
             </div>
+
+            <div class="section-divider"></div>
+
+            <!-- Detailní rozpad nákladů -->
+            <div style="font-size:var(--font-size-sm); font-weight:600; margin:var(--space-sm) 0 var(--space-xs);"
+                 data-i18n="t3d_result_breakdown">Rozpad nákladů</div>
+            <div class="partial-scores-list" id="t3d-breakdown"></div>
+
+            <div class="section-divider"></div>
+
+            <!-- Srovnání se single sourcingem -->
+            <div style="font-size:var(--font-size-sm); font-weight:600; margin:var(--space-sm) 0 var(--space-xs);"
+                 data-i18n="t3d_result_comparison">Srovnání se single sourcingem</div>
+            <div class="partial-scores-list" id="t3d-comparison"></div>
+
+            <div class="section-divider"></div>
+
+            <!-- Interpretace -->
+            <div id="t3d-interpretation" class="result-interpretation"></div>
+            <!-- T3-10/T3-11: srovnání proti současnému A a čistý přínos podle odhadu -->
+            <div id="t3d-net-interpretation" class="result-interpretation"></div>
           </div>
-
-          <div class="section-divider"></div>
-
-          <!-- Detailní rozpad nákladů -->
-          <div style="font-size:var(--font-size-sm); font-weight:600; margin:var(--space-sm) 0 var(--space-xs);"
-               data-i18n="t3d_result_breakdown">Rozpad nákladů</div>
-          <div class="partial-scores-list" id="t3d-breakdown"></div>
-
-          <div class="section-divider"></div>
-
-          <!-- Srovnání se single sourcingem -->
-          <div style="font-size:var(--font-size-sm); font-weight:600; margin:var(--space-sm) 0 var(--space-xs);"
-               data-i18n="t3d_result_comparison">Srovnání se single sourcingem</div>
-          <div class="partial-scores-list" id="t3d-comparison"></div>
-
-          <div class="section-divider"></div>
-
-          <!-- Interpretace -->
-          <div id="t3d-interpretation" class="result-interpretation"></div>
+          <!-- D4: kopírování výsledku; je uvnitř výsledku, bez výsledku se tedy nezobrazí -->
+          <div class="copy-result" id="t3d-copy-bar">
+            <button type="button" class="btn-copy-result" id="t3d-copy" data-i18n="copy_result">Kopírovat výsledek</button>
+            <p class="copy-result-status" id="t3d-copy-status" role="status"></p>
+          </div>
 
           <!-- Bar chart -->
           <div class="chart-container">
@@ -1187,6 +1398,19 @@
     /* ===== i18n TEXTS ===== */
     const TEXTS = {
       cs: {
+        // D2/D2b: odkazy a přenos hodnot mezi nástroji (T-016)
+        xfer_manual: 'Přenést ručně (kopírovat data)',
+        xfer_fallback_intro: 'Automatický přenos tady nefunguje (soubor otevřený z disku, vložení do cizí stránky nebo zablokované cookies). Zkopírujte data, otevřete cílový nástroj a vložte je do pole „Vložit data z jiného nástroje“.',
+        xfer_fallback_short: 'Automatický přenos tady nefunguje, data přeneste ručně níže.',
+        xfer_json_label: 'Data pro cílový nástroj',
+        xfer_copy: 'Kopírovat data',
+        xfer_copied: 'Zkopírováno.',
+        xfer_selected: 'Text je označený, zkopírujte ho Ctrl+C (Cmd+C).',
+        xfer_open_target: 'Otevřít cílový nástroj ↗',
+        xfer_btn_t6c: 'Přenést do kontroly varovných signálů ↗',
+        xfer_need_result_3b: 'Vyplňte počet dodavatelů a kritičnost nebo region.',
+        xfer_need_result_3c: 'Vyplňte alternativy a kritičnost.',
+        t3b_to_3c: 'Pokračovat na závislost →',
         // Tab labels
         tab3a: 'Scorecard',
         tab3b: 'Risk checker',
@@ -1201,6 +1425,9 @@
 
         // Shared
         btn_reset: 'Resetovat',
+        copy_result: 'Kopírovat výsledek',
+        copy_done: 'Výsledek zkopírován.',
+        copy_selected: 'Text je označený, zkopírujte ho Ctrl+C (Cmd+C).',
 
         // Placeholders
         placeholder_3b: 'Bude doplněno v T-006',
@@ -1209,7 +1436,7 @@
 
         // Nástroj 3a: Scorecard
         t3a_title:          'Hodnocení dodavatele',
-        t3a_desc:           'Ohodnoťte dodavatele v 5 kritériích (skóre 1–5, nebo ponechte „neověřeno“) a nastavte váhy (1–3, váha 0 kritérium vyřadí). Celkové skóre a verdikt se ukážou, až když jsou ohodnocena všechna kritéria s kladnou vahou.',
+        t3a_desc:           'Ohodnoťte dodavatele v 5 kritériích (skóre 1–5, nebo ponechte „neověřeno“) a nastavte váhy (1–3, váha 0 kritérium vyřadí). Celkové skóre a verdikt se ukážou, až když jsou ohodnocena všechna kritéria s kladnou vahou. Závažné selhání a slabá kvalita se ukážou jako samostatné upozornění, průměr nemění.',
         t3a_opt_unverified: '— neověřeno —',
         t3a_unverified:     'neověřeno',
         t3a_incomplete:     'Pokryto {pct} % vah',
@@ -1227,6 +1454,15 @@
 
         t3a_result_overall:  'Celkové vážené skóre (0–100)',
         t3a_partial_heading: 'Dílčí skóre (0–100)',
+
+        // T3-4: závažné selhání a slabá kvalita (průměr nemění)
+        t3a_lbl_serious:     'Závažné selhání v hodnoceném období (kvalita, bezpečnost, smluvní povinnost)',
+        t3a_opt_serious_no:  'Ne, nedošlo',
+        t3a_opt_serious_yes: 'Ano, došlo',
+        t3a_verdict_serious: 'Závažné selhání k řešení',
+        t3a_alert_serious:   'Závažné selhání řešte samostatně: určete odpovědnou osobu, ochranné opatření a termín. Dobrá cena ani ostatní známky ho nevyváží.',
+        t3a_alert_quality:   'Kvalita má známku {score}. Slabá kvalita potřebuje konkrétní nápravné opatření, příznivý celkový průměr ji nemaže.',
+        t3a_alert_serious_unverified: 'Závažné selhání je neověřené. Verdikt hodnotí jen známky; ověřte, zda nedošlo k závažnému kvalitativnímu, bezpečnostnímu nebo smluvnímu selhání.',
 
         // Verdikt thresholds (dle architektury: výborný ≥70, přijatelný ≥40, rizikový <40)
         t3a_verdict_excellent:    'Výborný',
@@ -1247,6 +1483,12 @@
         t3b_incomplete_badge: 'Neúplné údaje',
         t3b_incomplete:       'Zodpovězeno {n} z 5. Skóre a úroveň rizika se ukážou po zodpovězení všech otázek.',
         t3b_red_flags_none_partial: 'Z vyplněných odpovědí zatím žádné red flags.',
+        t3b_critical_trigger: 'Kritická komodita (kritičnost 4 nebo 5) s jediným dodavatelem nebo se závislostí na jednom zdroji. Prověřte překlenovací zásobu, obnovu dodávek a plán kvalifikace nezávislého zdroje bez ohledu na celkové skóre.',
+
+        // Úrovně signálů (B5)
+        sig_critical:  'Kritické',
+        sig_attention: 'Pozor',
+        sig_info:      'Poznámka',
 
         t3b_lbl_suppliers:    'Počet dodavatelů',
         t3b_opt_suppliers_1:  '1 (jediný)',
@@ -1286,6 +1528,7 @@
         t3b_recom_low:    'Riziko je pod kontrolou. Pravidelně monitorujte.',
         t3b_recom_mid:    'Doporučujeme přijmout opatření: zvýšit počet dodavatelů, prověřit logistiku.',
         t3b_recom_high:   'Okamžitě proveďte audit dodavatelského řetězce a identifikujte alternativy.',
+        t3b_recom_low_critical: 'Celkové skóre je nízké, ale kritický spouštěč výše vyžaduje opatření: zajistěte překlenutí výpadku a připravte nezávislý zdroj.',
 
         // Red flag labels pro každý faktor
         t3b_flag_suppliers:   'Jediný dodavatel nebo malý počet (vysoká koncentrace)',
@@ -1296,12 +1539,19 @@
 
         // Nástroj 3c: Závislost na dodavateli
         t3c_title: 'Míra závislosti na dodavateli',
-        t3c_desc:  'Zadejte 4 parametry. Nástroj vypočítá kompozitní index závislosti (0–100) a doporučení pro diverzifikaci.',
+        t3c_desc:  'Zadejte 4 povinné parametry, pokrytí výpadku je nepovinné. Nástroj vypočítá kompozitní index závislosti (0–100), kritické signály a doporučení pro diverzifikaci.',
 
         t3c_lbl_spend:        'Podíl nákupu u tohoto dodavatele (%)',
         t3c_lbl_alts:         'Počet alternativních dodavatelů',
         t3c_lbl_weeks:        'Odhadovaná doba náhrady (týdny)',
         t3c_lbl_criticality:  'Kritičnost položky (1–5)',
+        t3c_lbl_cover:        'Pokrytí výpadku (týdny, nepovinné)',
+        t3c_hint_cover:       'Na kolik týdnů výpadek překlene použitelná zásoba nebo jiná zajištěná dodávka. Prázdné pole = neověřeno, mezera se nepočítá.',
+
+        // T3-9: signály
+        t3c_sig_no_alt:  'Kritická dodávka bez kvalifikované alternativy. Prověřte překlenovací zásobu, obnovu dodávek a plán kvalifikace nezávislého zdroje.',
+        t3c_sig_gap:     'Náhrada trvá o {gap} týd. déle než pokrytí výpadku. Zkraťte dobu náhrady nebo zajistěte překlenutí výpadku.',
+        t3c_sig_covered: 'Pokrytí {cover} týd. překlene odhadovanou dobu náhrady {weeks} týd. Předpokladem je skutečně použitelná zásoba nebo zajištěná dodávka.',
 
         t3c_result_index_label: 'Index závislosti (0–100)',
         t3c_components_heading: 'Složky indexu',
@@ -1341,12 +1591,21 @@
 
         // Nástroj 3d: Dual sourcing
         t3d_title: 'Srovnání nákladů – dual vs. single sourcing',
-        t3d_desc:  'Zadejte ceny obou dodavatelů, celkový objem a podíl dodavatele A. Nástroj zobrazí celkové náklady a srovnání s alternativami single sourcingu.',
+        t3d_desc:  'Zadejte ceny obou dodavatelů, celkový objem a podíl dodavatele A, případně dopravu, zavedení B a vícenáklady řízení. Nástroj zobrazí celkové náklady, srovnání se single sourcingem a se současným dodavatelem A.',
 
         t3d_lbl_priceA:  'Cena/ks – dodavatel A',
         t3d_lbl_priceB:  'Cena/ks – dodavatel B',
         t3d_lbl_volume:  'Celkový objem (ks)',
         t3d_lbl_splitA:  'Podíl dodavatele A (%)',
+
+        // T3-10: doplňkové náklady a odhad přínosu
+        t3d_extra_heading: 'Doplňkové náklady a přínos (nepovinné)',
+        t3d_extra_hint:    'Prázdné pole = 0. Všechny částky platí pro stejné období jako celkový objem. Odhad snížení ztráty zadejte jen tehdy, když ho umíte doložit.',
+        t3d_lbl_freightA:  'Doprava/ks – dodavatel A',
+        t3d_lbl_freightB:  'Doprava/ks – dodavatel B',
+        t3d_lbl_setup:     'Jednorázové zavedení dodavatele B',
+        t3d_lbl_coord:     'Vícenáklady řízení dvou zdrojů',
+        t3d_lbl_avoided:   'Vlastní odhad snížení očekávané ztráty',
 
         t3d_result_total_dual: 'Celkové náklady – Dual sourcing',
         t3d_result_breakdown:  'Rozpad nákladů',
@@ -1359,6 +1618,20 @@
         t3d_single_a:     'Single sourcing – pouze A',
         t3d_single_b:     'Single sourcing – pouze B',
         t3d_diff_cheaper: 'Příplatek oproti levnějšímu single sourcingu',
+        t3d_vsA_premium:  'Příplatek proti současnému A',
+        t3d_vsA_saving:   'Úspora proti současnému A',
+        t3d_row_setup:    'Zavedení B',
+        t3d_row_coord:    'Vícenáklady řízení dvou zdrojů',
+        t3d_row_avoided:  'Vlastní odhad snížení očekávané ztráty',
+        t3d_net_pos:      'Čistý modelovaný přínos',
+        t3d_net_neg:      'Čistý modelovaný záporný přínos',
+
+        t3d_net_none_premium: 'Bez odhadu snížení očekávané ztráty nelze rozhodnout o celkové výhodnosti. Přínos nižšího rizika musí pokrýt příplatek {premium} proti současnému A.',
+        t3d_net_none_saving:  'Rozdělení vychází při zadaných nákladech levněji než samotný A. Prověřte kapacitu, kvalitu a proveditelnost u dodavatele B.',
+        t3d_net_none_equal:   'Rozdělení má při zadaných nákladech stejné náklady jako samotný A. O výhodnosti rozhoduje přínos nižšího rizika.',
+        t3d_net_pos_text:     'Podle vašeho odhadu přínos nižšího rizika převyšuje dodatečné náklady o {net}. Výsledek stojí na ověřitelnosti odhadu a nezávislosti obou zdrojů.',
+        t3d_net_zero_text:    'Podle vašeho odhadu přínos nižšího rizika právě pokrývá dodatečné náklady.',
+        t3d_net_neg_text:     'Podle vašeho odhadu přínos nižšího rizika nepokrývá dodatečné náklady, chybí {net}. Zvažte jiné rozdělení, cenu nebo způsob zajištění.',
 
         t3d_interp_dual_costlier:  'Dual sourcing je o {diff} dražší než nejlevnější single sourcing (dodavatel {who}).',
         t3d_interp_dual_equal:     'Dual sourcing má stejné náklady jako nejlevnější single sourcing.',
@@ -1378,6 +1651,19 @@
         t3d_chart_label_dual: 'Dual sourcing',
       },
       en: {
+        // D2/D2b: odkazy a přenos hodnot mezi nástroji (T-016)
+        xfer_manual: 'Transfer manually (copy data)',
+        xfer_fallback_intro: 'Automatic transfer is not available here (file opened from disk, embedded in another site or cookies blocked). Copy the data, open the target tool and paste it into "Paste data from another tool".',
+        xfer_fallback_short: 'Automatic transfer does not work here, transfer the data manually below.',
+        xfer_json_label: 'Data for the target tool',
+        xfer_copy: 'Copy data',
+        xfer_copied: 'Copied.',
+        xfer_selected: 'Text is selected, copy it with Ctrl+C (Cmd+C).',
+        xfer_open_target: 'Open the target tool ↗',
+        xfer_btn_t6c: 'Send to red flag checker ↗',
+        xfer_need_result_3b: 'Fill in the number of suppliers and criticality or region.',
+        xfer_need_result_3c: 'Fill in alternatives and criticality.',
+        t3b_to_3c: 'Continue to dependency →',
         // Tab labels
         tab3a: 'Scorecard',
         tab3b: 'Risk checker',
@@ -1392,6 +1678,9 @@
 
         // Shared
         btn_reset: 'Reset',
+        copy_result: 'Copy result',
+        copy_done: 'Result copied.',
+        copy_selected: 'Text is selected, copy it with Ctrl+C (Cmd+C).',
 
         // Placeholders
         placeholder_3b: 'Will be added in T-006',
@@ -1400,7 +1689,7 @@
 
         // Tool 3a: Scorecard
         t3a_title:          'Supplier evaluation',
-        t3a_desc:           'Score the supplier on 5 criteria (1–5, or leave "not verified") and set weights (1–3, weight 0 excludes a criterion). The overall score and verdict appear once every criterion with a positive weight is scored.',
+        t3a_desc:           'Score the supplier on 5 criteria (1–5, or leave "not verified") and set weights (1–3, weight 0 excludes a criterion). The overall score and verdict appear once every criterion with a positive weight is scored. A serious failure or weak quality is shown as a separate warning and does not change the average.',
         t3a_opt_unverified: '— not verified —',
         t3a_unverified:     'not verified',
         t3a_incomplete:     '{pct} % of weight covered',
@@ -1419,6 +1708,15 @@
         t3a_result_overall:  'Weighted overall score (0–100)',
         t3a_partial_heading: 'Partial scores (0–100)',
 
+        // T3-4: serious failure and weak quality (average unchanged)
+        t3a_lbl_serious:     'Serious failure in the evaluated period (quality, safety, contractual obligation)',
+        t3a_opt_serious_no:  'No',
+        t3a_opt_serious_yes: 'Yes',
+        t3a_verdict_serious: 'Serious failure to resolve',
+        t3a_alert_serious:   'Handle the serious failure separately: name an owner, a containment action and a deadline. A good price or other scores do not offset it.',
+        t3a_alert_quality:   'Quality is scored {score}. Weak quality needs a specific corrective action; a favourable overall average does not cancel it.',
+        t3a_alert_serious_unverified: 'Serious failure is not verified. The verdict reflects the scores only; check whether a serious quality, safety or contractual failure occurred.',
+
         t3a_verdict_excellent:    'Excellent',
         t3a_verdict_acceptable:   'Acceptable',
         t3a_verdict_risky:        'At risk',
@@ -1435,6 +1733,12 @@
         t3b_incomplete_badge: 'Incomplete data',
         t3b_incomplete:       '{n} of 5 answered. The score and risk level appear once all questions are answered.',
         t3b_red_flags_none_partial: 'No red flags in the answers given so far.',
+        t3b_critical_trigger: 'Critical commodity (criticality 4 or 5) with a sole supplier or single-source dependency. Review bridging stock, supply recovery and a plan to qualify an independent source, regardless of the overall score.',
+
+        // Signal levels (B5)
+        sig_critical:  'Critical',
+        sig_attention: 'Attention',
+        sig_info:      'Note',
 
         t3b_lbl_suppliers:     'Number of suppliers',
         t3b_opt_suppliers_1:   '1 (sole source)',
@@ -1474,6 +1778,7 @@
         t3b_recom_low:  'Risk is under control. Monitor regularly.',
         t3b_recom_mid:  'Recommended actions: increase number of suppliers, review logistics.',
         t3b_recom_high: 'Immediately audit your supply chain and identify alternatives.',
+        t3b_recom_low_critical: 'The overall score is low, but the critical trigger above requires action: secure a way to bridge an outage and prepare an independent source.',
 
         t3b_flag_suppliers:   'Sole or very few suppliers (high concentration)',
         t3b_flag_region:      'Region with elevated geopolitical or logistics risk',
@@ -1483,12 +1788,19 @@
 
         // Tool 3c: Supplier dependency
         t3c_title: 'Supplier dependency score',
-        t3c_desc:  'Enter 4 parameters. The tool calculates a composite dependency index (0–100) and diversification recommendations.',
+        t3c_desc:  'Enter 4 required parameters; outage cover is optional. The tool calculates a composite dependency index (0–100), critical signals and diversification recommendations.',
 
         t3c_lbl_spend:        'Spend share with this supplier (%)',
         t3c_lbl_alts:         'Number of alternative suppliers',
         t3c_lbl_weeks:        'Estimated replacement lead time (weeks)',
         t3c_lbl_criticality:  'Item criticality (1–5)',
+        t3c_lbl_cover:        'Outage cover (weeks, optional)',
+        t3c_hint_cover:       'How many weeks usable stock or another secured supply can bridge an outage. Leave empty if not verified; no gap is calculated.',
+
+        // T3-9: signals
+        t3c_sig_no_alt:  'Critical supply with no qualified alternative. Review bridging stock, supply recovery and a plan to qualify an independent source.',
+        t3c_sig_gap:     'Replacement takes {gap} weeks longer than the outage cover. Shorten the replacement time or secure a way to bridge the outage.',
+        t3c_sig_covered: 'Cover of {cover} weeks bridges the estimated replacement time of {weeks} weeks, provided the stock or secured supply is actually usable.',
 
         t3c_result_index_label: 'Dependency index (0–100)',
         t3c_components_heading: 'Index components',
@@ -1527,12 +1839,21 @@
 
         // Tool 3d: Dual sourcing
         t3d_title: 'Cost comparison – dual vs. single sourcing',
-        t3d_desc:  'Enter both supplier prices, total volume and the share for supplier A. The tool shows total costs and a comparison with single sourcing alternatives.',
+        t3d_desc:  'Enter both supplier prices, total volume and the share for supplier A, optionally freight, onboarding of B and coordination costs. The tool shows total costs and compares them with single sourcing and with the current supplier A.',
 
         t3d_lbl_priceA:  'Unit price – supplier A',
         t3d_lbl_priceB:  'Unit price – supplier B',
         t3d_lbl_volume:  'Total volume (units)',
         t3d_lbl_splitA:  'Share of supplier A (%)',
+
+        // T3-10: additional costs and benefit estimate
+        t3d_extra_heading: 'Additional costs and benefit (optional)',
+        t3d_extra_hint:    'An empty field counts as 0. All amounts cover the same period as the total volume. Enter the loss reduction estimate only if you can support it.',
+        t3d_lbl_freightA:  'Freight per unit – supplier A',
+        t3d_lbl_freightB:  'Freight per unit – supplier B',
+        t3d_lbl_setup:     'One-off onboarding of supplier B',
+        t3d_lbl_coord:     'Extra cost of managing two sources',
+        t3d_lbl_avoided:   'Own estimate of expected loss reduction',
 
         t3d_result_total_dual: 'Total cost – Dual sourcing',
         t3d_result_breakdown:  'Cost breakdown',
@@ -1545,6 +1866,20 @@
         t3d_single_a:     'Single sourcing – A only',
         t3d_single_b:     'Single sourcing – B only',
         t3d_diff_cheaper: 'Premium over cheapest single sourcing',
+        t3d_vsA_premium:  'Premium over the current supplier A',
+        t3d_vsA_saving:   'Saving against the current supplier A',
+        t3d_row_setup:    'Onboarding of B',
+        t3d_row_coord:    'Extra cost of managing two sources',
+        t3d_row_avoided:  'Own estimate of expected loss reduction',
+        t3d_net_pos:      'Net modelled benefit',
+        t3d_net_neg:      'Net modelled shortfall',
+
+        t3d_net_none_premium: 'Without an estimate of the expected loss reduction the overall value cannot be judged. The benefit of lower risk has to cover the premium of {premium} over the current supplier A.',
+        t3d_net_none_saving:  'With the costs entered, the split is cheaper than staying with A alone. Check capacity, quality and feasibility at supplier B.',
+        t3d_net_none_equal:   'With the costs entered, the split costs the same as staying with A alone. The benefit of lower risk decides.',
+        t3d_net_pos_text:     'By your estimate the benefit of lower risk exceeds the additional costs by {net}. The result depends on how well the estimate can be supported and on the two sources being independent.',
+        t3d_net_zero_text:    'By your estimate the benefit of lower risk exactly covers the additional costs.',
+        t3d_net_neg_text:     'By your estimate the benefit of lower risk does not cover the additional costs; {net} is missing. Consider a different split, price or way of securing supply.',
 
         t3d_interp_dual_costlier:  'Dual sourcing costs {diff} more than the cheapest single sourcing (supplier {who}).',
         t3d_interp_dual_equal:     'Dual sourcing has the same cost as the cheapest single sourcing.',
@@ -1566,6 +1901,355 @@
     };
 
     let currentLang = 'cs';
+
+    /* ===== D2: KONFIGURACE ODKAZŮ MEZI NÁSTROJI (pro admina webu) =====
+       Hodnoty mají být stejné ve všech šesti souborech.
+       TOOLBOX_LINKS        adresa každého toolboxu: soubor vedle tohoto, nebo URL stránky CMS. Prázdná hodnota odkaz
+                            (i tlačítko přenosu hodnot do toho toolboxu) skryje.
+       TOOLBOX_LINK_TARGET  '_top' (výchozí; při vložení přes <iframe> otevře celou stránku), '_self' (inline vložení
+                            do stránky CMS), '_blank' (nová karta).
+       TOOLBOX_DEEP_LINK    false = odkaz bez #tool=… otevře výchozí tab. Použít při vložení přes <iframe>, kde by kotva
+                            zůstala na rodičovské stránce; jinak samostatné stránky CMS s <iframe src="…?tool=3b">.
+       Vložení přes <iframe>: přidat allow="clipboard-write", jinak tlačítka kopírování text jen označí.
+       Cookie procuppa_xfer, text pro cookie lištu webu (kategorie technicky nezbytné, souhlas se nevyžaduje):
+         CZ: procuppa_xfer – technicky nezbytná cookie. Vznikne jen po kliknutí na „Přenést do …“ a přenese zadaná čísla
+             do jiného nástroje toolboxu. Neobsahuje osobní údaje, neslouží k měření ani reklamě, platí nejvýš 10 minut
+             a cílový nástroj ji po přečtení hned smaže.
+         EN: procuppa_xfer – strictly necessary cookie. It is set only when you click "Send to …" and carries the numbers
+             you entered to another toolbox tool. It contains no personal data, is not used for analytics or advertising,
+             lasts at most 10 minutes and is deleted as soon as the target tool reads it. */
+    const TOOLBOX_LINKS = {
+      t1: 'toolbox-1-kalkulacky.html',
+      t2: 'toolbox-2-naklady.html',
+      t3: 'toolbox-3-dodavatele.html',
+      t4: 'toolbox-4-logistika.html',
+      t5: 'toolbox-5-finance.html',
+      t6: 'toolbox-6-rychla-pomoc.html',
+    };
+    const TOOLBOX_LINK_TARGET = '_top';   // '_top' | '_self' | '_blank'
+    const TOOLBOX_DEEP_LINK = true;       // false = odkaz bez #tool=… (otevře výchozí tab)
+    const TOOLBOX_TOOLS = ['3a', '3b', '3c', '3d'];   // taby tohoto souboru (router)
+
+    /* ===== D2: ROUTER #tool= A ODKAZY =====
+       Blok mezi značkami ROUTER-SHARED je ve všech šesti toolboxech textově shodný (hlídá iter-013-gates.js, brána R).
+       Každý soubor má vlastní activateToolById(id, { focus, remember }) nad svými taby.
+       Kotva #tool=3b se záměrně neshoduje s id panelu, takže prohlížeč ani CMS na ni po načtení neskočí. */
+    // ROUTER-SHARED-BEGIN
+    const TOOL_ID = /^[1-6][a-f]$/;
+
+    /** Nástroj z adresy: #tool=3b, nebo ?tool=3b (i mezi jinými parametry). Jiné kotvy a tvary → null. */
+    function toolFromLocation() {
+      let hash = '', search = '';
+      try { hash = String(location.hash || ''); search = String(location.search || ''); } catch (e) { return null; }
+      const h = hash.match(/^#tool=([1-6][a-f])$/);
+      if (h) return h[1];
+      const q = search.replace(/^\?/, '').split('&').map(p => p.match(/^tool=([1-6][a-f])$/)).find(Boolean);
+      return q ? q[1] : null;
+    }
+
+    /** Odkaz na nástroj podle TOOLBOX_LINKS a TOOLBOX_DEEP_LINK; '' = odkaz skrýt. */
+    function toolboxHref(tool) {
+      if (!TOOL_ID.test(String(tool))) return '';
+      const file = TOOLBOX_LINKS['t' + String(tool).charAt(0)];
+      if (typeof file !== 'string' || file === '') return '';
+      return TOOLBOX_DEEP_LINK ? file + '#tool=' + tool : file;
+    }
+
+    /** Odkaz <a data-tool-link="1d"> dostane href a target; bez adresy se skryje. → true, když odkaz platí. */
+    function setToolLink(a, tool) {
+      const href = toolboxHref(tool);
+      a.hidden = !href;
+      if (!href) { a.removeAttribute('href'); return false; }
+      a.setAttribute('href', href);
+      a.setAttribute('target', TOOLBOX_LINK_TARGET);
+      if (TOOLBOX_LINK_TARGET === '_blank') a.setAttribute('rel', 'noopener');
+      else a.removeAttribute('rel');
+      return true;
+    }
+
+    /** Výběr tabu uživatelem: kotva v adrese bez nové položky historie (tlačítko Zpět neprochází taby). */
+    function rememberTool(tool) {
+      try { history.replaceState(null, '', '#tool=' + tool); } catch (e) { /* sandbox nebo file:// bez history */ }
+    }
+
+    /** Načtení: tab z adresy bez přesunu fokusu. Změna kotvy (hashchange): tab a fokus na jeho tlačítko. */
+    function initRouter() {
+      document.querySelectorAll('[data-tool-link]').forEach(a => setToolLink(a, a.getAttribute('data-tool-link')));
+      const tool = toolFromLocation();
+      if (tool) activateToolById(tool, { focus: false, remember: false });
+      window.addEventListener('hashchange', () => {
+        const t = toolFromLocation();
+        if (t) activateToolById(t, { focus: true, remember: false });
+      });
+    }
+    // ROUTER-SHARED-END
+
+    /* ===== D2b: PŘEDÁVÁNÍ HODNOT MEZI SOUBORY =====
+       Blok mezi značkami XFER-SHARED je ve všech šesti toolboxech textově shodný
+       (hlídá iter-013-gates.js, G5). Neměnit v jednom souboru bez ostatních.
+       Nezávisí na D1 ani na DOM konkrétního souboru; routy a texty má každý soubor vlastní. */
+    // XFER-SHARED-BEGIN
+    const XFER_COOKIE = 'procuppa_xfer';
+    const XFER_VERSION = 1;
+    const XFER_MAX_AGE = 600;      // s, cookie i kontrola ts
+    const XFER_MAX_BYTES = 1024;   // délka zakódované hodnoty cookie
+    const XFER_MAX_PASTE = 2000;   // znaků ve vkládacím poli
+    const XFER_MAX_DP = 6;         // desetinná místa čísla v payloadu
+    const XFER_ID = /^t([1-6])-\1[a-d]$/;
+    const xferHas = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
+
+    function xferAttrs(maxAge) {
+      return '; path=/; max-age=' + maxAge + '; SameSite=Lax' + (location.protocol === 'https:' ? '; Secure' : '');
+    }
+
+    /** Surová (zakódovaná) hodnota cookie, nebo null. */
+    function xferRead() {
+      let all = '';
+      try { all = String(document.cookie || ''); } catch (e) { return null; }
+      const hit = all.split(/;\s*/).find(c => c.indexOf(XFER_COOKIE + '=') === 0);
+      return hit ? hit.slice(XFER_COOKIE.length + 1) : null;
+    }
+
+    function xferClear() {
+      try { document.cookie = XFER_COOKIE + '=' + xferAttrs(0); } catch (e) { /* cookies zablokované */ }
+    }
+
+    function xferMake(from, to, values, now = Date.now()) {
+      return { v: XFER_VERSION, from, to, ts: now, values };
+    }
+
+    /** Zápis a zpětné čtení. → { ok, reason?, json }; json se při neúspěchu nabídne ke zkopírování. */
+    function xferSend(payload) {
+      const json = JSON.stringify(payload);
+      const enc = encodeURIComponent(json);
+      if (enc.length > XFER_MAX_BYTES) return { ok: false, reason: 'tooLarge', json };
+      try { document.cookie = XFER_COOKIE + '=' + enc + xferAttrs(XFER_MAX_AGE); } catch (e) { return { ok: false, reason: 'blocked', json }; }
+      return xferRead() === enc ? { ok: true, json } : { ok: false, reason: 'blocked', json };
+    }
+
+    /** Text (cookie nebo vložený JSON) → { payload } | { error }. */
+    function xferParse(text) {
+      if (typeof text !== 'string' || text.trim() === '') return { error: 'empty' };
+      if (text.length > XFER_MAX_PASTE) return { error: 'tooLarge' };
+      let p;
+      try { p = JSON.parse(text); } catch (e) { return { error: 'badJson' }; }
+      if (!p || typeof p !== 'object' || Array.isArray(p)) return { error: 'badJson' };
+      if (p.v !== XFER_VERSION) return { error: 'version' };
+      if (typeof p.from !== 'string' || typeof p.to !== 'string' || !XFER_ID.test(p.from) || !XFER_ID.test(p.to)) return { error: 'badRoute' };
+      if (typeof p.ts !== 'number' || !Number.isFinite(p.ts)) return { error: 'badJson' };
+      if (!p.values || typeof p.values !== 'object' || Array.isArray(p.values)) return { error: 'badValues' };
+      return { payload: p };
+    }
+
+    function xferNumError(v, spec) {
+      if (typeof v !== 'number' || !Number.isFinite(v)) return 'badValue';
+      if (Number(v.toFixed(spec.int ? 0 : XFER_MAX_DP)) !== v) return 'badValue';
+      if (v < spec.min || v > spec.max) return 'range';
+      return null;
+    }
+
+    /** Whitelist cíle. → { routeKey, route, fields: [{ key, id, type, value }] } | { error, key? }. */
+    function xferCheck(payload, routes, self) {
+      if (payload.to.slice(0, 2) !== self) return { error: 'otherFile' };
+      const routeKey = payload.from + '>' + payload.to;
+      if (!xferHas(routes, routeKey)) return { error: 'badRoute' };
+      const route = routes[routeKey];
+      const vals = payload.values;
+      for (const k of Object.keys(vals)) if (!xferHas(route.fields, k)) return { error: 'unknownKey', key: k };
+      const fields = [];
+      for (const k of Object.keys(route.fields)) {
+        const spec = route.fields[k];
+        if (!xferHas(vals, k)) { if (spec.required) return { error: 'missing', key: k }; continue; }
+        const v = vals[k];
+        const err = spec.type === 'bool' ? (typeof v === 'boolean' ? null : 'badValue')
+          : spec.type === 'enum' ? (spec.values.indexOf(v) >= 0 ? null : 'badValue')
+          : xferNumError(v, spec);
+        if (err) return { error: err, key: k };
+        fields.push({ key: k, id: spec.id || null, type: spec.type, value: v });
+      }
+      return { routeKey, route, fields };
+    }
+
+    /** Kanonické číslo → text pole v daném jazyce (D1 ho přečte zpět beze změny). */
+    function xferFieldText(n, lang) {
+      const s = String(n);
+      return lang === 'cs' ? s.replace('.', ',') : s;
+    }
+
+    /** Vše, nebo nic. Jen .value a .checked, žádné vkládání HTML. → true | false (chybí prvek). */
+    function xferApply(fields, lang) {
+      const els = fields.map(f => (f.id ? document.getElementById(f.id) : null));
+      if (fields.some((f, i) => f.id && !els[i])) return false;
+      fields.forEach((f, i) => {
+        if (!f.id) return;
+        if (f.type === 'bool') els[i].checked = f.value;
+        else if (f.type === 'enum') els[i].value = f.value;
+        else els[i].value = xferFieldText(f.value, lang);
+      });
+      return true;
+    }
+
+    /** Při načtení: cookie pro tento soubor přečíst a hned smazat (jednorázově, i neplatnou).
+        Cookie jiného souboru nechat být. → null | { payload } | { error }. */
+    function xferTakeCookie(self, now = Date.now()) {
+      const raw = xferRead();
+      if (raw === null) return null;
+      let text;
+      try { text = decodeURIComponent(raw); } catch (e) { xferClear(); return { error: 'badJson' }; }
+      const r = xferParse(text);
+      if (r.payload && r.payload.to.slice(0, 2) !== self) return null;
+      xferClear();
+      if (r.error) return r;
+      if (now - r.payload.ts > XFER_MAX_AGE * 1000 || r.payload.ts - now > 60000) return { error: 'expired' };
+      return r;
+    }
+
+    /** Schránka pro D4 i pro fallback JSON. → Promise<'copied' | 'selected'>.
+        selectEl: textarea/input se označí přes select(), jiný prvek přes Range. */
+    function copyText(text, selectEl) {
+      const fallback = () => {
+        if (!selectEl) return 'selected';
+        try {
+          if (typeof selectEl.select === 'function') { selectEl.focus(); selectEl.select(); }
+          else { const r = document.createRange(); r.selectNodeContents(selectEl); const s = window.getSelection(); s.removeAllRanges(); s.addRange(r); }
+          if (document.execCommand && document.execCommand('copy')) return 'copied';
+        } catch (e) { /* označení zůstane, uživatel zkopíruje ručně */ }
+        return 'selected';
+      };
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(text).then(() => 'copied', fallback);
+      } catch (e) { /* iframe bez clipboard-write */ }
+      return Promise.resolve(fallback());
+    }
+    // XFER-SHARED-END
+
+    /* ===== D4: KOPÍROVAT VÝSLEDEK (T-017) =====
+       Tenká obálka nad copyText z XFER-SHARED, druhá implementace schránky nevzniká. Tlačítko a hláška
+       (role="status") leží uvnitř prvku, který výsledek ukazuje a skrývá, takže bez výsledku nejsou vidět.
+       Kopíruje se innerText obsahu <p>-copy-src: jen viditelný text výsledku, bez tlačítek a grafů. */
+    const COPY_RESULTS = [
+      { btn: 't3d-copy', src: 't3d-copy-src', status: 't3d-copy-status' },
+    ];
+    const COPY_STATUS_MS = { copied: 3000, selected: 8000 };
+    const copyStatusTimers = {};
+
+    /** Viditelný text výsledku po řádcích, bez prázdných řádků a okrajových mezer. */
+    function copyResultText(el) {
+      return String(el.innerText || '').split('\n').map(s => s.trim()).filter(Boolean).join('\n');
+    }
+
+    /** D4: zkopíruje výsledek `resultBoxId` a ohlásí to v `feedbackId`. → Promise<'copied' | 'selected'>. */
+    function copyResult(resultBoxId, feedbackId) {
+      const box = document.getElementById(resultBoxId);
+      const status = document.getElementById(feedbackId);
+      return copyText(copyResultText(box), box)
+        .catch(() => 'selected')
+        .then(r => {
+          const T = TEXTS[currentLang];
+          status.textContent = r === 'copied' ? T.copy_done : T.copy_selected;
+          clearTimeout(copyStatusTimers[feedbackId]);
+          copyStatusTimers[feedbackId] = setTimeout(() => { status.textContent = ''; }, COPY_STATUS_MS[r] || COPY_STATUS_MS.selected);
+          return r;
+        });
+    }
+
+    function initCopyResults() {
+      COPY_RESULTS.forEach(c => document.getElementById(c.btn).addEventListener('click', () => copyResult(c.src, c.status)));
+    }
+
+    /* ===== D2b: ZDROJE PŘENOSU – toolbox-3, 3b a 3c → toolbox-6, 6c (mapa převodů D2b, řádky 4–6) ===== */
+    const XFER_SOURCES = {
+      t3b: { from: 't3-3b', to: 't6-6c', tool: '6c', need: 'xfer_need_result_3b', values: () => {
+        const v = xferValuesT3b({ suppliers: xferSelect('t3b-suppliers'), criticality: xferSelect('t3b-criticality'), region: xferSelect('t3b-region') });
+        return Object.keys(v).length ? v : null;
+      } },
+      t3c: { from: 't3-3c', to: 't6-6c', tool: '6c', need: 'xfer_need_result_3c', values: () => xferValuesT3c(xferT3cInputs()) },
+    };
+
+    function xferSelect(id) { return String(document.getElementById(id).value); }
+
+    /** 3c: alternativy (celé ≥ 0) a kritičnost (celá 1–5) po D1, jinak null. */
+    function xferT3cInputs() {
+      const read = (id, ok) => { const r = parseNumEx(document.getElementById(id).value, { integer: true }); return r.error || !ok(r.value) ? null : r.value; };
+      return { alts: read('t3c-alts', n => n >= 0), criticality: read('t3c-criticality', n => n >= 1 && n <= 5) };
+    }
+
+    /** 3b: surové hodnoty selectů ('' = neověřeno). Neověřený vstup → klíč chybí (zdroj netvrdí, že signál neplatí). */
+    function xferValuesT3b({ suppliers, criticality, region }) {
+      const v = {};
+      if (suppliers !== '' && criticality !== '') v.rf09 = suppliers === '30' && (criticality === '15' || criticality === '20');
+      if (suppliers !== '' && region !== '') v.rf10 = suppliers === '30' && region === '25';
+      return v;
+    }
+
+    /** 3c: celá čísla po D1 (null = prázdné nebo chybné). 0 alternativ a kritičnost ≥ 4 → rf-09. */
+    function xferValuesT3c({ alts, criticality }) {
+      if (alts === null || criticality === null) return null;
+      return { rf09: alts === 0 && criticality >= 4 };
+    }
+
+    /* ===== D2b: ZDROJ PŘENOSU – obsluha (stejná v toolbox-2 a toolbox-3) =====
+       Prvky s prefixem nástroje p: <p>-xfer (blok), -xfer-btn (odkaz „Přenést do …“), -xfer-hint, -xfer-status,
+       -xfer-fallback (<details>), -xfer-json (readonly textarea), -xfer-copy. Hodnoty jdou z výsledku výpočtu,
+       nikdy z textu v DOM. */
+
+    /** Stav tlačítka: aktivní jen s platnými hodnotami. JSON pro ruční přenos je vždy aktuální. → values | null. */
+    function xferSourceRefresh(p) {
+      const src = XFER_SOURCES[p];
+      const values = src.values();
+      const ok = values !== null;
+      document.getElementById(p + '-xfer-btn').setAttribute('aria-disabled', ok ? 'false' : 'true');
+      document.getElementById(p + '-xfer-hint').hidden = ok;
+      document.getElementById(p + '-xfer-copy').disabled = !ok;
+      document.getElementById(p + '-xfer-json').value = ok ? JSON.stringify(xferMake(src.from, src.to, values)) : '';
+      if (!ok) document.getElementById(p + '-xfer-status').textContent = '';
+      return values;
+    }
+
+    /** Klik na „Přenést do …“: zápis cookie se zpětným čtením. OK → odkaz naviguje; jinak zůstat a otevřít ruční přenos.
+        → 'disabled' | 'sent' | 'fallback'. */
+    function xferSourceClick(p, e) {
+      const src = XFER_SOURCES[p], T = TEXTS[currentLang];
+      const status = document.getElementById(p + '-xfer-status');
+      const values = xferSourceRefresh(p);
+      if (values === null) {
+        if (e) e.preventDefault();
+        status.textContent = T[src.need];
+        return 'disabled';
+      }
+      const res = xferSend(xferMake(src.from, src.to, values));
+      document.getElementById(p + '-xfer-json').value = res.json;
+      if (res.ok) { status.textContent = ''; return 'sent'; }
+      if (e) e.preventDefault();
+      document.getElementById(p + '-xfer-fallback').open = true;
+      status.textContent = T.xfer_fallback_short;
+      document.getElementById(p + '-xfer-json').focus();
+      return 'fallback';
+    }
+
+    /** „Kopírovat data“ → Promise<'copied' | 'selected' | 'disabled'>. */
+    function xferSourceCopy(p) {
+      const T = TEXTS[currentLang];
+      const status = document.getElementById(p + '-xfer-status');
+      const ta = document.getElementById(p + '-xfer-json');
+      if (xferSourceRefresh(p) === null) { status.textContent = T[XFER_SOURCES[p].need]; return Promise.resolve('disabled'); }
+      return copyText(ta.value, ta).then(r => { status.textContent = r === 'copied' ? T.xfer_copied : T.xfer_selected; return r; });
+    }
+
+    /** Po routeru: obsluha tlačítek; bez adresy cílového toolboxu (TOOLBOX_LINKS) se celý blok skryje. */
+    function xferSourceInit() {
+      Object.keys(XFER_SOURCES).forEach(p => {
+        const box = document.getElementById(p + '-xfer');
+        if (!toolboxHref(XFER_SOURCES[p].tool)) { box.hidden = true; return; }
+        document.getElementById(p + '-xfer-btn').addEventListener('click', e => xferSourceClick(p, e));
+        document.getElementById(p + '-xfer-copy').addEventListener('click', () => xferSourceCopy(p));
+        xferSourceRefresh(p);
+      });
+    }
+
+    /** Číslo pro payload bez float šumu (nejvýš XFER_MAX_DP desetinných míst). */
+    function xferRound(x) { return Number(x.toFixed(XFER_MAX_DP)); }
+
 
     /* ===== CURRENCY STATE ===== */
     let currentCurrency = 'CZK';
@@ -1704,6 +2388,36 @@
       return p.value;
     }
 
+    /**
+     * Nepovinné nezáporné číselné pole (B5). Prázdné pole → `empty`, chyba se zobrazí u pole.
+     * Vrací { ok, value }.
+     */
+    function readOptionalNumber(id, empty) {
+      const raw = document.getElementById(id).value;
+      const err = validateNumeric(raw, { required: false, allowNegative: false });
+      if (err) { showError(id, err); return { ok: false, value: null }; }
+      clearError(id);
+      const p = parseNumEx(raw);
+      return { ok: true, value: p.error === 'empty' ? empty : p.value };
+    }
+
+    /**
+     * Vykreslí signály [{ level: 'critical'|'attention'|'info', text }] do kontejneru.
+     * Úroveň je i v textu (ne jen barvou). Prázdný seznam kontejner skryje.
+     */
+    function renderSignals(containerId, signals) {
+      const T = TEXTS[currentLang];
+      const box = document.getElementById(containerId);
+      const prefix = { critical: T.sig_critical, attention: T.sig_attention, info: T.sig_info };
+      box.replaceChildren(...signals.map(s => {
+        const p = document.createElement('p');
+        p.className = 'signal-box ' + s.level;
+        p.textContent = prefix[s.level] + ': ' + s.text;
+        return p;
+      }));
+      box.style.display = signals.length ? 'block' : 'none';
+    }
+
     function showErrorEl(elId, message) {
       const errEl = document.getElementById(elId);
       if (!errEl) return;
@@ -1794,6 +2508,7 @@
         const btn = e.target.closest('.tab-btn');
         if (!btn) return;
         activateTab(btn, buttons, panels);
+        rememberTool(btn.id.replace('tab-btn-', ''));
       });
 
       nav.addEventListener('keydown', (e) => {
@@ -1816,6 +2531,7 @@
           e.preventDefault();
           buttons[targetIndex].focus();
           activateTab(buttons[targetIndex], buttons, panels);
+          rememberTool(buttons[targetIndex].id.replace('tab-btn-', ''));
         }
       });
     }
@@ -1840,6 +2556,19 @@
         panel.classList.add('active');
         panel.removeAttribute('hidden');
       }
+    }
+
+    /** D2: aktivuje tab podle id nástroje ('1d'). focus = fokus na tlačítko tabu, remember = kotva #tool= v adrese.
+        → false, když tab v tomto souboru není. */
+    function activateToolById(id, { focus = false, remember = true } = {}) {
+      if (TOOLBOX_TOOLS.indexOf(id) < 0) return false;
+      const btn = document.getElementById('tab-btn-' + id);
+      const nav = document.querySelector('.tab-nav');
+      if (!btn || !nav) return false;
+      activateTab(btn, Array.from(nav.querySelectorAll('.tab-btn')), document.querySelectorAll('.tool-panel'));
+      if (focus) btn.focus();
+      if (remember) rememberTool(id);
+      return true;
     }
 
     /* ===== LANG SWITCHER ===== */
@@ -1883,6 +2612,21 @@
       return { partial, complete, coverage, score };
     }
 
+    /**
+     * T3-4: upozornění scorecardu nezávislá na průměru (skóre ani jeho výpočet nemění).
+     *  serious: 'yes' | 'no' | '' (neověřeno); scores/weights jako u scorecard().
+     * Slabá kvalita = kritérium Kvalita s kladnou vahou ohodnocené známkou 1 nebo 2.
+     * Vrací [{ level, key, score? }].
+     */
+    function scorecardAlerts({ scores, weights, serious }) {
+      const alerts = [];
+      if (serious === 'yes') alerts.push({ level: 'critical', key: 't3a_alert_serious' });
+      const q = scores[1];
+      if (weights[1] > 0 && q !== null && q <= 2) alerts.push({ level: 'attention', key: 't3a_alert_quality', score: q });
+      if (serious !== 'yes' && serious !== 'no') alerts.push({ level: 'info', key: 't3a_alert_serious_unverified' });
+      return alerts;
+    }
+
     function calcScorecard() {
       const T = TEXTS[currentLang];
       const resultEl = document.getElementById('t3a-result');
@@ -1907,6 +2651,7 @@
         return;
       }
 
+      const serious = document.getElementById('t3a-serious').value;
       const res = scorecard({ scores, weights });
       if (res.error) {
         showErrorEl('t3a-weight-err', T.err_t3a_weight_zero);
@@ -1932,6 +2677,8 @@
         } else {
           verdictKey = 't3a_verdict_risky'; badgeClass = 'danger';
         }
+        // T3-4: závažné selhání nahradí verdikt, skóre (průměr) zůstává beze změny
+        if (serious === 'yes') { verdictKey = 't3a_verdict_serious'; badgeClass = 'danger'; }
         document.getElementById('t3a-overall-score').textContent = res.score.toFixed(1);
         badge.textContent = T[verdictKey];
         badge.className = 'risk-badge ' + badgeClass;
@@ -1942,6 +2689,10 @@
         badge.className = 'risk-badge';
         note.textContent = T.t3a_incomplete_hint;
       }
+
+      // T3-4: upozornění (závažné selhání, slabá kvalita, neověřené závažné selhání)
+      renderSignals('t3a-alerts', scorecardAlerts({ scores, weights, serious })
+        .map(a => ({ level: a.level, text: T[a.key].replace('{score}', a.score) })));
 
       // Dílčí skóre seznam (neověřené kritérium = „neověřeno“, ne 0)
       const partialContainer = document.getElementById('t3a-partial-scores');
@@ -2029,6 +2780,7 @@
       for (let i = 0; i < 5; i++) {
         document.getElementById('t3a-score-' + i).value = '';
       }
+      document.getElementById('t3a-serious').value = '';
       // Reset weights to defaults
       const defaultWeights = [2, 3, 2, 1, 1];
       for (let i = 0; i < 5; i++) {
@@ -2074,13 +2826,39 @@
       return { answered, complete: true, score, level };
     }
 
+    /**
+     * T3-6: kritický spouštěč nezávislý na skóre. Vstupy jsou jen ověřené odpovědi:
+     *  criticality 1–5 | null, soleSupplier / singleSource true | false | null (null = neověřeno).
+     * Spustí se při kritičnosti ≥ 4 a jediném dodavateli (nebo závislosti na jednom zdroji);
+     * z neověřené odpovědi nikdy nevznikne.
+     */
+    function riskCriticalTrigger({ criticality, soleSupplier, singleSource }) {
+      return criticality !== null && criticality >= 4 && (soleSupplier === true || singleSource === true);
+    }
+
+    // Hodnota selectu (body) → ověřená odpověď; '' = neověřeno (null)
+    const T3B_CRITICALITY_BY_POINTS = { '0': 1, '5': 2, '10': 3, '15': 4, '20': 5 };
+    function riskAnswers() {
+      const v = id => document.getElementById(id).value;
+      const yesNo = (raw, yes) => (raw === '' ? null : raw === yes);
+      const crit = v('t3b-criticality');
+      return {
+        criticality: crit === '' ? null : T3B_CRITICALITY_BY_POINTS[crit],
+        soleSupplier: yesNo(v('t3b-suppliers'), '30'),
+        singleSource: yesNo(v('t3b-singlesource'), '10'),
+      };
+    }
+
     function calcRisk() {
       const T = TEXTS[currentLang];
+      xferSourceRefresh('t3b');
       const points = RISK_FACTORS.map(f => {
         const raw = document.getElementById(f.id).value;
         return raw === '' ? null : Number(raw);
       });
       const res = riskStatus(points);
+      const critical = riskCriticalTrigger(riskAnswers());
+      renderSignals('t3b-critical', critical ? [{ level: 'critical', text: T.t3b_critical_trigger }] : []);
 
       if (res.answered === 0) {
         document.getElementById('t3b-result').style.display = 'none';
@@ -2101,7 +2879,9 @@
         badge.className = 'risk-badge ' + lv.badgeClass;
         bar.style.width = res.score + '%';
         bar.className = 'progress-bar-fill ' + lv.badgeClass;
-        document.getElementById('t3b-recommendation').textContent = T[lv.recomKey];
+        // T3-6: nízké skóre nesmí s kritickým spouštěčem tvrdit „pod kontrolou“
+        document.getElementById('t3b-recommendation').textContent =
+          critical && res.level === 'low' ? T.t3b_recom_low_critical : T[lv.recomKey];
       } else {
         document.getElementById('t3b-score-value').textContent = '—';
         badge.textContent = T.t3b_incomplete_badge;
@@ -2141,8 +2921,10 @@
     function resetRisk() {
       // Reset všech selectů na první volbu „— neověřeno —“
       RISK_FACTORS.forEach(f => { document.getElementById(f.id).value = ''; });
+      renderSignals('t3b-critical', []);
       // Skryj result box
       document.getElementById('t3b-result').style.display = 'none';
+      xferSourceRefresh('t3b');
     }
 
     document.getElementById('t3b-reset').addEventListener('click', resetRisk);
@@ -2165,17 +2947,37 @@
                spendComponent, altComponent, replacementComponent, criticalityComponent };
     }
 
+    /**
+     * T3-9: signály závislosti nezávislé na indexu, jen z ověřených (zadaných) hodnot.
+     *  cover = pokrytí výpadku v týdnech, null = neověřeno (mezera se nepočítá).
+     *  - kritičnost ≥ 4 a 0 alternativ → kritický signál,
+     *  - náhrada déle než pokrytí → mezera (weeks − cover); kritická při kritičnosti ≥ 4, jinak pozor,
+     *  - pokrytí ≥ náhrada → informace.
+     * Vrací [{ level, key, gap? }].
+     */
+    function dependencySignals({ alts, weeks, criticality, cover }) {
+      const signals = [];
+      if (criticality >= 4 && alts === 0) signals.push({ level: 'critical', key: 't3c_sig_no_alt' });
+      if (cover !== null) {
+        if (weeks > cover) signals.push({ level: criticality >= 4 ? 'critical' : 'attention', key: 't3c_sig_gap', gap: weeks - cover });
+        else signals.push({ level: 'info', key: 't3c_sig_covered' });
+      }
+      return signals;
+    }
+
     function calcDependency() {
       const T = TEXTS[currentLang];
+      xferSourceRefresh('t3c');
 
       // Čtení vstupů
       const spendRaw       = document.getElementById('t3c-spend').value.trim();
       const altsRaw        = document.getElementById('t3c-alts').value.trim();
       const weeksRaw       = document.getElementById('t3c-weeks').value.trim();
       const critRaw        = document.getElementById('t3c-criticality').value.trim();
+      const coverRaw       = document.getElementById('t3c-cover').value.trim();
 
       // Pokud jsou všechna pole prázdná, nekalkujeme
-      if (spendRaw === '' && altsRaw === '' && weeksRaw === '' && critRaw === '') {
+      if (spendRaw === '' && altsRaw === '' && weeksRaw === '' && critRaw === '' && coverRaw === '') {
         document.getElementById('t3c-result').style.display = 'none';
         return;
       }
@@ -2185,8 +2987,9 @@
       const alternatives = readRequiredNumber('t3c-alts', { integer: true, inRange: v => v >= 0 }, T.err_t3c_alts);
       const replacementWeeks = readRequiredNumber('t3c-weeks', { inRange: v => v >= 0 }, T.err_t3c_weeks);
       const criticality = readRequiredNumber('t3c-criticality', { integer: true, inRange: v => v >= 1 && v <= 5 }, T.err_t3c_criticality);
+      const cover = readOptionalNumber('t3c-cover', null);   // T3-9, nepovinné
 
-      if ([spendShare, alternatives, replacementWeeks, criticality].includes(null)) {
+      if ([spendShare, alternatives, replacementWeeks, criticality].includes(null) || !cover.ok) {
         document.getElementById('t3c-result').style.display = 'none';
         return;
       }
@@ -2223,6 +3026,13 @@
       bar.style.width = Math.min(indexRounded, 100) + '%';
       bar.className = 'progress-bar-fill ' + badgeClass;
 
+      // T3-9: kritický signál a mezera mezi dobou náhrady a pokrytím výpadku
+      const signals = dependencySignals({ alts: alternatives, weeks: replacementWeeks, criticality, cover: cover.value });
+      renderSignals('t3c-signals', signals.map(s => ({ level: s.level, text: T[s.key]
+        .replace('{gap}', formatPlainNumber(Math.round(s.gap * 100) / 100))
+        .replace('{cover}', formatPlainNumber(cover.value))
+        .replace('{weeks}', formatPlainNumber(replacementWeeks)) })));
+
       // Složky indexu
       const components = document.getElementById('t3c-components');
       components.innerHTML = '';
@@ -2256,12 +3066,13 @@
     }
 
     function resetDependency() {
-      ['t3c-spend', 't3c-alts', 't3c-weeks', 't3c-criticality'].forEach(id => {
+      ['t3c-spend', 't3c-alts', 't3c-weeks', 't3c-criticality', 't3c-cover'].forEach(id => {
         const el = document.getElementById(id);
         el.value = '';
         clearError(id);
       });
       document.getElementById('t3c-result').style.display = 'none';
+      xferSourceRefresh('t3c');
     }
 
     document.getElementById('t3c-reset').addEventListener('click', resetDependency);
@@ -2269,6 +3080,37 @@
     /* ===========================================================
        NÁSTROJ 3d: DUAL SOURCING – COST COMPARISON
        =========================================================== */
+
+    /**
+     * T3-10, T3-11: dual sourcing jako čistá funkce (vzorec v8 supplier-math.mjs `sourcing`).
+     *  ceny a doprava za kus, objem za období, splitA 1–99 (%), setup = jednorázové zavedení B,
+     *  coord = vícenáklady řízení dvou zdrojů, avoided = vlastní odhad snížení očekávané ztráty (null = nezadáno).
+     *  singleA = (a + dopravaA) × Q; singleB = (b + dopravaB) × Q + zavedení B;
+     *  dual = (a + dopravaA) × Q_A + (b + dopravaB) × Q_B + zavedení B + koordinace;
+     *  premiumVsA = dual − singleA (záporné = úspora proti současnému A); net = avoided − premiumVsA.
+     * Bez doplňkových nákladů je výsledek shodný s dřívějším vzorcem (100/110/1 000/70 % → 103 000).
+     */
+    function dualSourcing({ priceA, priceB, volume, splitA, freightA = 0, freightB = 0, setup = 0, coord = 0, avoided = null }) {
+      const splitB = 100 - splitA;
+      const unitsA = volume * splitA / 100;
+      const unitsB = volume * splitB / 100;
+      const costA = (priceA + freightA) * unitsA;
+      const costB = (priceB + freightB) * unitsB;
+      const setupUsed = splitB > 0 ? setup : 0;
+      const coordUsed = splitA > 0 && splitB > 0 ? coord : 0;
+      const totalDual = costA + costB + setupUsed + coordUsed;
+      const totalSingleA = (priceA + freightA) * volume;
+      const totalSingleB = (priceB + freightB) * volume + setup;
+      const cheaperSingle = Math.min(totalSingleA, totalSingleB);
+      const cheaperWho = totalSingleA <= totalSingleB ? 'A' : 'B';
+      const premiumVsA = totalDual - totalSingleA;
+      return {
+        splitB, unitsA, unitsB, costA, costB, setupUsed, coordUsed, totalDual, totalSingleA, totalSingleB,
+        cheaperWho, diffVsCheaper: totalDual - cheaperSingle, premiumVsA,
+        avgPrice: (priceA * unitsA + priceB * unitsB) / volume,
+        avoided, net: avoided === null ? null : avoided - premiumVsA,
+      };
+    }
 
     function calcDualSourcing() {
       const T = TEXTS[currentLang];
@@ -2297,92 +3139,93 @@
         warnEl.classList.remove('visible');
       }
 
-      // Validace vstupů
-      let hasError = false;
-
+      // Validace vstupů: povinné ceny a objem, nepovinné doplňkové náklady (prázdné = 0) a odhad přínosu
       const priceA = readRequiredNumber('t3d-priceA', { inRange: v => v > 0 }, T.err_t3d_priceA);
       const priceB = readRequiredNumber('t3d-priceB', { inRange: v => v > 0 }, T.err_t3d_priceB);
       const totalVolume = readRequiredNumber('t3d-volume', { inRange: v => v > 0 }, T.err_t3d_volume);
-      if ([priceA, priceB, totalVolume].includes(null)) hasError = true;
+      const extras = {
+        freightA: readOptionalNumber('t3d-freightA', 0),
+        freightB: readOptionalNumber('t3d-freightB', 0),
+        setup:    readOptionalNumber('t3d-setup', 0),
+        coord:    readOptionalNumber('t3d-coord', 0),
+        avoided:  readOptionalNumber('t3d-avoided', null),
+      };
 
-      if (hasError) {
+      if ([priceA, priceB, totalVolume].includes(null) || Object.values(extras).some(x => !x.ok)) {
         document.getElementById('t3d-result').style.display = 'none';
         return;
       }
 
-      // Algoritmus dle architecture_iter-005.md sekce 4.4
-      const splitB   = 100 - splitAVal;
-      const volumeA  = totalVolume * (splitAVal / 100);
-      const volumeB  = totalVolume * (splitB    / 100);
-
-      const costA     = priceA * volumeA;
-      const costB     = priceB * volumeB;
-      const totalDual = costA + costB;
-
-      const avgPriceDual = totalDual / totalVolume;
-
-      const totalSingleA = priceA * totalVolume;
-      const totalSingleB = priceB * totalVolume;
-
-      const cheaperSingle   = Math.min(totalSingleA, totalSingleB);
-      const cheaperWho      = totalSingleA <= totalSingleB ? 'A' : 'B';
-      const diffVsCheaper   = totalDual - cheaperSingle; // vždy >= 0 pro lineární ceny
+      const r = dualSourcing({ priceA, priceB, volume: totalVolume, splitA: splitAVal,
+        freightA: extras.freightA.value, freightB: extras.freightB.value, setup: extras.setup.value,
+        coord: extras.coord.value, avoided: extras.avoided.value });
+      const sym = CURRENCY_CONFIG[currentCurrency].symbol;
+      const money = v => formatCurrency(v, 0) + ' ' + sym;
+      const fillRows = (containerId, rows) => {
+        document.getElementById(containerId).replaceChildren(...rows.map(item => {
+          const row = document.createElement('div');
+          row.className = 'result-row';
+          row.innerHTML =
+            '<span class="result-row-label">' + escHtml(item.label) + '</span>' +
+            '<span class="result-row-value">'  + escHtml(item.value) + '</span>';
+          return row;
+        }));
+      };
 
       // Zobraz hlavní hodnotu
-      document.getElementById('t3d-total-dual').textContent =
-        formatCurrency(totalDual, 0) + ' ' + CURRENCY_CONFIG[currentCurrency].symbol;
+      document.getElementById('t3d-total-dual').textContent = money(r.totalDual);
 
-      // Rozpad nákladů
-      const breakdown = document.getElementById('t3d-breakdown');
-      breakdown.innerHTML = '';
-      const sym = CURRENCY_CONFIG[currentCurrency].symbol;
-      const breakdownData = [
-        { labelKey: 't3d_breakdown_costA',    value: formatCurrency(costA, 0) + ' ' + sym + ' (' + splitAVal + ' %)' },
-        { labelKey: 't3d_breakdown_costB',    value: formatCurrency(costB, 0) + ' ' + sym + ' (' + splitB    + ' %)' },
-        { labelKey: 't3d_breakdown_avgPrice', value: formatCurrency(avgPriceDual, 2) + ' ' + sym },
+      // Rozpad nákladů (doprava je v nákladech dodavatele, zavedení B a koordinace zvlášť)
+      const breakdownRows = [
+        { label: T.t3d_breakdown_costA,    value: money(r.costA) + ' (' + splitAVal + ' %)' },
+        { label: T.t3d_breakdown_costB,    value: money(r.costB) + ' (' + r.splitB  + ' %)' },
       ];
-      breakdownData.forEach(item => {
-        const row = document.createElement('div');
-        row.className = 'result-row';
-        row.innerHTML =
-          '<span class="result-row-label">' + escHtml(T[item.labelKey]) + '</span>' +
-          '<span class="result-row-value">'  + escHtml(item.value) + '</span>';
-        breakdown.appendChild(row);
-      });
+      if (r.setupUsed > 0) breakdownRows.push({ label: T.t3d_row_setup, value: money(r.setupUsed) });
+      if (r.coordUsed > 0) breakdownRows.push({ label: T.t3d_row_coord, value: money(r.coordUsed) });
+      breakdownRows.push({ label: T.t3d_breakdown_avgPrice, value: formatCurrency(r.avgPrice, 2) + ' ' + sym });
+      fillRows('t3d-breakdown', breakdownRows);
 
-      // Srovnání se single sourcingem
-      const comparison = document.getElementById('t3d-comparison');
-      comparison.innerHTML = '';
-      const compData = [
-        { labelKey: 't3d_single_a',     value: formatCurrency(totalSingleA, 0) + ' ' + sym },
-        { labelKey: 't3d_single_b',     value: formatCurrency(totalSingleB, 0) + ' ' + sym },
-        { labelKey: 't3d_diff_cheaper', value: formatCurrency(diffVsCheaper, 0) + ' ' + sym },
+      // Srovnání se single sourcingem (vs. levnější) a T3-11 proti současnému A
+      const comparisonRows = [
+        { label: T.t3d_single_a,     value: money(r.totalSingleA) },
+        { label: T.t3d_single_b,     value: money(r.totalSingleB) },
+        { label: T.t3d_diff_cheaper, value: money(r.diffVsCheaper) },
+        { label: r.premiumVsA >= 0 ? T.t3d_vsA_premium : T.t3d_vsA_saving, value: money(Math.abs(r.premiumVsA)) },
       ];
-      compData.forEach(item => {
-        const row = document.createElement('div');
-        row.className = 'result-row';
-        row.innerHTML =
-          '<span class="result-row-label">' + escHtml(T[item.labelKey]) + '</span>' +
-          '<span class="result-row-value">'  + escHtml(item.value) + '</span>';
-        comparison.appendChild(row);
-      });
+      if (r.avoided !== null) {
+        comparisonRows.push({ label: T.t3d_row_avoided, value: money(r.avoided) });
+        comparisonRows.push({ label: r.net >= 0 ? T.t3d_net_pos : T.t3d_net_neg, value: money(Math.abs(r.net)) });
+      }
+      fillRows('t3d-comparison', comparisonRows);
 
-      // Interpretace
+      // Interpretace: vs. nejlevnější single sourcing
       let interpText;
-      if (diffVsCheaper < 0.005) {
+      if (r.diffVsCheaper < 0.005) {
         interpText = T.t3d_interp_dual_equal;
       } else {
         interpText = T.t3d_interp_dual_costlier
-          .replace('{diff}', formatCurrency(diffVsCheaper, 0) + ' ' + sym)
-          .replace('{who}',  cheaperWho);
+          .replace('{diff}', money(r.diffVsCheaper))
+          .replace('{who}',  r.cheaperWho);
       }
       document.getElementById('t3d-interpretation').textContent = interpText;
+
+      // Interpretace: proti současnému A a podle vlastního odhadu přínosu
+      let netText;
+      if (r.net === null) {
+        netText = r.premiumVsA >= 0.005 ? T.t3d_net_none_premium.replace('{premium}', money(r.premiumVsA))
+          : r.premiumVsA <= -0.005 ? T.t3d_net_none_saving : T.t3d_net_none_equal;
+      } else if (Math.abs(r.net) < 0.005) {
+        netText = T.t3d_net_zero_text;
+      } else {
+        netText = (r.net > 0 ? T.t3d_net_pos_text : T.t3d_net_neg_text).replace('{net}', money(Math.abs(r.net)));
+      }
+      document.getElementById('t3d-net-interpretation').textContent = netText;
 
       // Zobraz result box
       document.getElementById('t3d-result').style.display = 'block';
 
       // Bar chart
-      renderDualChart(totalSingleA, totalSingleB, totalDual);
+      renderDualChart(r.totalSingleA, r.totalSingleB, r.totalDual);
     }
 
     function renderDualChart(totalSingleA, totalSingleB, totalDual) {
@@ -2438,7 +3281,7 @@
 
     function resetDualSourcing() {
       // Reset inputs
-      ['t3d-priceA', 't3d-priceB', 't3d-volume'].forEach(id => {
+      ['t3d-priceA', 't3d-priceB', 't3d-volume', 't3d-freightA', 't3d-freightB', 't3d-setup', 't3d-coord', 't3d-avoided'].forEach(id => {
         document.getElementById(id).value = '';
         clearError(id);
       });
@@ -2462,6 +3305,10 @@
     initLangSwitcher();
     setLang('cs');
     setCurrency('CZK');
+    initCopyResults();
+    initRouter();
+    xferSourceInit();
+    document.getElementById('t3b-to-3c').addEventListener('click', () => activateToolById('3c', { focus: true }));
   </script>
 </body>
 </html>

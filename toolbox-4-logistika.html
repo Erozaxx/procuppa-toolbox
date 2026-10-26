@@ -108,10 +108,15 @@
       transition: background 0.15s, color 0.15s, border-color 0.15s;
     }
 
-    .lang-btn.active,
-    .lang-btn:hover {
+    .lang-btn.active {
       background: var(--color-primary);
       color: var(--color-primary-text);
+      border-color: var(--color-primary);
+    }
+
+    /* Hover na neaktivním jazyce jen obrys, aby nevypadal jako zvolený (T-017) */
+    .lang-btn:not(.active):hover {
+      color: var(--color-primary);
       border-color: var(--color-primary);
     }
 
@@ -697,6 +702,78 @@
       margin-top: var(--space-xs);
     }
 
+    /* 4c: převzetí dodací doby (T4-8), jednotka a násobek (T4-6), zásobová pozice (T4-7) */
+    .ss-transfer {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-md);
+    }
+
+    .ss-transfer .btn-reset {
+      margin-top: 0;
+    }
+
+    .ss-hint {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+    }
+
+    .ss-common,
+    .ss-position {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      column-gap: var(--space-md);
+      border-top: 1px solid var(--color-border);
+      padding-top: var(--space-md);
+      margin-top: var(--space-sm);
+    }
+
+    .ss-position {
+      border-left: none;
+      border-right: none;
+      border-bottom: none;
+      padding-left: 0;
+      padding-right: 0;
+      margin-left: 0;
+      margin-right: 0;
+    }
+
+    .ss-common .ss-hint,
+    .ss-position .ss-hint,
+    .ss-position legend {
+      grid-column: 1 / -1;
+    }
+
+    .ss-common .ss-hint,
+    .ss-position .ss-hint {
+      margin: 0 0 var(--space-md);
+    }
+
+    .ss-position legend {
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      padding: 0;
+      margin-bottom: var(--space-xs);
+    }
+
+    .ss-pos-result {
+      font-size: var(--font-size-sm);
+      margin-top: var(--space-sm);
+      padding-top: var(--space-sm);
+      border-top: 1px solid var(--color-border);
+    }
+
+    .ss-pos-result:empty {
+      display: none;
+    }
+
+    .ss-pos-result.reached {
+      color: #92400E;
+      font-weight: 600;
+    }
+
     /* ===== FOOTER ===== */
     footer {
       text-align: center;
@@ -748,6 +825,14 @@
         flex-direction: column;
       }
     }
+    /* ===== D4: Kopírovat výsledek (T-017) ===== */
+    .copy-result { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-sm); margin-top: var(--space-md); }
+    .copy-result[hidden] { display: none; }
+    .btn-copy-result { padding: var(--space-xs) var(--space-md); border: 1px solid var(--color-primary); border-radius: var(--radius-sm);
+                       background: var(--color-surface); color: var(--color-primary); font: inherit; font-size: var(--font-size-sm); font-weight: 600; cursor: pointer; }
+    .btn-copy-result:hover { background: var(--color-accent); color: var(--color-accent-text, var(--color-primary)); }
+    .btn-copy-result:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+    .copy-result-status { margin: 0; font-size: var(--font-size-sm); color: var(--color-text-muted); }
   </style>
 </head>
 <body>
@@ -905,16 +990,22 @@
           <button class="ss-mode-btn" data-mode="B" data-i18n="ss_modeB">Vzorec B (Rezerva %)</button>
         </div>
 
+        <!-- Převzetí dodací doby ze záložky Lead time (T4-8, jen uvnitř souboru) -->
+        <div class="ss-transfer">
+          <button type="button" class="btn-reset" id="ss-lt-transfer" data-i18n="t4c_lt_transfer_btn">Převzít dodací dobu z Lead time</button>
+          <span id="ss-lt-transfer-msg" class="ss-hint" role="status" aria-live="polite"></span>
+        </div>
+
         <!-- Vzorec A vstupy -->
         <div class="ss-inputs-a active" id="ss-inputs-a">
           <div class="input-group">
-            <label for="ss-avg-demand" data-i18n="t4c_avgDemand">Průměrná denní spotřeba (ks/den)</label>
+            <label for="ss-avg-demand" data-i18n-unit="t4c_avgDemand">Průměrná denní spotřeba (ks/den)</label>
             <input type="text" inputmode="decimal" autocomplete="off" id="ss-avg-demand" class="input-field"
                    aria-describedby="ss-avg-demand-err" placeholder="100">
             <span id="ss-avg-demand-err" class="error-msg" role="alert"></span>
           </div>
           <div class="input-group">
-            <label for="ss-max-demand" data-i18n="t4c_maxDemand">Maximální denní spotřeba (ks/den)</label>
+            <label for="ss-max-demand" data-i18n-unit="t4c_maxDemand">Maximální denní spotřeba (ks/den)</label>
             <input type="text" inputmode="decimal" autocomplete="off" id="ss-max-demand" class="input-field"
                    aria-describedby="ss-max-demand-err" placeholder="130">
             <span id="ss-max-demand-err" class="error-msg" role="alert"></span>
@@ -930,7 +1021,7 @@
         <!-- Vzorec B vstupy -->
         <div class="ss-inputs-b" id="ss-inputs-b">
           <div class="input-group">
-            <label for="ss-avg-demand-b" data-i18n="t4c_avgDemand">Průměrná denní spotřeba (ks/den)</label>
+            <label for="ss-avg-demand-b" data-i18n-unit="t4c_avgDemand">Průměrná denní spotřeba (ks/den)</label>
             <input type="text" inputmode="decimal" autocomplete="off" id="ss-avg-demand-b" class="input-field"
                    aria-describedby="ss-avg-demand-b-err" placeholder="100">
             <span id="ss-avg-demand-b-err" class="error-msg" role="alert"></span>
@@ -949,6 +1040,50 @@
           </div>
         </div>
 
+        <!-- Jednotka a násobek zaokrouhlení (T4-6) -->
+        <div class="ss-common">
+          <div class="input-group">
+            <label for="ss-unit" data-i18n="t4c_unit">Jednotka množství</label>
+            <select id="ss-unit" class="input-field">
+              <option value="ks" data-i18n="t4c_unit_ks" selected>ks</option>
+              <option value="kg" data-i18n="t4c_unit_kg">kg</option>
+              <option value="l" data-i18n="t4c_unit_l">l</option>
+              <option value="m" data-i18n="t4c_unit_m">m</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label for="ss-step" data-i18n-unit="t4c_step">Zaokrouhlit nahoru na násobek (ks)</label>
+            <input type="text" inputmode="decimal" autocomplete="off" id="ss-step" class="input-field"
+                   aria-describedby="ss-step-err" placeholder="1">
+            <span id="ss-step-err" class="error-msg" role="alert"></span>
+          </div>
+          <p class="ss-hint" data-i18n="t4c_step_hint">Např. 1 ks, balení po 12 ks nebo 0,1 kg. Nevyplněno = 1. Zaokrouhluje se hladina zásoby, nejde o velikost objednávky.</p>
+        </div>
+
+        <!-- Zásobová pozice a spouštěč objednání (T4-7) -->
+        <fieldset class="ss-position">
+          <legend data-i18n="t4c_pos_title">Zásobová pozice (nepovinné)</legend>
+          <div class="input-group">
+            <label for="ss-onhand" data-i18n-unit="t4c_onhand">Použitelná zásoba na skladě (ks)</label>
+            <input type="text" inputmode="decimal" autocomplete="off" id="ss-onhand" class="input-field"
+                   aria-describedby="ss-onhand-err" placeholder="1400">
+            <span id="ss-onhand-err" class="error-msg" role="alert"></span>
+          </div>
+          <div class="input-group">
+            <label for="ss-onorder" data-i18n-unit="t4c_onorder">Již objednáno, dosud nedodáno (ks)</label>
+            <input type="text" inputmode="decimal" autocomplete="off" id="ss-onorder" class="input-field"
+                   aria-describedby="ss-onorder-err" placeholder="0">
+            <span id="ss-onorder-err" class="error-msg" role="alert"></span>
+          </div>
+          <div class="input-group">
+            <label for="ss-backlog" data-i18n-unit="t4c_backlog">Nevyřízená poptávka po termínu (ks)</label>
+            <input type="text" inputmode="decimal" autocomplete="off" id="ss-backlog" class="input-field"
+                   aria-describedby="ss-backlog-err" placeholder="0">
+            <span id="ss-backlog-err" class="error-msg" role="alert"></span>
+          </div>
+          <p class="ss-hint" data-i18n="t4c_pos_hint">Pozice = zásoba na skladě + již objednáno − nevyřízená poptávka po termínu. Pro porovnání s bodem objednání vyplňte všechna tři pole, i nuly. Započítejte jen potvrzené použitelné dodávky.</p>
+        </fieldset>
+
         <div class="ss-formula-box" id="ss-formula-box">
           <span id="ss-formula-text"></span>
         </div>
@@ -960,15 +1095,23 @@
         </details>
 
         <div class="result-box" style="margin-top: var(--space-md);">
-          <div class="ss-result-row">
-            <div class="ss-result-item">
-              <div class="ss-result-value" id="ss-result-ss">—</div>
-              <div class="ss-result-label" id="ss-result-ss-label"><span data-i18n="t4c_result_ss">Bezpečnostní zásoba</span> (<span data-i18n="t4c_result_unit">ks</span>)</div>
+          <div id="ss-copy-src">
+            <div class="ss-result-row">
+              <div class="ss-result-item">
+                <div class="ss-result-value" id="ss-result-ss">—</div>
+                <div class="ss-result-label" id="ss-result-ss-label" data-i18n-unit="t4c_result_ss">Bezpečnostní zásoba (ks)</div>
+              </div>
+              <div class="ss-result-item">
+                <div class="ss-result-value" id="ss-result-rop">—</div>
+                <div class="ss-result-label" data-i18n-unit="t4c_result_rop">Reorder point (ROP) (ks)</div>
+              </div>
             </div>
-            <div class="ss-result-item">
-              <div class="ss-result-value" id="ss-result-rop">—</div>
-              <div class="ss-result-label"><span data-i18n="t4c_result_rop">Reorder point (ROP)</span> (<span data-i18n="t4c_result_unit">ks</span>)</div>
-            </div>
+            <p class="ss-pos-result" id="ss-pos-result" role="status" aria-live="polite"></p>
+          </div>
+          <!-- D4: kopírování výsledku; výsledkový box je vidět vždy („—“), lištu skrývá renderSafetyStock bez výsledku -->
+          <div class="copy-result" id="ss-copy-bar" hidden>
+            <button type="button" class="btn-copy-result" id="ss-copy" data-i18n="copy_result">Kopírovat výsledek</button>
+            <p class="copy-result-status" id="ss-copy-status" role="status"></p>
           </div>
         </div>
 
@@ -1014,6 +1157,7 @@
         t4a_detail_cost: 'Náklady',
         t4a_detail_risk_transfer: 'Přechod rizika',
         t4a_detail_risk_point: 'Bod rizika',
+        t4a_detail_note: 'Na co si dát pozor',
 
         panel4b_heading: 'Lead time kalkulačka',
         t4b_title: 'Kalkulace celkového lead time',
@@ -1036,21 +1180,46 @@
         t4c_desc: 'Výpočet bezpečnostní zásoby. Vyberte vzorec a zadejte vstupy.',
         ss_modeA: 'Vzorec A (Max-Avg)',
         ss_modeB: 'Vzorec B (Rezerva %)',
-        t4c_avgDemand: 'Průměrná denní spotřeba (ks/den)',
+        t4c_avgDemand: 'Průměrná denní spotřeba ({unit}/den)',
         t4c_avgLT: 'Průměrný lead time (dny)',
-        t4c_maxDemand: 'Maximální denní spotřeba (ks/den)',
+        t4c_maxDemand: 'Maximální denní spotřeba ({unit}/den)',
         t4c_reservePct: 'Rezerva (%)',
-        t4c_result_ss: 'Bezpečnostní zásoba',
-        t4c_result_rop: 'Reorder point (ROP)',
-        t4c_result_unit: 'ks',
-        t4c_formula_A: '<strong>Vzorec A:</strong> SS = (max. spotřeba − prům. spotřeba) × prům. LT = ({peak} − {avg}) × {lt} = {rawSS}, nahoru <strong>{ss} {unit}</strong> &nbsp;|&nbsp; ROP = prům. spotřeba × prům. LT + SS = {avg} × {lt} + {ss} = {ropRaw}, nahoru <strong>{rop} {unit}</strong>',
-        t4c_formula_B: '<strong>Vzorec B:</strong> SS = prům. spotřeba × prům. LT × rezerva % / 100 = {avg} × {lt} × {pct} / 100 = {rawSS}, nahoru <strong>{ss} {unit}</strong> &nbsp;|&nbsp; ROP = prům. spotřeba × prům. LT + SS = {avg} × {lt} + {ss} = {ropRaw}, nahoru <strong>{rop} {unit}</strong>',
+        t4c_result_ss: 'Bezpečnostní zásoba ({unit})',
+        t4c_result_rop: 'Reorder point (ROP) ({unit})',
+        t4c_unit: 'Jednotka množství',
+        t4c_unit_ks: 'ks',
+        t4c_unit_kg: 'kg',
+        t4c_unit_l: 'l',
+        t4c_unit_m: 'm',
+        t4c_step: 'Zaokrouhlit nahoru na násobek ({unit})',
+        t4c_step_hint: 'Např. 1 ks, balení po 12 ks nebo 0,1 kg. Nevyplněno = 1. Zaokrouhluje se hladina zásoby, nejde o velikost objednávky.',
+        t4c_formula_A: '<strong>Vzorec A:</strong> SS = (max. spotřeba − prům. spotřeba) × prům. LT = ({peak} − {avg}) × {lt} = {rawSS}, nahoru{roundTo} <strong>{ss} {unit}</strong> &nbsp;|&nbsp; ROP = prům. spotřeba × prům. LT + SS = {avg} × {lt} + {ss} = {ropRaw}, nahoru{roundTo} <strong>{rop} {unit}</strong>',
+        t4c_formula_B: '<strong>Vzorec B:</strong> SS = prům. spotřeba × prům. LT × rezerva % / 100 = {avg} × {lt} × {pct} / 100 = {rawSS}, nahoru{roundTo} <strong>{ss} {unit}</strong> &nbsp;|&nbsp; ROP = prům. spotřeba × prům. LT + SS = {avg} × {lt} + {ss} = {ropRaw}, nahoru{roundTo} <strong>{rop} {unit}</strong>',
+        t4c_formula_step: ' na násobek {step} {unit}',
         t4c_formula_empty: 'Vyplňte všechna pole, výpočet se rozepíše zde.',
         t4c_howto_title: 'Jak počítáme a zaokrouhlujeme',
-        t4c_howto_body: 'Pojistná zásoba (SS) je rezerva navíc ke spotřebě za dodací dobu. Vzorec A: SS = (maximální − průměrná denní spotřeba) × lead time. Vzorec B: SS = průměrná spotřeba × lead time × rezerva % / 100. Bod objednání (ROP) = průměrná spotřeba × lead time + SS. Obě čísla zaokrouhlujeme nahoru na celé kusy, aby se rezerva zaokrouhlením nezkrátila. Proto mohou vyjít o kus vyšší než při běžném zaokrouhlení.',
+        t4c_howto_body: 'Pojistná zásoba (SS) je rezerva navíc ke spotřebě za dodací dobu. Vzorec A: SS = (maximální − průměrná denní spotřeba) × lead time. Vzorec B: SS = průměrná spotřeba × lead time × rezerva % / 100. Bod objednání (ROP) = průměrná spotřeba × lead time + SS. Obě čísla zaokrouhlujeme nahoru na zadaný násobek (bez zadání na celé jednotky), aby se rezerva zaokrouhlením nezkrátila. Proto mohou vyjít o kus nebo o balení vyšší než při běžném zaokrouhlení. Zásobová pozice = zásoba na skladě + již objednáno − nevyřízená poptávka po termínu. Když je pozice na bodu objednání nebo pod ním, je čas objednat. Bod objednání neříká, kolik objednat.',
+        t4c_lt_transfer_btn: 'Převzít dodací dobu z Lead time',
+        t4c_lt_transfer_done: 'Převzato {days} dní ze záložky Lead time.',
+        t4c_lt_transfer_none: 'Lead time zatím nemá výsledek. Vyplňte fáze v záložce Lead time.',
+        t4c_lt_transfer_zero: 'Dodací doba 0 dní nejde použít pro výpočet zásoby.',
+        t4c_pos_title: 'Zásobová pozice (nepovinné)',
+        t4c_onhand: 'Použitelná zásoba na skladě ({unit})',
+        t4c_onorder: 'Již objednáno, dosud nedodáno ({unit})',
+        t4c_backlog: 'Nevyřízená poptávka po termínu ({unit})',
+        t4c_pos_hint: 'Pozice = zásoba na skladě + již objednáno − nevyřízená poptávka po termínu. Pro porovnání s bodem objednání vyplňte všechna tři pole, i nuly. Započítejte jen potvrzené použitelné dodávky.',
+        t4c_pos_incomplete: 'Pro porovnání s bodem objednání vyplňte všechna tři pole zásobové pozice, i nuly.',
+        t4c_pos_noRop: 'Zásobová pozice: {pos} {unit}. Bod objednání zatím není spočítaný, doplňte vstupy výše.',
+        t4c_pos_order: 'Zásobová pozice {pos} {unit} je na bodu objednání {rop} {unit} nebo pod ním: je čas objednat. Ověřte i termíny otevřených dodávek.',
+        t4c_pos_wait: 'Zásobová pozice {pos} {unit} je nad bodem objednání {rop} {unit}: zatím neobjednávat. Ověřte i termíny otevřených dodávek.',
         err_t4c_peakBelowAvg: 'Maximální spotřeba nemůže být nižší než průměrná.',
+        err_t4c_unitInteger: 'U jednotky ks zadejte celé číslo, nebo změňte jednotku.',
+        err_t4c_stepTooFine: 'Příliš jemný násobek pro tak velký výsledek. Zvětšete násobek.',
 
         btn_reset: 'Resetovat',
+        copy_result: 'Kopírovat výsledek',
+        copy_done: 'Výsledek zkopírován.',
+        copy_selected: 'Text je označený, zkopírujte ho Ctrl+C (Cmd+C).',
 
         // Čtení čísel (D1)
         err_required: 'Pole je povinné',
@@ -1093,6 +1262,7 @@
         t4a_detail_cost: 'Costs',
         t4a_detail_risk_transfer: 'Risk transfer',
         t4a_detail_risk_point: 'Risk point',
+        t4a_detail_note: 'Watch out',
 
         panel4b_heading: 'Lead time calculator',
         t4b_title: 'Total lead time calculator',
@@ -1115,21 +1285,46 @@
         t4c_desc: 'Calculate safety stock. Choose a formula and enter inputs.',
         ss_modeA: 'Formula A (Max-Avg)',
         ss_modeB: 'Formula B (Reserve %)',
-        t4c_avgDemand: 'Average daily demand (units/day)',
+        t4c_avgDemand: 'Average daily demand ({unit}/day)',
         t4c_avgLT: 'Average lead time (days)',
-        t4c_maxDemand: 'Maximum daily demand (units/day)',
+        t4c_maxDemand: 'Maximum daily demand ({unit}/day)',
         t4c_reservePct: 'Reserve (%)',
-        t4c_result_ss: 'Safety stock',
-        t4c_result_rop: 'Reorder point (ROP)',
-        t4c_result_unit: 'units',
-        t4c_formula_A: '<strong>Formula A:</strong> SS = (max demand − avg demand) × avg LT = ({peak} − {avg}) × {lt} = {rawSS}, rounded up <strong>{ss} {unit}</strong> &nbsp;|&nbsp; ROP = avg demand × avg LT + SS = {avg} × {lt} + {ss} = {ropRaw}, rounded up <strong>{rop} {unit}</strong>',
-        t4c_formula_B: '<strong>Formula B:</strong> SS = avg demand × avg LT × reserve % / 100 = {avg} × {lt} × {pct} / 100 = {rawSS}, rounded up <strong>{ss} {unit}</strong> &nbsp;|&nbsp; ROP = avg demand × avg LT + SS = {avg} × {lt} + {ss} = {ropRaw}, rounded up <strong>{rop} {unit}</strong>',
+        t4c_result_ss: 'Safety stock ({unit})',
+        t4c_result_rop: 'Reorder point (ROP) ({unit})',
+        t4c_unit: 'Unit of quantity',
+        t4c_unit_ks: 'units',
+        t4c_unit_kg: 'kg',
+        t4c_unit_l: 'l',
+        t4c_unit_m: 'm',
+        t4c_step: 'Round up to a multiple of ({unit})',
+        t4c_step_hint: 'E.g. 1 unit, packs of 12 units or 0.1 kg. Empty = 1. This rounds the stock level, it is not an order quantity.',
+        t4c_formula_A: '<strong>Formula A:</strong> SS = (max demand − avg demand) × avg LT = ({peak} − {avg}) × {lt} = {rawSS}, rounded up{roundTo} <strong>{ss} {unit}</strong> &nbsp;|&nbsp; ROP = avg demand × avg LT + SS = {avg} × {lt} + {ss} = {ropRaw}, rounded up{roundTo} <strong>{rop} {unit}</strong>',
+        t4c_formula_B: '<strong>Formula B:</strong> SS = avg demand × avg LT × reserve % / 100 = {avg} × {lt} × {pct} / 100 = {rawSS}, rounded up{roundTo} <strong>{ss} {unit}</strong> &nbsp;|&nbsp; ROP = avg demand × avg LT + SS = {avg} × {lt} + {ss} = {ropRaw}, rounded up{roundTo} <strong>{rop} {unit}</strong>',
+        t4c_formula_step: ' to a multiple of {step} {unit}',
         t4c_formula_empty: 'Fill in all fields to see the calculation here.',
         t4c_howto_title: 'How we calculate and round',
-        t4c_howto_body: 'Safety stock (SS) is a reserve on top of the demand during the lead time. Formula A: SS = (maximum − average daily demand) × lead time. Formula B: SS = average demand × lead time × reserve % / 100. Reorder point (ROP) = average demand × lead time + SS. Both numbers are rounded up to whole units so that rounding never cuts the reserve. They can therefore come out one unit higher than with ordinary rounding.',
+        t4c_howto_body: 'Safety stock (SS) is a reserve on top of the demand during the lead time. Formula A: SS = (maximum − average daily demand) × lead time. Formula B: SS = average demand × lead time × reserve % / 100. Reorder point (ROP) = average demand × lead time + SS. Both numbers are rounded up to the multiple you enter (whole units if empty) so that rounding never cuts the reserve. They can therefore come out one unit or one pack higher than with ordinary rounding. Stock position = stock on hand + on order − overdue backlog. When the position is at or below the reorder point, it is time to order. The reorder point does not tell you how much to order.',
+        t4c_lt_transfer_btn: 'Use lead time from the Lead time tab',
+        t4c_lt_transfer_done: 'Copied {days} days from the Lead time tab.',
+        t4c_lt_transfer_none: 'Lead time has no result yet. Fill in the phases in the Lead time tab.',
+        t4c_lt_transfer_zero: 'A lead time of 0 days cannot be used for safety stock.',
+        t4c_pos_title: 'Stock position (optional)',
+        t4c_onhand: 'Usable stock on hand ({unit})',
+        t4c_onorder: 'On order, not yet delivered ({unit})',
+        t4c_backlog: 'Overdue backlog ({unit})',
+        t4c_pos_hint: 'Position = stock on hand + on order − overdue backlog. To compare it with the reorder point, fill in all three fields, zeros included. Count only confirmed usable deliveries.',
+        t4c_pos_incomplete: 'To compare with the reorder point, fill in all three stock position fields, zeros included.',
+        t4c_pos_noRop: 'Stock position: {pos} {unit}. The reorder point is not calculated yet, complete the inputs above.',
+        t4c_pos_order: 'Stock position {pos} {unit} is at or below the reorder point {rop} {unit}: time to order. Check the dates of open deliveries too.',
+        t4c_pos_wait: 'Stock position {pos} {unit} is above the reorder point {rop} {unit}: no need to order yet. Check the dates of open deliveries too.',
         err_t4c_peakBelowAvg: 'Maximum demand cannot be lower than average demand.',
+        err_t4c_unitInteger: 'For units, enter a whole number or change the unit.',
+        err_t4c_stepTooFine: 'The multiple is too fine for such a large result. Use a larger multiple.',
 
         btn_reset: 'Reset',
+        copy_result: 'Copy result',
+        copy_done: 'Result copied.',
+        copy_selected: 'Text is selected, copy it with Ctrl+C (Cmd+C).',
 
         // Number input (D1)
         err_required: 'This field is required',
@@ -1167,17 +1362,19 @@
         code: "FCA",
         name_cs: "Free Carrier",
         name_en: "Free Carrier",
-        transport_cs: "Prodávající dodá dopravci určenému kupujícím v named place",
-        transport_en: "Seller delivers to carrier named by buyer at named place",
-        cost_cs: "Prodávající: náklady po named place; Kupující: hlavní přeprava dále",
-        cost_en: "Seller: costs to named place; Buyer: main carriage onwards",
-        risk_transfer_cs: "Riziko přechází po předání dopravci v named place",
-        risk_transfer_en: "Risk transfers on delivery to carrier at named place",
+        transport_cs: "Dvě varianty: v provozovně prodávajícího prodávající naloží zboží na dopravní prostředek kupujícího; v jiném sjednaném místě je dodá na svém dopravním prostředku připravené k vykládce a nevykládá. Hlavní přepravu sjednává a hradí kupující",
+        transport_en: "Two variants: at the seller's premises the seller loads the goods onto the buyer's means of transport; at another named place the seller delivers them on its own means of transport ready for unloading and does not unload. The buyer contracts and pays for the main carriage",
+        cost_cs: "Prodávající: náklady do předání dopravci včetně vývozního odbavení (v provozovně i nakládka); Kupující: hlavní přeprava, vykládka v jiném sjednaném místě, případné pojištění",
+        cost_en: "Seller: costs until delivery to the carrier including export clearance (at the premises also loading); Buyer: main carriage, unloading at another named place, any insurance",
+        risk_transfer_cs: "V provozovně prodávajícího po naložení na dopravní prostředek kupujícího; v jiném sjednaném místě na dopravním prostředku prodávajícího připraveném k vykládce, k dispozici dopravci",
+        risk_transfer_en: "At the seller's premises once loaded onto the buyer's means of transport; at another named place on the seller's means of transport ready for unloading, at the carrier's disposal",
         seller_responsibility: "low",
         buyer_responsibility: "high",
         modes: ["any"],
-        risk_point_cs: "Named place / dopravce",
-        risk_point_en: "Named place / carrier"
+        risk_point_cs: "Sjednané místo předání dopravci (provozovna: naloženo; jinde: před vykládkou)",
+        risk_point_en: "Named place of delivery to the carrier (premises: loaded; elsewhere: before unloading)",
+        note_cs: "Ve smlouvě uveďte přesné místo předání, tím se určí i varianta. Kdo nakládá a kdo vykládá, se mezi variantami liší.",
+        note_en: "State the exact place of delivery in the contract, which also sets the variant. Who loads and who unloads differs between the variants."
       },
       {
         code: "FAS",
@@ -1215,65 +1412,73 @@
         code: "CFR",
         name_cs: "Cost and Freight",
         name_en: "Cost and Freight",
-        transport_cs: "Prodávající hradí přepravu do přístavu určení; pojištění jde za kupujícím",
-        transport_en: "Seller pays freight to destination port; buyer bears insurance",
-        cost_cs: "Prodávající: námořní přeprava; Kupující: pojištění, vykládka",
-        cost_en: "Seller: sea freight; Buyer: insurance, unloading",
-        risk_transfer_cs: "Riziko přechází nakládkou na loď v přístavu odeslání",
-        risk_transfer_en: "Risk transfers when loaded on board at port of shipment",
+        transport_cs: "Prodávající sjednává a hradí námořní přepravu do přístavu určení; riziko ale nese kupující už od naložení na palubu v přístavu odeslání",
+        transport_en: "Seller contracts and pays sea freight to the port of destination; the buyer bears the risk from loading on board at the port of shipment",
+        cost_cs: "Prodávající: námořní přeprava a vývozní odbavení; Kupující: případné pojištění, dovozní clo, vykládka v cíli, pokud ji nezahrnuje přepravní smlouva prodávajícího",
+        cost_en: "Seller: sea freight and export clearance; Buyer: any insurance, import duty, unloading at destination unless included in the seller's contract of carriage",
+        risk_transfer_cs: "Riziko přechází na palubě lodi v přístavu odeslání, i když přepravu do přístavu určení platí prodávající",
+        risk_transfer_en: "Risk transfers on board the vessel at the port of shipment, even though the seller pays the freight to the port of destination",
         seller_responsibility: "mid",
         buyer_responsibility: "mid",
         modes: ["sea"],
         risk_point_cs: "Na palubě, přístav odeslání",
-        risk_point_en: "On board, port of shipment"
+        risk_point_en: "On board, port of shipment",
+        note_cs: "Zaplacené přepravné do cíle neznamená, že riziko nese prodávající až do cíle. Škody během plavby jdou za kupujícím, proto zvažte vlastní pojištění.",
+        note_en: "Freight paid to destination does not mean the seller bears the risk until destination. Loss during the voyage is the buyer's, so consider your own insurance."
       },
       {
         code: "CIF",
         name_cs: "Cost, Insurance and Freight",
         name_en: "Cost, Insurance and Freight",
-        transport_cs: "Prodávající hradí přepravu i minimální pojištění do přístavu určení",
-        transport_en: "Seller pays freight and minimum insurance to destination port",
-        cost_cs: "Prodávající: námořní přeprava + minimální pojištění; Kupující: vykládka, dovozní clo",
-        cost_en: "Seller: sea freight + minimum insurance; Buyer: unloading, import duty",
-        risk_transfer_cs: "Riziko přechází nakládkou na loď v přístavu odeslání",
-        risk_transfer_en: "Risk transfers when loaded on board at port of shipment",
+        transport_cs: "Prodávající sjednává a hradí námořní přepravu a pojištění do přístavu určení; riziko ale přechází na kupujícího už na palubě v přístavu odeslání",
+        transport_en: "Seller contracts and pays sea freight and insurance to the port of destination; the risk passes to the buyer on board at the port of shipment",
+        cost_cs: "Prodávající: námořní přeprava + pojištění se standardně užším krytím Institute Cargo Clauses (C), není-li dohodnuto jinak; Kupující: dovozní clo, vykládka v cíli, pokud ji nezahrnuje přepravní smlouva prodávajícího",
+        cost_en: "Seller: sea freight + insurance with the standard narrower cover of Institute Cargo Clauses (C) unless agreed otherwise; Buyer: import duty, unloading at destination unless included in the seller's contract of carriage",
+        risk_transfer_cs: "Riziko přechází na palubě lodi v přístavu odeslání, i když přepravu a pojištění do přístavu určení platí prodávající",
+        risk_transfer_en: "Risk transfers on board the vessel at the port of shipment, even though the seller pays freight and insurance to the port of destination",
         seller_responsibility: "mid",
         buyer_responsibility: "mid",
         modes: ["sea"],
         risk_point_cs: "Na palubě, přístav odeslání",
-        risk_point_en: "On board, port of shipment"
+        risk_point_en: "On board, port of shipment",
+        note_cs: "CIF má standardně užší krytí ICC (C) než CIP s ICC (A). Prověřte, zda krytí odpovídá vašemu zboží. Pojištění chrání riziko kupujícího během přepravy, okamžik přechodu rizika neposouvá.",
+        note_en: "CIF standard cover ICC (C) is narrower than CIP with ICC (A). Check that the cover suits your goods. The insurance protects the buyer's risk in transit, it does not move the point where risk passes."
       },
       {
         code: "CPT",
         name_cs: "Carriage Paid To",
         name_en: "Carriage Paid To",
-        transport_cs: "Prodávající hradí přepravu do named place určení; pojištění jde za kupujícím",
-        transport_en: "Seller pays carriage to named place of destination; buyer bears insurance",
-        cost_cs: "Prodávající: přeprava; Kupující: pojištění od prvního dopravce",
-        cost_en: "Seller: carriage; Buyer: insurance from first carrier",
-        risk_transfer_cs: "Riziko přechází předáním prvnímu dopravci v místě odeslání",
-        risk_transfer_en: "Risk transfers on delivery to first carrier at place of shipment",
+        transport_cs: "Prodávající sjednává a hradí přepravu do named place určení; riziko ale přechází na kupujícího už předáním prvnímu dopravci",
+        transport_en: "Seller contracts and pays carriage to the named place of destination; the risk passes to the buyer on handover to the first carrier",
+        cost_cs: "Prodávající: přeprava a vývozní odbavení; Kupující: případné pojištění od předání prvnímu dopravci, dovozní clo, vykládka v cíli, pokud ji nezahrnuje přepravní smlouva prodávajícího",
+        cost_en: "Seller: carriage and export clearance; Buyer: any insurance from handover to the first carrier, import duty, unloading at destination unless included in the seller's contract of carriage",
+        risk_transfer_cs: "Riziko přechází předáním prvnímu dopravci v místě odeslání, i když přepravu do cíle platí prodávající",
+        risk_transfer_en: "Risk transfers on handover to the first carrier at the place of shipment, even though the seller pays carriage to destination",
         seller_responsibility: "mid",
         buyer_responsibility: "mid",
         modes: ["any"],
         risk_point_cs: "První dopravce, místo odeslání",
-        risk_point_en: "First carrier, place of shipment"
+        risk_point_en: "First carrier, place of shipment",
+        note_cs: "Zaplacená přeprava do cíle neznamená, že riziko zůstává prodávajícímu až do cíle. Ve smlouvě uveďte místo určení i bod předání dopravci.",
+        note_en: "Carriage paid to destination does not mean the seller keeps the risk until destination. Name both the destination and the point of handover to the carrier."
       },
       {
         code: "CIP",
         name_cs: "Carriage and Insurance Paid To",
         name_en: "Carriage and Insurance Paid To",
-        transport_cs: "Prodávající hradí přepravu i pojištění (Institute Cargo A) do named place",
-        transport_en: "Seller pays carriage and full insurance (Institute Cargo A) to named place",
-        cost_cs: "Prodávající: přeprava + plné pojištění; Kupující: dovozní clo, vykládka",
-        cost_en: "Seller: carriage + full insurance; Buyer: import duty, unloading",
-        risk_transfer_cs: "Riziko přechází předáním prvnímu dopravci v místě odeslání",
-        risk_transfer_en: "Risk transfers on delivery to first carrier at place of shipment",
+        transport_cs: "Prodávající sjednává a hradí přepravu a pojištění do named place určení; riziko ale přechází na kupujícího už předáním prvnímu dopravci",
+        transport_en: "Seller contracts and pays carriage and insurance to the named place of destination; the risk passes to the buyer on handover to the first carrier",
+        cost_cs: "Prodávající: přeprava + pojištění se standardně širším krytím Institute Cargo Clauses (A), není-li dohodnuto jinak; Kupující: dovozní clo, vykládka v cíli, pokud ji nezahrnuje přepravní smlouva prodávajícího",
+        cost_en: "Seller: carriage + insurance with the standard broader cover of Institute Cargo Clauses (A) unless agreed otherwise; Buyer: import duty, unloading at destination unless included in the seller's contract of carriage",
+        risk_transfer_cs: "Riziko přechází předáním prvnímu dopravci v místě odeslání, i když přepravu a pojištění do cíle platí prodávající",
+        risk_transfer_en: "Risk transfers on handover to the first carrier at the place of shipment, even though the seller pays carriage and insurance to destination",
         seller_responsibility: "high",
         buyer_responsibility: "low",
         modes: ["any"],
         risk_point_cs: "První dopravce, místo odeslání",
-        risk_point_en: "First carrier, place of shipment"
+        risk_point_en: "First carrier, place of shipment",
+        note_cs: "Pojištění chrání riziko kupujícího během přepravy, okamžik přechodu rizika neposouvá. CIP má standardně širší krytí ICC (A) než CIF s ICC (C).",
+        note_en: "The insurance protects the buyer's risk in transit, it does not move the point where risk passes. CIP standard cover ICC (A) is broader than CIF with ICC (C)."
       },
       {
         code: "DAP",
@@ -1281,8 +1486,8 @@
         name_en: "Delivered at Place",
         transport_cs: "Prodávající dodá na named place určení (nevykládá); kupující hradí clo a vykládku",
         transport_en: "Seller delivers at named place of destination (not unloaded); buyer pays duty and unloading",
-        cost_cs: "Prodávající: veškerá přeprava; Kupující: dovozní clo, vykládka",
-        cost_en: "Seller: all transport; Buyer: import duty, unloading",
+        cost_cs: "Prodávající: veškerá přeprava; Kupující: dovozní clo, vykládka (není-li v přepravní smlouvě prodávajícího)",
+        cost_en: "Seller: all transport; Buyer: import duty, unloading (unless in the seller's contract of carriage)",
         risk_transfer_cs: "Riziko přechází v named place určení, připraveno k vykládce",
         risk_transfer_en: "Risk transfers at named place of destination, ready for unloading",
         seller_responsibility: "high",
@@ -1321,12 +1526,269 @@
         buyer_responsibility: "min",
         modes: ["any"],
         risk_point_cs: "Named place určení (procleno)",
-        risk_point_en: "Named place of destination (duty paid)"
+        risk_point_en: "Named place of destination (duty paid)",
+        note_cs: "DDP automaticky neznamená vykládku ani pojištění prodávajícím. Ověřte, že prodávající zvládne dovozní povinnosti v zemi určení.",
+        note_en: "DDP does not automatically mean the seller unloads or insures. Check that the seller can handle the import obligations in the destination country."
       }
     ];
 
     /* ===== STATE ===== */
     let currentLang = 'cs';
+
+    /* ===== D2: KONFIGURACE ODKAZŮ MEZI NÁSTROJI (pro admina webu) =====
+       Hodnoty mají být stejné ve všech šesti souborech.
+       TOOLBOX_LINKS        adresa každého toolboxu: soubor vedle tohoto, nebo URL stránky CMS. Prázdná hodnota odkaz
+                            (i tlačítko přenosu hodnot do toho toolboxu) skryje.
+       TOOLBOX_LINK_TARGET  '_top' (výchozí; při vložení přes <iframe> otevře celou stránku), '_self' (inline vložení
+                            do stránky CMS), '_blank' (nová karta).
+       TOOLBOX_DEEP_LINK    false = odkaz bez #tool=… otevře výchozí tab. Použít při vložení přes <iframe>, kde by kotva
+                            zůstala na rodičovské stránce; jinak samostatné stránky CMS s <iframe src="…?tool=3b">.
+       Vložení přes <iframe>: přidat allow="clipboard-write", jinak tlačítka kopírování text jen označí.
+       Cookie procuppa_xfer, text pro cookie lištu webu (kategorie technicky nezbytné, souhlas se nevyžaduje):
+         CZ: procuppa_xfer – technicky nezbytná cookie. Vznikne jen po kliknutí na „Přenést do …“ a přenese zadaná čísla
+             do jiného nástroje toolboxu. Neobsahuje osobní údaje, neslouží k měření ani reklamě, platí nejvýš 10 minut
+             a cílový nástroj ji po přečtení hned smaže.
+         EN: procuppa_xfer – strictly necessary cookie. It is set only when you click "Send to …" and carries the numbers
+             you entered to another toolbox tool. It contains no personal data, is not used for analytics or advertising,
+             lasts at most 10 minutes and is deleted as soon as the target tool reads it. */
+    const TOOLBOX_LINKS = {
+      t1: 'toolbox-1-kalkulacky.html',
+      t2: 'toolbox-2-naklady.html',
+      t3: 'toolbox-3-dodavatele.html',
+      t4: 'toolbox-4-logistika.html',
+      t5: 'toolbox-5-finance.html',
+      t6: 'toolbox-6-rychla-pomoc.html',
+    };
+    const TOOLBOX_LINK_TARGET = '_top';   // '_top' | '_self' | '_blank'
+    const TOOLBOX_DEEP_LINK = true;       // false = odkaz bez #tool=… (otevře výchozí tab)
+    const TOOLBOX_TOOLS = ['4a', '4b', '4c'];   // taby tohoto souboru (router)
+
+    /* ===== D2: ROUTER #tool= A ODKAZY =====
+       Blok mezi značkami ROUTER-SHARED je ve všech šesti toolboxech textově shodný (hlídá iter-013-gates.js, brána R).
+       Každý soubor má vlastní activateToolById(id, { focus, remember }) nad svými taby.
+       Kotva #tool=3b se záměrně neshoduje s id panelu, takže prohlížeč ani CMS na ni po načtení neskočí. */
+    // ROUTER-SHARED-BEGIN
+    const TOOL_ID = /^[1-6][a-f]$/;
+
+    /** Nástroj z adresy: #tool=3b, nebo ?tool=3b (i mezi jinými parametry). Jiné kotvy a tvary → null. */
+    function toolFromLocation() {
+      let hash = '', search = '';
+      try { hash = String(location.hash || ''); search = String(location.search || ''); } catch (e) { return null; }
+      const h = hash.match(/^#tool=([1-6][a-f])$/);
+      if (h) return h[1];
+      const q = search.replace(/^\?/, '').split('&').map(p => p.match(/^tool=([1-6][a-f])$/)).find(Boolean);
+      return q ? q[1] : null;
+    }
+
+    /** Odkaz na nástroj podle TOOLBOX_LINKS a TOOLBOX_DEEP_LINK; '' = odkaz skrýt. */
+    function toolboxHref(tool) {
+      if (!TOOL_ID.test(String(tool))) return '';
+      const file = TOOLBOX_LINKS['t' + String(tool).charAt(0)];
+      if (typeof file !== 'string' || file === '') return '';
+      return TOOLBOX_DEEP_LINK ? file + '#tool=' + tool : file;
+    }
+
+    /** Odkaz <a data-tool-link="1d"> dostane href a target; bez adresy se skryje. → true, když odkaz platí. */
+    function setToolLink(a, tool) {
+      const href = toolboxHref(tool);
+      a.hidden = !href;
+      if (!href) { a.removeAttribute('href'); return false; }
+      a.setAttribute('href', href);
+      a.setAttribute('target', TOOLBOX_LINK_TARGET);
+      if (TOOLBOX_LINK_TARGET === '_blank') a.setAttribute('rel', 'noopener');
+      else a.removeAttribute('rel');
+      return true;
+    }
+
+    /** Výběr tabu uživatelem: kotva v adrese bez nové položky historie (tlačítko Zpět neprochází taby). */
+    function rememberTool(tool) {
+      try { history.replaceState(null, '', '#tool=' + tool); } catch (e) { /* sandbox nebo file:// bez history */ }
+    }
+
+    /** Načtení: tab z adresy bez přesunu fokusu. Změna kotvy (hashchange): tab a fokus na jeho tlačítko. */
+    function initRouter() {
+      document.querySelectorAll('[data-tool-link]').forEach(a => setToolLink(a, a.getAttribute('data-tool-link')));
+      const tool = toolFromLocation();
+      if (tool) activateToolById(tool, { focus: false, remember: false });
+      window.addEventListener('hashchange', () => {
+        const t = toolFromLocation();
+        if (t) activateToolById(t, { focus: true, remember: false });
+      });
+    }
+    // ROUTER-SHARED-END
+
+    /* ===== D2b: PŘEDÁVÁNÍ HODNOT MEZI SOUBORY =====
+       Blok mezi značkami XFER-SHARED je ve všech šesti toolboxech textově shodný
+       (hlídá iter-013-gates.js, G5). Neměnit v jednom souboru bez ostatních.
+       Nezávisí na D1 ani na DOM konkrétního souboru; routy a texty má každý soubor vlastní. */
+    // XFER-SHARED-BEGIN
+    const XFER_COOKIE = 'procuppa_xfer';
+    const XFER_VERSION = 1;
+    const XFER_MAX_AGE = 600;      // s, cookie i kontrola ts
+    const XFER_MAX_BYTES = 1024;   // délka zakódované hodnoty cookie
+    const XFER_MAX_PASTE = 2000;   // znaků ve vkládacím poli
+    const XFER_MAX_DP = 6;         // desetinná místa čísla v payloadu
+    const XFER_ID = /^t([1-6])-\1[a-d]$/;
+    const xferHas = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
+
+    function xferAttrs(maxAge) {
+      return '; path=/; max-age=' + maxAge + '; SameSite=Lax' + (location.protocol === 'https:' ? '; Secure' : '');
+    }
+
+    /** Surová (zakódovaná) hodnota cookie, nebo null. */
+    function xferRead() {
+      let all = '';
+      try { all = String(document.cookie || ''); } catch (e) { return null; }
+      const hit = all.split(/;\s*/).find(c => c.indexOf(XFER_COOKIE + '=') === 0);
+      return hit ? hit.slice(XFER_COOKIE.length + 1) : null;
+    }
+
+    function xferClear() {
+      try { document.cookie = XFER_COOKIE + '=' + xferAttrs(0); } catch (e) { /* cookies zablokované */ }
+    }
+
+    function xferMake(from, to, values, now = Date.now()) {
+      return { v: XFER_VERSION, from, to, ts: now, values };
+    }
+
+    /** Zápis a zpětné čtení. → { ok, reason?, json }; json se při neúspěchu nabídne ke zkopírování. */
+    function xferSend(payload) {
+      const json = JSON.stringify(payload);
+      const enc = encodeURIComponent(json);
+      if (enc.length > XFER_MAX_BYTES) return { ok: false, reason: 'tooLarge', json };
+      try { document.cookie = XFER_COOKIE + '=' + enc + xferAttrs(XFER_MAX_AGE); } catch (e) { return { ok: false, reason: 'blocked', json }; }
+      return xferRead() === enc ? { ok: true, json } : { ok: false, reason: 'blocked', json };
+    }
+
+    /** Text (cookie nebo vložený JSON) → { payload } | { error }. */
+    function xferParse(text) {
+      if (typeof text !== 'string' || text.trim() === '') return { error: 'empty' };
+      if (text.length > XFER_MAX_PASTE) return { error: 'tooLarge' };
+      let p;
+      try { p = JSON.parse(text); } catch (e) { return { error: 'badJson' }; }
+      if (!p || typeof p !== 'object' || Array.isArray(p)) return { error: 'badJson' };
+      if (p.v !== XFER_VERSION) return { error: 'version' };
+      if (typeof p.from !== 'string' || typeof p.to !== 'string' || !XFER_ID.test(p.from) || !XFER_ID.test(p.to)) return { error: 'badRoute' };
+      if (typeof p.ts !== 'number' || !Number.isFinite(p.ts)) return { error: 'badJson' };
+      if (!p.values || typeof p.values !== 'object' || Array.isArray(p.values)) return { error: 'badValues' };
+      return { payload: p };
+    }
+
+    function xferNumError(v, spec) {
+      if (typeof v !== 'number' || !Number.isFinite(v)) return 'badValue';
+      if (Number(v.toFixed(spec.int ? 0 : XFER_MAX_DP)) !== v) return 'badValue';
+      if (v < spec.min || v > spec.max) return 'range';
+      return null;
+    }
+
+    /** Whitelist cíle. → { routeKey, route, fields: [{ key, id, type, value }] } | { error, key? }. */
+    function xferCheck(payload, routes, self) {
+      if (payload.to.slice(0, 2) !== self) return { error: 'otherFile' };
+      const routeKey = payload.from + '>' + payload.to;
+      if (!xferHas(routes, routeKey)) return { error: 'badRoute' };
+      const route = routes[routeKey];
+      const vals = payload.values;
+      for (const k of Object.keys(vals)) if (!xferHas(route.fields, k)) return { error: 'unknownKey', key: k };
+      const fields = [];
+      for (const k of Object.keys(route.fields)) {
+        const spec = route.fields[k];
+        if (!xferHas(vals, k)) { if (spec.required) return { error: 'missing', key: k }; continue; }
+        const v = vals[k];
+        const err = spec.type === 'bool' ? (typeof v === 'boolean' ? null : 'badValue')
+          : spec.type === 'enum' ? (spec.values.indexOf(v) >= 0 ? null : 'badValue')
+          : xferNumError(v, spec);
+        if (err) return { error: err, key: k };
+        fields.push({ key: k, id: spec.id || null, type: spec.type, value: v });
+      }
+      return { routeKey, route, fields };
+    }
+
+    /** Kanonické číslo → text pole v daném jazyce (D1 ho přečte zpět beze změny). */
+    function xferFieldText(n, lang) {
+      const s = String(n);
+      return lang === 'cs' ? s.replace('.', ',') : s;
+    }
+
+    /** Vše, nebo nic. Jen .value a .checked, žádné vkládání HTML. → true | false (chybí prvek). */
+    function xferApply(fields, lang) {
+      const els = fields.map(f => (f.id ? document.getElementById(f.id) : null));
+      if (fields.some((f, i) => f.id && !els[i])) return false;
+      fields.forEach((f, i) => {
+        if (!f.id) return;
+        if (f.type === 'bool') els[i].checked = f.value;
+        else if (f.type === 'enum') els[i].value = f.value;
+        else els[i].value = xferFieldText(f.value, lang);
+      });
+      return true;
+    }
+
+    /** Při načtení: cookie pro tento soubor přečíst a hned smazat (jednorázově, i neplatnou).
+        Cookie jiného souboru nechat být. → null | { payload } | { error }. */
+    function xferTakeCookie(self, now = Date.now()) {
+      const raw = xferRead();
+      if (raw === null) return null;
+      let text;
+      try { text = decodeURIComponent(raw); } catch (e) { xferClear(); return { error: 'badJson' }; }
+      const r = xferParse(text);
+      if (r.payload && r.payload.to.slice(0, 2) !== self) return null;
+      xferClear();
+      if (r.error) return r;
+      if (now - r.payload.ts > XFER_MAX_AGE * 1000 || r.payload.ts - now > 60000) return { error: 'expired' };
+      return r;
+    }
+
+    /** Schránka pro D4 i pro fallback JSON. → Promise<'copied' | 'selected'>.
+        selectEl: textarea/input se označí přes select(), jiný prvek přes Range. */
+    function copyText(text, selectEl) {
+      const fallback = () => {
+        if (!selectEl) return 'selected';
+        try {
+          if (typeof selectEl.select === 'function') { selectEl.focus(); selectEl.select(); }
+          else { const r = document.createRange(); r.selectNodeContents(selectEl); const s = window.getSelection(); s.removeAllRanges(); s.addRange(r); }
+          if (document.execCommand && document.execCommand('copy')) return 'copied';
+        } catch (e) { /* označení zůstane, uživatel zkopíruje ručně */ }
+        return 'selected';
+      };
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(text).then(() => 'copied', fallback);
+      } catch (e) { /* iframe bez clipboard-write */ }
+      return Promise.resolve(fallback());
+    }
+    // XFER-SHARED-END
+
+    /* ===== D4: KOPÍROVAT VÝSLEDEK (T-017) =====
+       Tenká obálka nad copyText z XFER-SHARED, druhá implementace schránky nevzniká. Tlačítko a hláška
+       (role="status") leží uvnitř prvku, který výsledek ukazuje a skrývá, takže bez výsledku nejsou vidět.
+       Kopíruje se innerText obsahu <p>-copy-src: jen viditelný text výsledku, bez tlačítek a grafů. */
+    const COPY_RESULTS = [
+      { btn: 'ss-copy', src: 'ss-copy-src', status: 'ss-copy-status' },
+    ];
+    const COPY_STATUS_MS = { copied: 3000, selected: 8000 };
+    const copyStatusTimers = {};
+
+    /** Viditelný text výsledku po řádcích, bez prázdných řádků a okrajových mezer. */
+    function copyResultText(el) {
+      return String(el.innerText || '').split('\n').map(s => s.trim()).filter(Boolean).join('\n');
+    }
+
+    /** D4: zkopíruje výsledek `resultBoxId` a ohlásí to v `feedbackId`. → Promise<'copied' | 'selected'>. */
+    function copyResult(resultBoxId, feedbackId) {
+      const box = document.getElementById(resultBoxId);
+      const status = document.getElementById(feedbackId);
+      return copyText(copyResultText(box), box)
+        .catch(() => 'selected')
+        .then(r => {
+          const T = TEXTS[currentLang];
+          status.textContent = r === 'copied' ? T.copy_done : T.copy_selected;
+          clearTimeout(copyStatusTimers[feedbackId]);
+          copyStatusTimers[feedbackId] = setTimeout(() => { status.textContent = ''; }, COPY_STATUS_MS[r] || COPY_STATUS_MS.selected);
+          return r;
+        });
+    }
+
+    function initCopyResults() {
+      COPY_RESULTS.forEach(c => document.getElementById(c.btn).addEventListener('click', () => copyResult(c.src, c.status)));
+    }
     let currentIncoFilter = 'all';
     let selectedIncoCode = null;
     let currentSsMode = 'A';
@@ -1422,18 +1884,20 @@
 
     /**
      * Číselné pole T4 (T4-5): prázdné → { empty: true } bez hlášky (výsledek „—“, ne tichá 0),
-     * neplatné, záporné, nad `max` nebo 0 u `positive` → hláška u pole a { error: true },
-     * jinak { value }.
+     * neplatné, záporné, pod `min`, nad `max`, 0 u `positive` nebo necelé u `integerMsg` → hláška u pole
+     * a { error: true }, jinak { value, canonical }. `integerMsg` = hláška pro necelé číslo (kusy, T4-6/7).
      */
-    function readNumber(id, { positive = false, max = null } = {}) {
+    function readNumber(id, { positive = false, min = null, max = null, integerMsg = null } = {}) {
       const raw = document.getElementById(id).value;
       const p = parseNumEx(raw);
       if (p.error === 'empty') { clearError(id); return { empty: true }; }
       let msg = validateNumeric(raw, { max });
       if (!msg && positive && p.value === 0) msg = TEXTS[currentLang].err_zeroNotAllowed;
+      if (!msg && min !== null && p.value < min) msg = TEXTS[currentLang].err_min.replace('{min}', formatPlainNumber(min));
+      if (!msg && integerMsg && !Number.isInteger(p.value)) msg = integerMsg;
       if (msg) { showError(id, msg); return { error: true }; }
       clearError(id);
-      return { value: p.value };
+      return { value: p.value, canonical: p.canonical };
     }
 
     /* ===== RESPONSIBILITY LEVEL → % ===== */
@@ -1454,6 +1918,8 @@
       document.querySelectorAll('.lang-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.lang === lang);
       });
+      renderUnitTexts();
+      document.getElementById('ss-lt-transfer-msg').textContent = '';
       renderIncotermsTable();
       updateLeadTime();
       updateSafetyStock();
@@ -1463,19 +1929,20 @@
     function initTabs() {
       const tabBtns = document.querySelectorAll('.tab-btn');
       tabBtns.forEach(btn => {
-        btn.addEventListener('click', () => activateTab(btn.dataset.tab));
+        const go = tabId => { activateTab(tabId); rememberTool(tabId.replace('tab-', '')); };
+        btn.addEventListener('click', () => go(btn.dataset.tab));
         btn.addEventListener('keydown', e => {
           const tabs = Array.from(tabBtns);
           const idx = tabs.indexOf(btn);
-          if (e.key === 'ArrowRight') { e.preventDefault(); activateTab(tabs[(idx + 1) % tabs.length].dataset.tab); }
-          if (e.key === 'ArrowLeft')  { e.preventDefault(); activateTab(tabs[(idx - 1 + tabs.length) % tabs.length].dataset.tab); }
-          if (e.key === 'Home')       { e.preventDefault(); activateTab(tabs[0].dataset.tab); }
-          if (e.key === 'End')        { e.preventDefault(); activateTab(tabs[tabs.length - 1].dataset.tab); }
+          if (e.key === 'ArrowRight') { e.preventDefault(); go(tabs[(idx + 1) % tabs.length].dataset.tab); }
+          if (e.key === 'ArrowLeft')  { e.preventDefault(); go(tabs[(idx - 1 + tabs.length) % tabs.length].dataset.tab); }
+          if (e.key === 'Home')       { e.preventDefault(); go(tabs[0].dataset.tab); }
+          if (e.key === 'End')        { e.preventDefault(); go(tabs[tabs.length - 1].dataset.tab); }
         });
       });
     }
 
-    function activateTab(tabId) {
+    function activateTab(tabId, focus = true) {
       document.querySelectorAll('.tab-btn').forEach(btn => {
         const isActive = btn.dataset.tab === tabId;
         btn.classList.toggle('active', isActive);
@@ -1485,7 +1952,16 @@
       document.querySelectorAll('.tool-panel').forEach(panel => {
         panel.classList.toggle('active', panel.id === tabId);
       });
-      document.getElementById('tab-btn-' + tabId.replace('tab-', '')).focus();
+      if (focus) document.getElementById('tab-btn-' + tabId.replace('tab-', '')).focus();
+    }
+
+    /** D2: aktivuje tab podle id nástroje ('4c'). focus = fokus na tlačítko tabu, remember = kotva #tool= v adrese.
+        → false, když tab v tomto souboru není. */
+    function activateToolById(id, { focus = false, remember = true } = {}) {
+      if (TOOLBOX_TOOLS.indexOf(id) < 0) return false;
+      activateTab('tab-' + id, focus);
+      if (remember) rememberTool(id);
+      return true;
     }
 
     /* ===== 4a INCOTERMS ===== */
@@ -1565,7 +2041,11 @@
               <div class="inco-detail-item">
                 <strong>${T.t4a_detail_risk_point}</strong>
                 <span>${term['risk_point_' + lang]}</span>
-              </div>
+              </div>${term['note_' + lang] ? `
+              <div class="inco-detail-item">
+                <strong>${T.t4a_detail_note}</strong>
+                <span>${term['note_' + lang]}</span>
+              </div>` : ''}
             </div>
           </td>
         `;
@@ -1691,12 +2171,24 @@
     }
 
     /**
-     * Pojistná zásoba a bod objednání (T4-1/2/3, Q3): obojí nahoru na celé kusy.
-     * method 'peak' (vzorec A): SS_raw = (peak − avg) × LT; 'percent' (vzorec B): SS_raw = avg × LT × percent / 100.
-     * ROP = avg × LT + SS (už zaokrouhlená), poté znovu nahoru. Karta i rozepsaný vzorec čtou tentýž výsledek.
-     * → { demand, rawSS, ss, rop } nebo { error, field }.
+     * SS a ROP v násobcích zaokrouhlení (T4-6). Vstupy jsou už vydělené násobkem, takže `up` vrací počet
+     * násobků; při násobku 1 jde o celé kusy přesně jako v T-009 (tolerance z max × LT zůstává).
+     * ROP se počítá z už zaokrouhlené SS: ROP = ⌈D + SS⌉.
      */
-    function safetyStock({ method, avg, leadTime, peak = null, percent = null }) {
+    function roundUpInSteps({ demand, rawSS, scale }) {
+      const ss = up(rawSS, scale);
+      const rop = up(demand + ss);
+      return { ss, rop };
+    }
+
+    /**
+     * Pojistná zásoba a bod objednání (T4-1/2/3, Q3, T4-6): obojí nahoru na násobek `step` (výchozí 1).
+     * method 'peak' (vzorec A): SS_raw = (peak − avg) × LT; 'percent' (vzorec B): SS_raw = avg × LT × percent / 100.
+     * Násobek balení výsledek nikdy nesníží: SS = nejmenší násobek ≥ SS_raw, ROP = nejmenší násobek ≥ D + SS.
+     * Karta i rozepsaný vzorec čtou tentýž výsledek.
+     * → { demand, rawSS, ss, rop, step, ropSteps } nebo { error, field }.
+     */
+    function safetyStock({ method, avg, leadTime, peak = null, percent = null, step = 1 }) {
       const demand = avg * leadTime;
       let rawSS, scale;
       if (method === 'peak') {
@@ -1707,19 +2199,81 @@
         rawSS = demand * percent / 100;
         scale = rawSS;
       }
-      const ss = up(rawSS, scale);
-      const rop = up(demand + ss);
-      return { demand, rawSS, ss, rop };
+      // v8: podíl nad MAX_SAFE_INTEGER se odmítne (násobek je na tak velký výsledek příliš jemný)
+      if ((demand + rawSS) / step + 1 > Number.MAX_SAFE_INTEGER) return { error: 'stepTooFine', field: 'step' };
+      const steps = roundUpInSteps({ demand: demand / step, rawSS: rawSS / step, scale: scale / step });
+      const ss = Number((steps.ss * step).toPrecision(15));
+      const rop = Number((steps.rop * step).toPrecision(15));
+      return { demand, rawSS, ss, rop, step, ropSteps: steps.rop };
+    }
+
+    /* Přesná desetinná aritmetika pro zásobovou pozici (T4-7): 0,1 + 0,2 kg musí být přesně 0,3 = ROP. */
+    /** Desetinný zápis („12.5“, „-3“, „.5“, číslo) → { int: BigInt, exp } s hodnotou int · 10^−exp. */
+    function decParse(value) {
+      let s = String(value).trim();
+      if (/e/i.test(s)) s = Number(s).toFixed(20);
+      const neg = s.startsWith('-');
+      const [i, f = ''] = s.replace(/^[+-]/, '').split('.');
+      const int = BigInt((i || '0') + f);
+      return { int: neg ? -int : int, exp: f.length };
+    }
+    function decAlign(d, exp) { return d.int * 10n ** BigInt(exp - d.exp); }
+    function decString(int, exp) {
+      const neg = int < 0n, digits = (neg ? -int : int).toString().padStart(exp + 1, '0');
+      const s = exp ? digits.slice(0, -exp) + '.' + digits.slice(-exp) : digits;
+      return (neg ? '-' : '') + s;
+    }
+
+    /**
+     * Zásobová pozice a spouštěč objednání (T4-7, v8 F4.5):
+     * pozice = zásoba na skladě + již objednáno − nevyřízená poptávka po termínu; objednat = pozice ≤ ROP.
+     * Vstupy jsou desetinné zápisy (canonical z parseNumEx) nebo čísla; počítá se přesně, bez floatu.
+     * → { position, order } (order = null, když ROP není).
+     */
+    function stockPosition({ onhand, onorder, backlog, rop = null }) {
+      const parts = [onhand, onorder, backlog].map(decParse);
+      const r = rop === null ? null : decParse(rop);
+      const exp = Math.max(r ? r.exp : 0, ...parts.map(p => p.exp));
+      const [h, o, b] = parts.map(p => decAlign(p, exp));
+      const pos = h + o - b;
+      return { position: Number(decString(pos, exp)), order: r ? pos <= decAlign(r, exp) : null };
     }
 
     const SS_FIELDS = {
       A: { avg: 'ss-avg-demand', leadTime: 'ss-avg-lt', peak: 'ss-max-demand' },
       B: { avg: 'ss-avg-demand-b', leadTime: 'ss-avg-lt-b', percent: 'ss-reserve-pct' },
     };
+    const SS_COMMON_IDS = ['ss-step', 'ss-onhand', 'ss-onorder', 'ss-backlog'];
+    const POS_FIELDS = { onhand: 'ss-onhand', onorder: 'ss-onorder', backlog: 'ss-backlog' };
+    const SS_UNITS = ['ks', 'kg', 'l', 'm'];
 
     /** Šablona s {klíč}; náhrada funkcí, aby se „$&“ apod. v hodnotě nikdy neinterpretovalo. */
     function fillText(tpl, vals) {
       return tpl.replace(/\{(\w+)\}/g, (m, k) => (k in vals ? String(vals[k]) : m));
+    }
+
+    /** Zvolená jednotka (T4-6); neznámá nebo prázdná hodnota = ks. */
+    function currentUnit() {
+      const v = document.getElementById('ss-unit').value;
+      return SS_UNITS.includes(v) ? v : 'ks';
+    }
+    function unitText() { return TEXTS[currentLang]['t4c_unit_' + currentUnit()]; }
+
+    /** Popisky s {unit} (data-i18n-unit) podle jazyka a zvolené jednotky. */
+    function renderUnitTexts() {
+      const T = TEXTS[currentLang], unit = unitText();
+      document.querySelectorAll('[data-i18n-unit]').forEach(el => {
+        const key = el.getAttribute('data-i18n-unit');
+        if (T[key] !== undefined) el.textContent = fillText(T[key], { unit });
+      });
+    }
+
+    /** Násobek zaokrouhlení: prázdné = 1 (popisek to říká), u ks jen celé číslo. → { value, canonical } | { error } */
+    function readStep() {
+      const T = TEXTS[currentLang];
+      const r = readNumber('ss-step', { positive: true, min: 0.000001, max: 1e9,
+        integerMsg: currentUnit() === 'ks' ? T.err_t4c_unitInteger : null });
+      return r.empty ? { value: 1, canonical: '1' } : r;
     }
 
     function updateSafetyStock() {
@@ -1731,31 +2285,83 @@
       };
       if (currentSsMode === 'A') fields.peak = readNumber(ids.peak, { max: 1e9 });
       else fields.percent = readNumber(ids.percent, { max: 1000 });
+      const step = readStep();
 
-      const incomplete = Object.values(fields).some(f => f.error || f.empty);
+      const incomplete = step.error || Object.values(fields).some(f => f.error || f.empty);
       let r = null;
       if (!incomplete) {
         const v = {};
         for (const [k, f] of Object.entries(fields)) v[k] = f.value;
-        r = safetyStock({ method: currentSsMode === 'A' ? 'peak' : 'percent', ...v });
+        r = safetyStock({ method: currentSsMode === 'A' ? 'peak' : 'percent', ...v, step: step.value });
         if (r.error === 'peakBelowAvg') { showError(ids.peak, T.err_t4c_peakBelowAvg); r = null; }
+        else if (r.error === 'stepTooFine') { showError('ss-step', T.err_t4c_stepTooFine); r = null; }
       }
-      renderSafetyStock(r, fields);
+      renderSafetyStock(r, fields, step);
+      updateStockPosition(r, step);
     }
 
     /** Karta i rozepsaný vzorec z jednoho výsledku `r` (null = „—“). */
-    function renderSafetyStock(r, fields) {
+    function renderSafetyStock(r, fields, step = { value: 1 }) {
       const T = TEXTS[currentLang];
       const fmt = formatPlainNumber;
       document.getElementById('ss-result-ss').textContent = r ? fmt(r.ss) : '—';
       document.getElementById('ss-result-rop').textContent = r ? fmt(r.rop) : '—';
+      document.getElementById('ss-copy-bar').hidden = !r;   // D4: kopírovat jen hotový výsledek
       const box = document.getElementById('ss-formula-text');
       if (!r) { box.innerHTML = T.t4c_formula_empty; return; }
+      const unit = unitText();
       box.innerHTML = fillText(T['t4c_formula_' + currentSsMode], {
         avg: fmt(fields.avg.value), lt: fmt(fields.leadTime.value),
         peak: fields.peak ? fmt(fields.peak.value) : '', pct: fields.percent ? fmt(fields.percent.value) : '',
-        rawSS: fmt(r.rawSS), ss: fmt(r.ss), ropRaw: fmt(r.demand + r.ss), rop: fmt(r.rop), unit: T.t4c_result_unit,
+        rawSS: fmt(r.rawSS), ss: fmt(r.ss), ropRaw: fmt(r.demand + r.ss), rop: fmt(r.rop), unit,
+        roundTo: step.value === 1 ? '' : fillText(T.t4c_formula_step, { step: fmt(step.value), unit }),
       });
+    }
+
+    /**
+     * Zásobová pozice (T4-7) pod kartou. Nic nevyplněno → nic; část vyplněná → výzva doplnit (bez chyby u pole,
+     * jako T4-5); neplatné → hláška u pole. Bez ROP jen pozice, s ROP i spouštěč objednání.
+     */
+    function updateStockPosition(r, step) {
+      const T = TEXTS[currentLang];
+      const out = document.getElementById('ss-pos-result');
+      const integerMsg = currentUnit() === 'ks' ? T.err_t4c_unitInteger : null;
+      const f = {};
+      for (const [k, id] of Object.entries(POS_FIELDS)) f[k] = readNumber(id, { max: 1e12, integerMsg });
+      const vals = Object.values(f);
+      out.classList.remove('reached');
+      if (vals.some(x => x.error) || vals.every(x => x.empty)) { out.textContent = ''; return; }
+      if (vals.some(x => x.empty)) { out.textContent = T.t4c_pos_incomplete; return; }
+      const unit = unitText(), fmt = formatPlainNumber;
+      const input = { onhand: f.onhand.canonical, onorder: f.onorder.canonical, backlog: f.backlog.canonical };
+      if (!r) {
+        out.textContent = fillText(T.t4c_pos_noRop, { pos: fmt(stockPosition(input).position), unit });
+        return;
+      }
+      const stepDec = decParse(step.canonical);
+      const p = stockPosition({ ...input, rop: decString(BigInt(r.ropSteps) * stepDec.int, stepDec.exp) });
+      out.textContent = fillText(p.order ? T.t4c_pos_order : T.t4c_pos_wait, { pos: fmt(p.position), rop: fmt(r.rop), unit });
+      out.classList.toggle('reached', p.order);
+    }
+
+    /** Číslo do pole podle jazyka bez oddělovače tisíců (EN „50,000“ by parser odmítl jako víceznačné). */
+    function formatInputNumber(n) {
+      return new Intl.NumberFormat(TEXTS[currentLang].numLocale, { maximumFractionDigits: 6, useGrouping: false }).format(n);
+    }
+
+    /** T4-8: celková dodací doba ze 4b do lead time ve 4c (obě pole, A i B). → true, když se převzala. */
+    function transferLeadTime() {
+      const T = TEXTS[currentLang];
+      const msg = document.getElementById('ss-lt-transfer-msg');
+      const phases = readPhases();
+      if (!phases) { msg.textContent = T.t4c_lt_transfer_none; return false; }
+      const { total } = calcLeadTime(phases);
+      if (!(total > 0)) { msg.textContent = T.t4c_lt_transfer_zero; return false; }
+      const value = formatInputNumber(total);
+      [SS_FIELDS.A.leadTime, SS_FIELDS.B.leadTime].forEach(id => { document.getElementById(id).value = value; });
+      msg.textContent = fillText(T.t4c_lt_transfer_done, { days: formatPlainNumber(total) });
+      updateSafetyStock();
+      return true;
     }
 
     function initSafetyStock() {
@@ -1771,14 +2377,23 @@
         });
       });
 
-      const allIds = [...Object.values(SS_FIELDS.A), ...Object.values(SS_FIELDS.B)];
+      const allIds = [...Object.values(SS_FIELDS.A), ...Object.values(SS_FIELDS.B), ...SS_COMMON_IDS];
       allIds.forEach(id => document.getElementById(id).addEventListener('input', updateSafetyStock));
+      [SS_FIELDS.A.leadTime, SS_FIELDS.B.leadTime].forEach(id => document.getElementById(id).addEventListener('input', () => {
+        document.getElementById('ss-lt-transfer-msg').textContent = '';
+      }));
+      document.getElementById('ss-unit').addEventListener('change', () => { renderUnitTexts(); updateSafetyStock(); });
+      document.getElementById('ss-lt-transfer').addEventListener('click', transferLeadTime);
 
       document.getElementById('ss-reset').addEventListener('click', () => {
         allIds.forEach(id => { document.getElementById(id).value = ''; clearError(id); });
+        document.getElementById('ss-unit').value = 'ks';
+        document.getElementById('ss-lt-transfer-msg').textContent = '';
+        renderUnitTexts();
         updateSafetyStock();
       });
 
+      renderUnitTexts();
       updateSafetyStock();
     }
 
@@ -1797,6 +2412,8 @@
       renderIncotermsTable();
       initLeadTime();
       initSafetyStock();
+      initCopyResults();
+      initRouter();
     });
   </script>
 </body>
