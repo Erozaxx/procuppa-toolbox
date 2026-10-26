@@ -578,8 +578,8 @@
       <button onclick="setCurrency('CZK')" class="btn-currency active" data-currency="CZK">Kč</button>
       <button onclick="setCurrency('EUR')" class="btn-currency" data-currency="EUR">EUR</button>
       <button onclick="setCurrency('USD')" class="btn-currency" data-currency="USD">USD</button>
-      <select onchange="setCurrency(this.value); this.value=''" class="currency-dropdown" aria-label="Další měny">
-        <option value="">Další…</option>
+      <select onchange="setCurrency(this.value); this.value=''" class="currency-dropdown" aria-label="Další měny" data-i18n-aria-label="cur_more_aria">
+        <option value="" data-i18n="cur_more">Další…</option>
         <option value="GBP">GBP £</option>
         <option value="CHF">CHF Fr</option>
         <option value="JPY">JPY ¥</option>
@@ -593,7 +593,7 @@
   </header>
 
   <!-- TAB NAVIGATION -->
-  <nav class="tab-nav" role="tablist" aria-label="Nástroje nákladů">
+  <nav class="tab-nav" role="tablist" aria-label="Nástroje nákladů" data-i18n-aria-label="nav_aria">
     <button class="tab-btn active" role="tab" data-tab="tab-2a"
             id="tab-btn-2a" aria-selected="true" aria-controls="tab-2a" tabindex="0"
             data-i18n="tab2a">TCO</button>
@@ -806,7 +806,7 @@
         </div>
 
         <!-- Mode switcher Kč / % -->
-        <div class="mode-switcher" role="group" aria-label="Způsob zadání úspory">
+        <div class="mode-switcher" role="group" aria-label="Způsob zadání úspory" data-i18n-aria-label="t2b_mode_aria">
           <button
             type="button"
             class="mode-btn active"
@@ -1026,7 +1026,7 @@
         </p>
 
         <!-- Mode switcher Kč / % -->
-        <div class="mode-switcher" role="group" aria-label="Způsob zadání složek">
+        <div class="mode-switcher" role="group" aria-label="Způsob zadání složek" data-i18n-aria-label="t2d_mode_aria">
           <button
             type="button"
             class="mode-btn active"
@@ -1117,6 +1117,15 @@
     /* ===== i18n TEXTS ===== */
     const TEXTS = {
       cs: {
+        dec_sep: ',',   // Q4: desetinný oddělovač v textech výsledků (fixedDec)
+      // T-026 Q2/Q3: titulek stránky a aria-label v jazyce stránky
+      page_title: 'Procuppa Toolbox 2 – Náklady',
+      nav_aria: 'Nástroje nákladů',
+      cur_more: 'Další…',
+      cur_more_aria: 'Další měny',
+      t2b_mode_aria: 'Způsob zadání úspory',
+      t2d_mode_aria: 'Způsob zadání složek',
+      t2d_row_value_aria: 'Hodnota složky {n} ({unit})',
         // D2/D2b: odkazy a přenos hodnot mezi nástroji (T-016)
         xfer_manual: 'Přenést ručně (kopírovat data)',
         xfer_fallback_intro: 'Automatický přenos tady nefunguje (soubor otevřený z disku, vložení do cizí stránky nebo zablokované cookies). Zkopírujte data, otevřete cílový nástroj a vložte je do pole „Vložit data z jiného nástroje“.',
@@ -1128,6 +1137,7 @@
         xfer_open_target: 'Otevřít cílový nástroj ↗',
         xfer_btn_t1d: 'Přenést do kalkulačky úspor ↗',
         xfer_need_result_2b: 'Nejdřív spočítejte cílovou cenu.',
+        xfer_need_range_2b: 'Cenu nejde přenést: kalkulačka úspor přijme částky od 0 do 1 000 000 000 000 s nejvýš 6 desetinnými místy.',
         t2a_link_1d: 'Porovnat dvě jednotkové ceny a úsporu v kalkulačce úspor ↗',
         // Tab labels
         tab2a: 'TCO',
@@ -1312,6 +1322,15 @@
         t2d_err_min_two:        'Zadejte alespoň dvě složky s hodnotou větší než 0',
       },
       en: {
+        dec_sep: '.',   // Q4: decimal separator in result texts (fixedDec)
+      // T-026 Q2/Q3: page title and aria-label in the page language
+      page_title: 'Procuppa Toolbox 2 – Costs',
+      nav_aria: 'Cost tools',
+      cur_more: 'More…',
+      cur_more_aria: 'More currencies',
+      t2b_mode_aria: 'Saving input method',
+      t2d_mode_aria: 'Component input method',
+      t2d_row_value_aria: 'Component {n} value ({unit})',
         // D2/D2b: odkazy a přenos hodnot mezi nástroji (T-016)
         xfer_manual: 'Transfer manually (copy data)',
         xfer_fallback_intro: 'Automatic transfer is not available here (file opened from disk, embedded in another site or cookies blocked). Copy the data, open the target tool and paste it into "Paste data from another tool".',
@@ -1323,6 +1342,7 @@
         xfer_open_target: 'Open the target tool ↗',
         xfer_btn_t1d: 'Send to savings calculator ↗',
         xfer_need_result_2b: 'Calculate the target price first.',
+        xfer_need_range_2b: 'The price cannot be transferred: the savings calculator accepts amounts from 0 to 1,000,000,000,000 with at most 6 decimal places.',
         t2a_link_1d: 'Compare two unit prices and the saving in the savings calculator ↗',
         // Tab labels
         tab2a: 'TCO',
@@ -1585,10 +1605,23 @@
       document.querySelectorAll('[data-tool-link]').forEach(a => setToolLink(a, a.getAttribute('data-tool-link')));
       const tool = toolFromLocation();
       if (tool) activateToolById(tool, { focus: false, remember: false });
+      // Q8: písmo nebo styly můžou šířku tabů změnit až po prvním vykreslení, aktivní tab proto ukázat znovu
+      const again = () => revealTab(document.querySelector('.tab-btn.active'));
+      window.addEventListener('load', again);
+      try { if (document.fonts && document.fonts.ready) document.fonts.ready.then(again); } catch (e) { /* bez FontFaceSet */ }
       window.addEventListener('hashchange', () => {
         const t = toolFromLocation();
         if (t) activateToolById(t, { focus: true, remember: false });
       });
+    }
+    /** Q8: aktivní tab do viditelné části lišty tabů (na mobilu se lišta posouvá do strany). Posouvá jen lištu, ne
+        stránku ani rodičovskou stránku při vložení přes <iframe>, proto ne scrollIntoView. Jako inline: 'nearest'. */
+    function revealTab(btn) {
+      const nav = btn && typeof btn.closest === 'function' ? btn.closest('.tab-nav') : null;
+      if (!nav || !(nav.scrollWidth > nav.clientWidth) || typeof btn.getBoundingClientRect !== 'function') return;
+      const n = nav.getBoundingClientRect(), b = btn.getBoundingClientRect();
+      if (b.left < n.left) nav.scrollLeft += b.left - n.left;
+      else if (b.right > n.right) nav.scrollLeft += Math.min(b.right - n.right, b.left - n.left);
     }
     // ROUTER-SHARED-END
 
@@ -1606,8 +1639,28 @@
     const XFER_ID = /^t([1-6])-\1[a-d]$/;
     const xferHas = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
 
-    function xferAttrs(maxAge) {
-      return '; path=/; max-age=' + maxAge + '; SameSite=Lax' + (location.protocol === 'https:' ? '; Secure' : '');
+    /** Adresář cesty URL: '/procuppa-toolbox/toolbox-2-naklady.html' → '/procuppa-toolbox/'. Nečitelná cesta → '/'. */
+    function xferDir(pathname) {
+      const p = String(pathname || '');
+      const d = p.slice(0, p.lastIndexOf('/') + 1);
+      return /^\/[^;,\s]*$/.test(d) ? d : '/';
+    }
+
+    /** Cesta cookie: nejdelší společný adresář této stránky a cílové stránky, ne celý web. Na GitHub Pages
+        '/procuppa-toolbox/', v CMS s adresami '/nastroje/kalkulacky/' a '/nastroje/naklady/' '/nastroje/'. */
+    function xferPath(targetHref) {
+      let here = '/', there = '/';
+      try {
+        here = xferDir(location.pathname);
+        there = targetHref ? xferDir(new URL(targetHref, location.href).pathname) : here;
+      } catch (e) { return '/'; }
+      let i = 0;
+      while (i < here.length && here[i] === there[i]) i++;
+      return here.slice(0, here.lastIndexOf('/', i - 1) + 1) || '/';
+    }
+
+    function xferAttrs(maxAge, path) {
+      return '; path=' + path + '; max-age=' + maxAge + '; SameSite=Lax' + (location.protocol === 'https:' ? '; Secure' : '');
     }
 
     /** Surová (zakódovaná) hodnota cookie, nebo null. */
@@ -1618,20 +1671,27 @@
       return hit ? hit.slice(XFER_COOKIE.length + 1) : null;
     }
 
+    /** Smazání v adresáři stránky i ve všech nadřazených: zdroj mohl cookie zapsat na společný adresář (xferPath). */
     function xferClear() {
-      try { document.cookie = XFER_COOKIE + '=' + xferAttrs(0); } catch (e) { /* cookies zablokované */ }
+      let dir = '/';
+      try { dir = xferDir(location.pathname); } catch (e) { /* bez location: jen '/' */ }
+      for (let p = dir; ; p = p.slice(0, p.lastIndexOf('/', p.length - 2) + 1)) {
+        try { document.cookie = XFER_COOKIE + '=' + xferAttrs(0, p); } catch (e) { return; /* cookies zablokované */ }
+        if (p === '/') return;
+      }
     }
 
     function xferMake(from, to, values, now = Date.now()) {
       return { v: XFER_VERSION, from, to, ts: now, values };
     }
 
-    /** Zápis a zpětné čtení. → { ok, reason?, json }; json se při neúspěchu nabídne ke zkopírování. */
-    function xferSend(payload) {
+    /** Zápis a zpětné čtení. targetHref = odkaz na cílovou stránku (cesta cookie). → { ok, reason?, json };
+        json se při neúspěchu nabídne ke zkopírování. */
+    function xferSend(payload, targetHref) {
       const json = JSON.stringify(payload);
       const enc = encodeURIComponent(json);
       if (enc.length > XFER_MAX_BYTES) return { ok: false, reason: 'tooLarge', json };
-      try { document.cookie = XFER_COOKIE + '=' + enc + xferAttrs(XFER_MAX_AGE); } catch (e) { return { ok: false, reason: 'blocked', json }; }
+      try { document.cookie = XFER_COOKIE + '=' + enc + xferAttrs(XFER_MAX_AGE, xferPath(targetHref)); } catch (e) { return { ok: false, reason: 'blocked', json }; }
       return xferRead() === enc ? { ok: true, json } : { ok: false, reason: 'blocked', json };
     }
 
@@ -1771,8 +1831,19 @@
     let t2bXferResult = null;   // { base, targetPrice, currency } posledního platného výsledku 2b, jinak null
     const XFER_SOURCES = {
       t2b: { from: 't2-2b', to: 't1-1d', tool: '1d', need: 'xfer_need_result_2b',
-             values: () => (t2bXferResult ? xferValuesT2b(t2bXferResult) : null) },
+             rejected: () => (t2bXferResult && !xferFitsT1d(t2bXferResult) ? 'xfer_need_range_2b' : null),
+             values: () => (t2bXferResult && xferFitsT1d(t2bXferResult) ? xferValuesT2b(t2bXferResult) : null) },
     };
+
+    /** Mez cíle 1d (toolbox-1, XFER_ROUTES 't2-2b>t1-1d': orig a new 0 až 1e12). Hlídá b1 test, že je v obou souborech stejná. */
+    const XFER_T1D_MAX = 1e12;
+
+    /** Projde výsledek kontrolou cíle 1d beze změny? Rozsah 0 až XFER_T1D_MAX; zadaná cena nejvýš XFER_MAX_DP desetinných
+        míst (víc by xferRound tiše zaokrouhlil). Cílová cena je výsledek výpočtu, ta se na XFER_MAX_DP zaokrouhlí záměrně. */
+    function xferFitsT1d({ base, targetPrice }) {
+      const inRange = x => Number.isFinite(x) && x >= 0 && x <= XFER_T1D_MAX;
+      return inRange(base) && inRange(targetPrice) && xferRound(base) === base;
+    }
 
     /** Hodnoty z výsledku targetPrice() (ne z textu v DOM), bez float šumu. */
     function xferValuesT2b({ base, targetPrice, currency }) {
@@ -1784,13 +1855,21 @@
        -xfer-fallback (<details>), -xfer-json (readonly textarea), -xfer-copy. Hodnoty jdou z výsledku výpočtu,
        nikdy z textu v DOM. */
 
+    /** Klíč nápovědy u neaktivního tlačítka: hodnota, kterou by cíl odmítl (src.rejected), jinak chybějící výsledek. */
+    function xferNeedKey(src) {
+      return (src.rejected && src.rejected()) || src.need;
+    }
+
     /** Stav tlačítka: aktivní jen s platnými hodnotami. JSON pro ruční přenos je vždy aktuální. → values | null. */
     function xferSourceRefresh(p) {
       const src = XFER_SOURCES[p];
       const values = src.values();
       const ok = values !== null;
+      const hint = document.getElementById(p + '-xfer-hint');
+      const need = xferNeedKey(src);
       document.getElementById(p + '-xfer-btn').setAttribute('aria-disabled', ok ? 'false' : 'true');
-      document.getElementById(p + '-xfer-hint').hidden = ok;
+      hint.hidden = ok;
+      if (hint.getAttribute('data-i18n') !== need) { hint.setAttribute('data-i18n', need); hint.textContent = TEXTS[currentLang][need]; }
       document.getElementById(p + '-xfer-copy').disabled = !ok;
       document.getElementById(p + '-xfer-json').value = ok ? JSON.stringify(xferMake(src.from, src.to, values)) : '';
       if (!ok) document.getElementById(p + '-xfer-status').textContent = '';
@@ -1805,10 +1884,10 @@
       const values = xferSourceRefresh(p);
       if (values === null) {
         if (e) e.preventDefault();
-        status.textContent = T[src.need];
+        status.textContent = T[xferNeedKey(src)];
         return 'disabled';
       }
-      const res = xferSend(xferMake(src.from, src.to, values));
+      const res = xferSend(xferMake(src.from, src.to, values), toolboxHref(src.tool));
       document.getElementById(p + '-xfer-json').value = res.json;
       if (res.ok) { status.textContent = ''; return 'sent'; }
       if (e) e.preventDefault();
@@ -1823,7 +1902,7 @@
       const T = TEXTS[currentLang];
       const status = document.getElementById(p + '-xfer-status');
       const ta = document.getElementById(p + '-xfer-json');
-      if (xferSourceRefresh(p) === null) { status.textContent = T[XFER_SOURCES[p].need]; return Promise.resolve('disabled'); }
+      if (xferSourceRefresh(p) === null) { status.textContent = T[xferNeedKey(XFER_SOURCES[p])]; return Promise.resolve('disabled'); }
       return copyText(ta.value, ta).then(r => { status.textContent = r === 'copied' ? T.xfer_copied : T.xfer_selected; return r; });
     }
 
@@ -2229,13 +2308,13 @@
         tr.innerHTML =
           '<td>' + escHtml(item.name) + '</td>' +
           '<td>' + formatCurrency(item.value, 0) + '</td>' +
-          '<td style="text-align:right">' + pct.toFixed(1) + ' %</td>';
+          '<td style="text-align:right">' + fixedDec(pct, 1) + ' %</td>';
         tbody.appendChild(tr);
       });
 
       // Interpretační věta
       const topItem = allItems.reduce((a, b) => a.value >= b.value ? a : b);
-      const topPct  = ((topItem.value / gross) * 100).toFixed(1);
+      const topPct  = fixedDec(((topItem.value / gross) * 100), 1);
       const residualTxt = residual > 0 ? T.t2a_interp_residual.replace('{residual}', formatCurrency(residual, 0)) : '';
       document.getElementById('t2a-interpretation').textContent =
         (T.t2a_interp
@@ -2354,13 +2433,38 @@
     /** T2-7: model převzatý ze Should-cost tlačítkem „Použít v Target price“, nebo null. */
     let targetModelRef = null; // { offer, model, costSum }
 
+    /* ===== Přesné haléře (R2, vzor T1 vatSplit a T5 earlyPay): bez float součinu při polovině haléře ===== */
+    /** Číslo → přesný desetinný zlomek { n, d } v BigInt z nejkratšího zápisu (String(x)), tedy z hodnoty, kterou
+        uživatel zadal (1024.12 → 102412 / 100). Nekonečno a NaN → null. */
+    function decOf(x) {
+      const m = /^(-?)(\d+)(?:\.(\d+))?(?:e([+-]\d+))?$/.exec(String(x));
+      if (!m) return null;
+      const frac = m[3] || '';
+      let n = BigInt(m[1] + m[2] + frac), scale = frac.length - Number(m[4] || 0);
+      if (scale < 0) { n *= 10n ** BigInt(-scale); scale = 0; }
+      return { n, d: 10n ** BigInt(scale) };
+    }
+
+    /** n / d zaokrouhlené na celé, polovina od nuly (d > 0). */
+    function roundHalfAwayBig(n, d) {
+      const neg = n < 0n, a = neg ? -n : n;
+      const q = (2n * a + d) / (2n * d);
+      return Number(neg ? -q : q);
+    }
+
+    /** Částka → celé haléře, polovina od nuly (1,005 → 101, ne 100 jako Math.round(1.005 * 100)). */
+    function toCentsExact(x) {
+      const v = decOf(x);
+      return v === null ? NaN : roundHalfAwayBig(v.n * 100n, v.d);
+    }
+
     /**
      * T2-7: cílová cena proti should-cost modelu (čistá funkce, částky na haléře).
      * → { gap: cílová cena − model, status: 'belowCosts' | 'belowModel' | 'atModel' | 'aboveModel' }.
      * belowCosts = cíl je pod náklady bez zisku (costSum), tedy i pod modelem.
      */
     function targetVsModel({ targetPrice, model, costSum }) {
-      const cents = x => Math.round(x * 100);
+      const cents = toCentsExact;
       const gap = (cents(targetPrice) - cents(model)) / 100;
       const status = cents(targetPrice) < cents(costSum) ? 'belowCosts'
         : gap < 0 ? 'belowModel' : gap > 0 ? 'aboveModel' : 'atModel';
@@ -2436,14 +2540,14 @@
       document.getElementById('t2b-result-saving-czk').textContent =
         formatCurrency(saving, 2) + ' ' + sym;
       document.getElementById('t2b-result-saving-pct').textContent =
-        pct.toFixed(2) + ' %';
+        fixedDec(pct, 2) + ' %';
       document.getElementById('t2b-result-ratio').textContent =
-        ratio.toFixed(2) + ' %';
+        fixedDec(ratio, 2) + ' %';
 
       let interp = (saving === 0 ? T.t2b_interp_zero : T.t2b_interp)
         .replace('{target}', formatCurrency(targetPrice, 2))
         .replace('{saving}', formatCurrency(saving, 2))
-        .replace('{pct}',    pct.toFixed(2));
+        .replace('{pct}',    fixedDec(pct, 2));
 
       // T2-7: porovnání s modelem převzatým ze Should-cost
       const modelRow = document.getElementById('t2b-model-row');
@@ -2504,7 +2608,7 @@
           legend: { display: true, position: 'bottom' },
           tooltip: {
             callbacks: {
-              label: ctx => ' ' + ctx.label + ': ' + ctx.parsed.toFixed(1) + ' %'
+              label: ctx => ' ' + ctx.label + ': ' + fixedDec(ctx.parsed, 1) + ' %'
             }
           }
         }
@@ -2566,7 +2670,7 @@
      * → { gap: nabídka − model, pctOfOffer, direction: 'offerAbove' | 'modelAbove' | 'equal' }.
      */
     function offerGap({ offer, model }) {
-      const gap = (Math.round(offer * 100) - Math.round(model * 100)) / 100;
+      const gap = (toCentsExact(offer) - toCentsExact(model)) / 100;
       return { gap, pctOfOffer: (gap / offer) * 100,
         direction: gap > 0 ? 'offerAbove' : gap < 0 ? 'modelAbove' : 'equal' };
     }
@@ -2696,13 +2800,13 @@
         tr.innerHTML =
           '<td>' + escHtml(item.name) + '</td>' +
           '<td>' + formatCurrency(item.value, 2) + '</td>' +
-          '<td style="text-align:right">' + pct.toFixed(1) + ' %</td>';
+          '<td style="text-align:right">' + fixedDec(pct, 1) + ' %</td>';
         tbody.appendChild(tr);
       });
 
       // Interpretační věta – největší složka
       const topItem = nonZeroItems.reduce((a, b) => a.value >= b.value ? a : b);
-      const topPct  = ((topItem.value / total) * 100).toFixed(1);
+      const topPct  = fixedDec(((topItem.value / total) * 100), 1);
       let interp = T.t2c_interp
         .replace('{total}',  formatCurrency(total, 2))
         .replace('{top}',    topItem.name)
@@ -2759,7 +2863,7 @@
      */
     function useInTargetPrice() {
       if (!shouldcostLast) return;
-      const r2 = x => Math.round(x * 100) / 100;
+      const r2 = x => toCentsExact(x) / 100;
       targetModelRef = { offer: r2(shouldcostLast.offer), model: r2(shouldcostLast.model), costSum: r2(shouldcostLast.costSum) };
       setTargetPriceMode('czk');
       document.getElementById('t2b-base-price').value = formatInputNumber(targetModelRef.offer);
@@ -2795,6 +2899,13 @@
        NÁSTROJ 2d: Cost breakdown
        =================================================== */
 
+    /** aria-label polí řádku 2d v aktuálním jazyce, měně a režimu (Q3: přepnutí jazyka je přeloží). */
+    function t2dRowAria(i) {
+      const T = TEXTS[currentLang];
+      const unit = breakdownMode === 'czk' ? CURRENCY_CONFIG[currentCurrency].symbol : '%';
+      return { name: T.t2d_breakdown_col_name + ' ' + (i + 1), value: T.t2d_row_value_aria.replace('{n}', String(i + 1)).replace('{unit}', unit) };
+    }
+
     /* --- Render řádků --- */
     function renderBreakdownRows() {
       const T = TEXTS[currentLang];
@@ -2815,7 +2926,7 @@
         nameInput.className = 'input-field';
         nameInput.style.flex = '1';
         nameInput.placeholder = T.t2d_row_name_ph;
-        nameInput.setAttribute('aria-label', T.t2d_breakdown_col_name + ' ' + (i + 1));
+        nameInput.setAttribute('aria-label', t2dRowAria(i).name);
         nameInput.setAttribute('aria-describedby', 't2d-name-' + i + '-err');
         nameInput.addEventListener('input', calcBreakdown);
 
@@ -2829,7 +2940,7 @@
         valueInput.setAttribute('autocomplete', 'off');
         valueInput.setAttribute('aria-describedby', 't2d-value-' + i + '-err');
         valueInput.placeholder = T.t2d_row_value_ph;
-        valueInput.setAttribute('aria-label', (isCzk ? T.t2d_mode_czk : T.t2d_mode_pct) + ' ' + (i + 1));
+        valueInput.setAttribute('aria-label', t2dRowAria(i).value);
         valueInput.addEventListener('input', calcBreakdown);
 
         // Error span
@@ -3044,11 +3155,13 @@
     }
 
     /**
-     * T2-9: podíly v % z nabídkové ceny → částky (čistá funkce), každá zaokrouhlená na haléře.
-     * Součet částek se od nabídky může lišit v mezích tolerance součtu podílů (0,1 p. b.).
+     * T2-9: podíly v % z nabídkové ceny → částky (čistá funkce), každá přesně na haléře, polovina od nuly:
+     * haléře = nabídka × podíl % (nabídka × p / 100 Kč = nabídka × p haléřů), počítáno v BigInt ze zadaných hodnot
+     * (1 024,12 × 12,5 % = 128,015 → 128,02). Součet částek se od nabídky může lišit v mezích tolerance součtu podílů (0,1 p. b.).
      */
     function percentToAmounts({ offer, percents }) {
-      return percents.map(p => Math.round(offer * p) / 100);
+      const O = decOf(offer);
+      return percents.map(p => { const P = decOf(p); return roundHalfAwayBig(O.n * P.n, O.d * P.d) / 100; });
     }
 
     /** T2-8: čistá kontrola součtu podílů. V režimu Kč vždy OK. → { sum } nebo { error: 'pctSum', sum }. */
@@ -3074,7 +3187,7 @@
         totalEl.textContent = formatCurrency(total, 0) + ' ' + sym;
         if (totalLabelEl) totalLabelEl.textContent = T.t2d_result_total_czk || T.t2d_result_total;
       } else {
-        totalEl.textContent = total.toFixed(1) + ' %';
+        totalEl.textContent = fixedDec(total, 1) + ' %';
         if (totalLabelEl) totalLabelEl.textContent = T.t2d_result_total;
       }
 
@@ -3100,7 +3213,7 @@
           tr.innerHTML =
             '<td>' + escHtml(it.name) + '</td>' +
             '<td>' + formatCurrency(it.value, 0) + '</td>' +
-            '<td style="text-align:right">' + pct.toFixed(1) + ' %</td>';
+            '<td style="text-align:right">' + fixedDec(pct, 1) + ' %</td>';
           tbody.appendChild(tr);
         });
       } else {
@@ -3111,7 +3224,7 @@
           tr.innerHTML =
             '<td>' + escHtml(it.name) + '</td>' +
             (withAmounts ? '<td>' + formatCurrency(amounts[idx], 2) + '</td>' : '') +
-            '<td style="text-align:right">' + it.value.toFixed(1) + ' %</td>';
+            '<td style="text-align:right">' + fixedDec(it.value, 1) + ' %</td>';
           tbody.appendChild(tr);
         });
       }
@@ -3119,8 +3232,8 @@
       // Interpretační věta
       const topItem = items.reduce((a, b) => a.value >= b.value ? a : b);
       const topPctVal = isCzk
-        ? ((topItem.value / total) * 100).toFixed(1)
-        : topItem.value.toFixed(1);
+        ? fixedDec(((topItem.value / total) * 100), 1)
+        : fixedDec(topItem.value, 1);
 
       const interpKey = isCzk ? 't2d_interp' : 't2d_interp_pct';
       const currSym2d = CURRENCY_CONFIG[currentCurrency].symbol;
@@ -3206,7 +3319,7 @@
               legend: { display: false },
               tooltip: {
                 callbacks: {
-                  label: ctx2 => ' ' + ctx2.label + ': ' + ctx2.parsed.x.toFixed(1) + ' %'
+                  label: ctx2 => ' ' + ctx2.label + ': ' + fixedDec(ctx2.parsed.x, 1) + ' %'
                 }
               }
             },
@@ -3214,7 +3327,7 @@
               x: {
                 beginAtZero: true,
                 ticks: {
-                  callback: val => val.toFixed(0) + ' %'
+                  callback: val => fixedDec(val, 0) + ' %'
                 }
               }
             }
@@ -3279,6 +3392,12 @@
     }
 
     /* ===== i18n ===== */
+    /** Q4: číslo s pevným počtem desetinných míst do textu výsledku; desetinný oddělovač podle jazyka (TEXTS.dec_sep:
+        CZ čárka, EN tečka). Jediné místo pro toFixed ve výstupu (hlídá iter-013-t026-tests.js). */
+    function fixedDec(x, digits) {
+      return Number(x).toFixed(digits).replace('.', TEXTS[currentLang].dec_sep);
+    }
+
     function setLang(lang) {
       currentLang = lang;
       document.documentElement.lang = lang;
@@ -3300,6 +3419,12 @@
           el.placeholder = TEXTS[lang][key].replace(/\{currency\}/g, currSym);
         }
       });
+
+      document.querySelectorAll('[data-i18n-aria-label]').forEach(el => {
+        const key = el.getAttribute('data-i18n-aria-label');
+        if (TEXTS[lang][key] !== undefined) el.setAttribute('aria-label', TEXTS[lang][key]);
+      });
+      document.title = TEXTS[lang].page_title;
 
       document.querySelectorAll('.lang-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.lang === lang);
@@ -3331,9 +3456,11 @@
       for (let i = 0; i < breakdownRowCount; i++) {
         const nEl = document.getElementById('t2d-name-' + i);
         const vEl = document.getElementById('t2d-value-' + i);
-        if (nEl) nEl.placeholder = T.t2d_row_name_ph;
-        if (vEl) vEl.placeholder = T.t2d_row_value_ph;
+        if (nEl) { nEl.placeholder = T.t2d_row_name_ph; nEl.setAttribute('aria-label', t2dRowAria(i).name); }
+        if (vEl) { vEl.placeholder = T.t2d_row_value_ph; vEl.setAttribute('aria-label', t2dRowAria(i).value); }
       }
+
+      refreshShownResults();   // Q2: zobrazené výsledky a vysvětlení v novém jazyce
     }
 
     /* ===== CURRENCY FUNCTIONS ===== */
@@ -3357,22 +3484,15 @@
       // Aktualizovat data-currency-label prvky
       updateCurrencyLabels();
 
-      // Aktualizovat i18n texty (volá substituci {currency} placeholder)
+      // Aktualizovat i18n texty (volá substituci {currency} placeholder) a přepočítat zobrazené výsledky
       setLang(currentLang);
+    }
 
-      // Re-render výsledků pokud jsou zobrazeny
-      if (document.getElementById('t2a-result').style.display !== 'none') {
-        calcTco();
-      }
-      if (document.getElementById('t2b-result').style.display !== 'none') {
-        calcTargetPrice();
-      }
-      if (document.getElementById('t2c-result').style.display !== 'none') {
-        calcShouldcost();
-      }
-      if (document.getElementById('t2d-result').style.display !== 'none') {
-        calcBreakdown();
-      }
+    /** Přepočítá jen nástroje, jejichž výsledek je zobrazený (po změně jazyka nebo měny; prázdný formulář nehlásí chyby). */
+    function refreshShownResults() {
+      [['t2a-result', calcTco], ['t2b-result', calcTargetPrice], ['t2c-result', calcShouldcost], ['t2d-result', calcBreakdown]].forEach(([id, calc]) => {
+        if (document.getElementById(id).style.display === 'block') calc();
+      });
     }
 
     /* ===== TAB NAVIGATION ===== */
@@ -3433,6 +3553,7 @@
         panel.classList.add('active');
         panel.removeAttribute('hidden');
       }
+      revealTab(btn);
     }
 
     /** D2: aktivuje tab podle id nástroje ('1d'). focus = fokus na tlačítko tabu, remember = kotva #tool= v adrese.

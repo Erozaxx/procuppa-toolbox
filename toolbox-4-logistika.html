@@ -847,7 +847,7 @@
   </header>
 
   <!-- TAB NAVIGATION -->
-  <nav class="tab-nav" role="tablist" aria-label="Nástroje logistika">
+  <nav class="tab-nav" role="tablist" aria-label="Nástroje logistika" data-i18n-aria-label="nav_aria">
     <button class="tab-btn active" role="tab" data-tab="tab-4a"
             id="tab-btn-4a" aria-selected="true" aria-controls="tab-4a" tabindex="0"
             data-i18n="tab4a">Incoterms</button>
@@ -870,7 +870,7 @@
         <h2 data-i18n="t4a_title">Incoterms 2020</h2>
         <p class="tool-desc" data-i18n="t4a_desc">Přehled 11 Incoterms 2020. Klikněte na termín pro detail.</p>
 
-        <div class="inco-filter-bar" role="group" aria-label="Filtr Incoterms">
+        <div class="inco-filter-bar" role="group" aria-label="Filtr Incoterms" data-i18n-aria-label="t4a_filter_aria">
           <button class="inco-filter-btn active" data-filter="all" data-i18n="t4a_filter_all">Vše</button>
           <button class="inco-filter-btn" data-filter="sea" data-i18n="t4a_filter_sea">Pouze Sea</button>
           <button class="inco-filter-btn" data-filter="seller_heavy" data-i18n="t4a_filter_seller_heavy">Prodávající nese víc</button>
@@ -951,7 +951,7 @@
           </div>
         </div>
 
-        <div class="lt-bar" id="lt-bar" role="img" aria-label="Vizualizace fází lead time">
+        <div class="lt-bar" id="lt-bar" role="img" aria-label="Vizualizace fází lead time" data-i18n-aria-label="t4b_bar_aria">
           <div class="lt-bar-segment lt-seg-production" id="lt-seg-production" style="width:0%"></div>
           <div class="lt-bar-segment lt-seg-dispatch"   id="lt-seg-dispatch"   style="width:0%"></div>
           <div class="lt-bar-segment lt-seg-transit"    id="lt-seg-transit"    style="width:0%"></div>
@@ -985,7 +985,7 @@
         <h2 data-i18n="t4c_title">Výpočet bezpečnostní zásoby</h2>
         <p class="tool-desc" data-i18n="t4c_desc">Výpočet bezpečnostní zásoby. Vyberte vzorec a zadejte vstupy.</p>
 
-        <div class="ss-mode-toggle" role="group" aria-label="Výběr vzorce">
+        <div class="ss-mode-toggle" role="group" aria-label="Výběr vzorce" data-i18n-aria-label="t4c_mode_aria">
           <button class="ss-mode-btn active" data-mode="A" data-i18n="ss_modeA">Vzorec A (Max-Avg)</button>
           <button class="ss-mode-btn" data-mode="B" data-i18n="ss_modeB">Vzorec B (Rezerva %)</button>
         </div>
@@ -1129,6 +1129,12 @@
     /* ===== i18n TEXTS ===== */
     const TEXTS = {
       cs: {
+      // T-026 Q2/Q3: titulek stránky a aria-label v jazyce stránky
+      page_title: 'Procuppa Toolbox 4 – Logistika',
+      nav_aria: 'Nástroje logistika',
+      t4a_filter_aria: 'Filtr Incoterms',
+      t4b_bar_aria: 'Vizualizace fází lead time',
+      t4c_mode_aria: 'Výběr vzorce',
         tab4a: 'Incoterms',
         tab4b: 'Lead time',
         tab4c: 'Safety stock',
@@ -1234,6 +1240,12 @@
         numLocale: 'cs-CZ',
       },
       en: {
+      // T-026 Q2/Q3: page title and aria-label in the page language
+      page_title: 'Procuppa Toolbox 4 – Logistics',
+      nav_aria: 'Logistics tools',
+      t4a_filter_aria: 'Incoterms filter',
+      t4b_bar_aria: 'Lead time phase chart',
+      t4c_mode_aria: 'Formula selection',
         tab4a: 'Incoterms',
         tab4b: 'Lead time',
         tab4c: 'Safety stock',
@@ -1610,10 +1622,23 @@
       document.querySelectorAll('[data-tool-link]').forEach(a => setToolLink(a, a.getAttribute('data-tool-link')));
       const tool = toolFromLocation();
       if (tool) activateToolById(tool, { focus: false, remember: false });
+      // Q8: písmo nebo styly můžou šířku tabů změnit až po prvním vykreslení, aktivní tab proto ukázat znovu
+      const again = () => revealTab(document.querySelector('.tab-btn.active'));
+      window.addEventListener('load', again);
+      try { if (document.fonts && document.fonts.ready) document.fonts.ready.then(again); } catch (e) { /* bez FontFaceSet */ }
       window.addEventListener('hashchange', () => {
         const t = toolFromLocation();
         if (t) activateToolById(t, { focus: true, remember: false });
       });
+    }
+    /** Q8: aktivní tab do viditelné části lišty tabů (na mobilu se lišta posouvá do strany). Posouvá jen lištu, ne
+        stránku ani rodičovskou stránku při vložení přes <iframe>, proto ne scrollIntoView. Jako inline: 'nearest'. */
+    function revealTab(btn) {
+      const nav = btn && typeof btn.closest === 'function' ? btn.closest('.tab-nav') : null;
+      if (!nav || !(nav.scrollWidth > nav.clientWidth) || typeof btn.getBoundingClientRect !== 'function') return;
+      const n = nav.getBoundingClientRect(), b = btn.getBoundingClientRect();
+      if (b.left < n.left) nav.scrollLeft += b.left - n.left;
+      else if (b.right > n.right) nav.scrollLeft += Math.min(b.right - n.right, b.left - n.left);
     }
     // ROUTER-SHARED-END
 
@@ -1631,8 +1656,28 @@
     const XFER_ID = /^t([1-6])-\1[a-d]$/;
     const xferHas = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
 
-    function xferAttrs(maxAge) {
-      return '; path=/; max-age=' + maxAge + '; SameSite=Lax' + (location.protocol === 'https:' ? '; Secure' : '');
+    /** Adresář cesty URL: '/procuppa-toolbox/toolbox-2-naklady.html' → '/procuppa-toolbox/'. Nečitelná cesta → '/'. */
+    function xferDir(pathname) {
+      const p = String(pathname || '');
+      const d = p.slice(0, p.lastIndexOf('/') + 1);
+      return /^\/[^;,\s]*$/.test(d) ? d : '/';
+    }
+
+    /** Cesta cookie: nejdelší společný adresář této stránky a cílové stránky, ne celý web. Na GitHub Pages
+        '/procuppa-toolbox/', v CMS s adresami '/nastroje/kalkulacky/' a '/nastroje/naklady/' '/nastroje/'. */
+    function xferPath(targetHref) {
+      let here = '/', there = '/';
+      try {
+        here = xferDir(location.pathname);
+        there = targetHref ? xferDir(new URL(targetHref, location.href).pathname) : here;
+      } catch (e) { return '/'; }
+      let i = 0;
+      while (i < here.length && here[i] === there[i]) i++;
+      return here.slice(0, here.lastIndexOf('/', i - 1) + 1) || '/';
+    }
+
+    function xferAttrs(maxAge, path) {
+      return '; path=' + path + '; max-age=' + maxAge + '; SameSite=Lax' + (location.protocol === 'https:' ? '; Secure' : '');
     }
 
     /** Surová (zakódovaná) hodnota cookie, nebo null. */
@@ -1643,20 +1688,27 @@
       return hit ? hit.slice(XFER_COOKIE.length + 1) : null;
     }
 
+    /** Smazání v adresáři stránky i ve všech nadřazených: zdroj mohl cookie zapsat na společný adresář (xferPath). */
     function xferClear() {
-      try { document.cookie = XFER_COOKIE + '=' + xferAttrs(0); } catch (e) { /* cookies zablokované */ }
+      let dir = '/';
+      try { dir = xferDir(location.pathname); } catch (e) { /* bez location: jen '/' */ }
+      for (let p = dir; ; p = p.slice(0, p.lastIndexOf('/', p.length - 2) + 1)) {
+        try { document.cookie = XFER_COOKIE + '=' + xferAttrs(0, p); } catch (e) { return; /* cookies zablokované */ }
+        if (p === '/') return;
+      }
     }
 
     function xferMake(from, to, values, now = Date.now()) {
       return { v: XFER_VERSION, from, to, ts: now, values };
     }
 
-    /** Zápis a zpětné čtení. → { ok, reason?, json }; json se při neúspěchu nabídne ke zkopírování. */
-    function xferSend(payload) {
+    /** Zápis a zpětné čtení. targetHref = odkaz na cílovou stránku (cesta cookie). → { ok, reason?, json };
+        json se při neúspěchu nabídne ke zkopírování. */
+    function xferSend(payload, targetHref) {
       const json = JSON.stringify(payload);
       const enc = encodeURIComponent(json);
       if (enc.length > XFER_MAX_BYTES) return { ok: false, reason: 'tooLarge', json };
-      try { document.cookie = XFER_COOKIE + '=' + enc + xferAttrs(XFER_MAX_AGE); } catch (e) { return { ok: false, reason: 'blocked', json }; }
+      try { document.cookie = XFER_COOKIE + '=' + enc + xferAttrs(XFER_MAX_AGE, xferPath(targetHref)); } catch (e) { return { ok: false, reason: 'blocked', json }; }
       return xferRead() === enc ? { ok: true, json } : { ok: false, reason: 'blocked', json };
     }
 
@@ -1915,6 +1967,11 @@
         const key = el.getAttribute('data-i18n-placeholder');
         if (TEXTS[lang][key] !== undefined) el.placeholder = TEXTS[lang][key];
       });
+      document.querySelectorAll('[data-i18n-aria-label]').forEach(el => {
+        const key = el.getAttribute('data-i18n-aria-label');
+        if (TEXTS[lang][key] !== undefined) el.setAttribute('aria-label', TEXTS[lang][key]);
+      });
+      document.title = TEXTS[lang].page_title;
       document.querySelectorAll('.lang-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.lang === lang);
       });
@@ -1953,6 +2010,7 @@
         panel.classList.toggle('active', panel.id === tabId);
       });
       if (focus) document.getElementById('tab-btn-' + tabId.replace('tab-', '')).focus();
+      revealTab(document.getElementById('tab-btn-' + tabId.replace('tab-', '')));
     }
 
     /** D2: aktivuje tab podle id nástroje ('4c'). focus = fokus na tlačítko tabu, remember = kotva #tool= v adrese.

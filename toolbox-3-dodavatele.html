@@ -763,8 +763,8 @@
       <button onclick="setCurrency('CZK')" class="btn-currency active" data-currency="CZK">Kč</button>
       <button onclick="setCurrency('EUR')" class="btn-currency" data-currency="EUR">EUR</button>
       <button onclick="setCurrency('USD')" class="btn-currency" data-currency="USD">USD</button>
-      <select onchange="setCurrency(this.value); this.value=''" class="currency-dropdown" aria-label="Další měny">
-        <option value="">Další…</option>
+      <select onchange="setCurrency(this.value); this.value=''" class="currency-dropdown" aria-label="Další měny" data-i18n-aria-label="cur_more_aria">
+        <option value="" data-i18n="cur_more">Další…</option>
         <option value="GBP">GBP £</option>
         <option value="CHF">CHF Fr</option>
         <option value="JPY">JPY ¥</option>
@@ -778,7 +778,7 @@
   </header>
 
   <!-- TAB NAVIGATION -->
-  <nav class="tab-nav" role="tablist" aria-label="Nástroje dodavatelé">
+  <nav class="tab-nav" role="tablist" aria-label="Nástroje dodavatelé" data-i18n-aria-label="nav_aria">
     <button class="tab-btn active" role="tab" data-tab="tab-3a"
             id="tab-btn-3a" aria-selected="true" aria-controls="tab-3a" tabindex="0"
             data-i18n="tab3a">Scorecard</button>
@@ -819,7 +819,7 @@
           <div class="score-slider-row">
             <span class="criterion-label" data-i18n="t3a_crit_price">Cena</span>
             <select id="t3a-score-0" class="select-field score-select" style="flex:1; min-width:120px; max-width:200px;"
-                    aria-label="Skóre – Cena" onchange="calcScorecard()">
+                    aria-label="Skóre – Cena" data-i18n-aria-label="t3a_s_price_aria" onchange="calcScorecard()">
               <option value="" data-i18n="t3a_opt_unverified">— neověřeno —</option>
               <option value="1">1</option>
               <option value="2">2</option>
@@ -832,7 +832,7 @@
               <input type="text" inputmode="decimal" autocomplete="off" id="t3a-weight-0" class="weight-input" value="2"
                      aria-describedby="t3a-weight-0-err"
                      oninput="calcScorecard()"
-                     aria-label="Váha – Cena">
+                     aria-label="Váha – Cena" data-i18n-aria-label="t3a_w_price_aria">
               <span id="t3a-weight-0-err" class="error-msg" role="alert"></span>
             </div>
           </div>
@@ -841,7 +841,7 @@
           <div class="score-slider-row">
             <span class="criterion-label" data-i18n="t3a_crit_quality">Kvalita</span>
             <select id="t3a-score-1" class="select-field score-select" style="flex:1; min-width:120px; max-width:200px;"
-                    aria-label="Skóre – Kvalita" onchange="calcScorecard()">
+                    aria-label="Skóre – Kvalita" data-i18n-aria-label="t3a_s_quality_aria" onchange="calcScorecard()">
               <option value="" data-i18n="t3a_opt_unverified">— neověřeno —</option>
               <option value="1">1</option>
               <option value="2">2</option>
@@ -854,7 +854,7 @@
               <input type="text" inputmode="decimal" autocomplete="off" id="t3a-weight-1" class="weight-input" value="3"
                      aria-describedby="t3a-weight-1-err"
                      oninput="calcScorecard()"
-                     aria-label="Váha – Kvalita">
+                     aria-label="Váha – Kvalita" data-i18n-aria-label="t3a_w_quality_aria">
               <span id="t3a-weight-1-err" class="error-msg" role="alert"></span>
             </div>
           </div>
@@ -863,7 +863,7 @@
           <div class="score-slider-row">
             <span class="criterion-label" data-i18n="t3a_crit_delivery">Dodávky</span>
             <select id="t3a-score-2" class="select-field score-select" style="flex:1; min-width:120px; max-width:200px;"
-                    aria-label="Skóre – Dodávky" onchange="calcScorecard()">
+                    aria-label="Skóre – Dodávky" data-i18n-aria-label="t3a_s_delivery_aria" onchange="calcScorecard()">
               <option value="" data-i18n="t3a_opt_unverified">— neověřeno —</option>
               <option value="1">1</option>
               <option value="2">2</option>
@@ -876,7 +876,7 @@
               <input type="text" inputmode="decimal" autocomplete="off" id="t3a-weight-2" class="weight-input" value="2"
                      aria-describedby="t3a-weight-2-err"
                      oninput="calcScorecard()"
-                     aria-label="Váha – Dodávky">
+                     aria-label="Váha – Dodávky" data-i18n-aria-label="t3a_w_delivery_aria">
               <span id="t3a-weight-2-err" class="error-msg" role="alert"></span>
             </div>
           </div>
@@ -885,7 +885,7 @@
           <div class="score-slider-row">
             <span class="criterion-label" data-i18n="t3a_crit_comm">Komunikace</span>
             <select id="t3a-score-3" class="select-field score-select" style="flex:1; min-width:120px; max-width:200px;"
-                    aria-label="Skóre – Komunikace" onchange="calcScorecard()">
+                    aria-label="Skóre – Komunikace" data-i18n-aria-label="t3a_s_comm_aria" onchange="calcScorecard()">
               <option value="" data-i18n="t3a_opt_unverified">— neověřeno —</option>
               <option value="1">1</option>
               <option value="2">2</option>
@@ -898,7 +898,7 @@
               <input type="text" inputmode="decimal" autocomplete="off" id="t3a-weight-3" class="weight-input" value="1"
                      aria-describedby="t3a-weight-3-err"
                      oninput="calcScorecard()"
-                     aria-label="Váha – Komunikace">
+                     aria-label="Váha – Komunikace" data-i18n-aria-label="t3a_w_comm_aria">
               <span id="t3a-weight-3-err" class="error-msg" role="alert"></span>
             </div>
           </div>
@@ -907,7 +907,7 @@
           <div class="score-slider-row">
             <span class="criterion-label" data-i18n="t3a_crit_flex">Flexibilita</span>
             <select id="t3a-score-4" class="select-field score-select" style="flex:1; min-width:120px; max-width:200px;"
-                    aria-label="Skóre – Flexibilita" onchange="calcScorecard()">
+                    aria-label="Skóre – Flexibilita" data-i18n-aria-label="t3a_s_flex_aria" onchange="calcScorecard()">
               <option value="" data-i18n="t3a_opt_unverified">— neověřeno —</option>
               <option value="1">1</option>
               <option value="2">2</option>
@@ -920,7 +920,7 @@
               <input type="text" inputmode="decimal" autocomplete="off" id="t3a-weight-4" class="weight-input" value="1"
                      aria-describedby="t3a-weight-4-err"
                      oninput="calcScorecard()"
-                     aria-label="Váha – Flexibilita">
+                     aria-label="Váha – Flexibilita" data-i18n-aria-label="t3a_w_flex_aria">
               <span id="t3a-weight-4-err" class="error-msg" role="alert"></span>
             </div>
           </div>
@@ -963,7 +963,7 @@
 
           <!-- Radar chart -->
           <div class="chart-container">
-            <canvas id="chart-3a-radar" aria-label="Radar chart – dílčí skóre dodavatele"></canvas>
+            <canvas id="chart-3a-radar" aria-label="Radar chart – dílčí skóre dodavatele" data-i18n-aria-label="t3a_radar_aria"></canvas>
           </div>
         </div><!-- /result-box -->
 
@@ -985,7 +985,7 @@
         <div class="input-group">
           <label for="t3b-suppliers" data-i18n="t3b_lbl_suppliers">Počet dodavatelů</label>
           <select id="t3b-suppliers" class="select-field"
-                  onchange="calcRisk()" aria-label="Počet dodavatelů">
+                  onchange="calcRisk()" aria-label="Počet dodavatelů" data-i18n-aria-label="t3b_suppliers_aria">
             <option value="" data-i18n="t3b_opt_unverified" selected>— neověřeno —</option>
             <option value="30" data-i18n="t3b_opt_suppliers_1">1 (jediný)</option>
             <option value="15" data-i18n="t3b_opt_suppliers_2_3">2–3</option>
@@ -997,7 +997,7 @@
         <div class="input-group">
           <label for="t3b-region" data-i18n="t3b_lbl_region">Region dodavatelů</label>
           <select id="t3b-region" class="select-field"
-                  onchange="calcRisk()" aria-label="Region dodavatelů">
+                  onchange="calcRisk()" aria-label="Region dodavatelů" data-i18n-aria-label="t3b_region_aria">
             <option value="" data-i18n="t3b_opt_unverified" selected>— neověřeno —</option>
             <option value="0"  data-i18n="t3b_opt_region_low">Nízké riziko (stabilní, ověřený region)</option>
             <option value="12" data-i18n="t3b_opt_region_mid">Střední riziko (zvýšené geopolitické nebo logistické riziko)</option>
@@ -1009,7 +1009,7 @@
         <div class="input-group">
           <label for="t3b-criticality" data-i18n="t3b_lbl_criticality">Kritičnost komodity (1–5)</label>
           <select id="t3b-criticality" class="select-field"
-                  onchange="calcRisk()" aria-label="Kritičnost komodity">
+                  onchange="calcRisk()" aria-label="Kritičnost komodity" data-i18n-aria-label="t3b_criticality_aria">
             <option value="" data-i18n="t3b_opt_unverified" selected>— neověřeno —</option>
             <option value="0"  data-i18n="t3b_opt_crit_1">1 – Nekritická</option>
             <option value="5"  data-i18n="t3b_opt_crit_2">2</option>
@@ -1023,7 +1023,7 @@
         <div class="input-group">
           <label for="t3b-logistics" data-i18n="t3b_lbl_logistics">Logistická náročnost</label>
           <select id="t3b-logistics" class="select-field"
-                  onchange="calcRisk()" aria-label="Logistická náročnost">
+                  onchange="calcRisk()" aria-label="Logistická náročnost" data-i18n-aria-label="t3b_logistics_aria">
             <option value="" data-i18n="t3b_opt_unverified" selected>— neověřeno —</option>
             <option value="0"  data-i18n="t3b_opt_log_low">Nízká</option>
             <option value="8"  data-i18n="t3b_opt_log_mid">Střední</option>
@@ -1035,7 +1035,7 @@
         <div class="input-group">
           <label for="t3b-singlesource" data-i18n="t3b_lbl_singlesource">Závislost na jednom zdroji</label>
           <select id="t3b-singlesource" class="select-field"
-                  onchange="calcRisk()" aria-label="Závislost na jednom zdroji">
+                  onchange="calcRisk()" aria-label="Závislost na jednom zdroji" data-i18n-aria-label="t3b_singlesource_aria">
             <option value="" data-i18n="t3b_opt_unverified" selected>— neověřeno —</option>
             <option value="0"  data-i18n="t3b_opt_ss_no">Ne</option>
             <option value="10" data-i18n="t3b_opt_ss_yes">Ano</option>
@@ -1082,7 +1082,7 @@
         <!-- D2b: přenos hodnot do jiného toolboxu (cookie, při selhání ruční JSON) -->
         <div class="xfer-box" id="t3b-xfer">
           <a id="t3b-xfer-btn" class="btn-xfer" data-tool-link="6c" aria-disabled="true" aria-describedby="t3b-xfer-hint" data-i18n="xfer_btn_t6c">Přenést do kontroly varovných signálů ↗</a>
-          <span id="t3b-xfer-hint" class="xfer-hint" data-i18n="xfer_need_result_3b">Vyplňte počet dodavatelů a kritičnost nebo region.</span>
+          <span id="t3b-xfer-hint" class="xfer-hint" data-i18n="xfer_need_result_3b">Vyplňte kritičnost a počet dodavatelů nebo závislost na jednom zdroji, případně počet dodavatelů a region.</span>
           <p id="t3b-xfer-status" class="xfer-note" role="status"></p>
           <details id="t3b-xfer-fallback" class="xfer-details">
             <summary data-i18n="xfer_manual">Přenést ručně (kopírovat data)</summary>
@@ -1117,7 +1117,7 @@
           <input type="text" inputmode="decimal" autocomplete="off" id="t3c-spend" class="input-field"
                  aria-describedby="t3c-spend-err" placeholder="0–100"
                  oninput="calcDependency()"
-                 aria-label="Podíl spendu v procentech">
+                 aria-label="Podíl spendu v procentech" data-i18n-aria-label="t3c_spend_aria">
           <span id="t3c-spend-err" class="error-msg" role="alert"></span>
         </div>
 
@@ -1127,7 +1127,7 @@
           <input type="text" inputmode="numeric" autocomplete="off" id="t3c-alts" class="input-field"
                  aria-describedby="t3c-alts-err" placeholder="0, 1, 2, …"
                  oninput="calcDependency()"
-                 aria-label="Počet alternativních dodavatelů">
+                 aria-label="Počet alternativních dodavatelů" data-i18n-aria-label="t3c_alts_aria">
           <span id="t3c-alts-err" class="error-msg" role="alert"></span>
         </div>
 
@@ -1137,7 +1137,7 @@
           <input type="text" inputmode="decimal" autocomplete="off" id="t3c-weeks" class="input-field"
                  aria-describedby="t3c-weeks-err" placeholder="1, 4, 12, …"
                  oninput="calcDependency()"
-                 aria-label="Doba náhrady v týdnech">
+                 aria-label="Doba náhrady v týdnech" data-i18n-aria-label="t3c_weeks_aria">
           <span id="t3c-weeks-err" class="error-msg" role="alert"></span>
         </div>
 
@@ -1147,7 +1147,7 @@
           <input type="text" inputmode="numeric" autocomplete="off" id="t3c-criticality" class="input-field"
                  aria-describedby="t3c-criticality-err" placeholder="1–5"
                  oninput="calcDependency()"
-                 aria-label="Kritičnost položky 1 až 5">
+                 aria-label="Kritičnost položky 1 až 5" data-i18n-aria-label="t3c_criticality_aria">
           <span id="t3c-criticality-err" class="error-msg" role="alert"></span>
         </div>
 
@@ -1239,7 +1239,7 @@
           <input type="text" inputmode="decimal" autocomplete="off" id="t3d-priceA" class="input-field"
                  aria-describedby="t3d-priceA-err" placeholder="0"
                  oninput="calcDualSourcing()"
-                 aria-label="Cena za kus – dodavatel A">
+                 aria-label="Cena za kus – dodavatel A" data-i18n-aria-label="t3d_price_a_aria">
           <span id="t3d-priceA-err" class="error-msg" role="alert"></span>
         </div>
 
@@ -1252,7 +1252,7 @@
           <input type="text" inputmode="decimal" autocomplete="off" id="t3d-priceB" class="input-field"
                  aria-describedby="t3d-priceB-err" placeholder="0"
                  oninput="calcDualSourcing()"
-                 aria-label="Cena za kus – dodavatel B">
+                 aria-label="Cena za kus – dodavatel B" data-i18n-aria-label="t3d_price_b_aria">
           <span id="t3d-priceB-err" class="error-msg" role="alert"></span>
         </div>
 
@@ -1262,7 +1262,7 @@
           <input type="text" inputmode="decimal" autocomplete="off" id="t3d-volume" class="input-field"
                  aria-describedby="t3d-volume-err" placeholder="1000"
                  oninput="calcDualSourcing()"
-                 aria-label="Celkový objem v kusech">
+                 aria-label="Celkový objem v kusech" data-i18n-aria-label="t3d_volume_aria">
           <span id="t3d-volume-err" class="error-msg" role="alert"></span>
         </div>
 
@@ -1271,7 +1271,7 @@
           <label for="t3d-splitA" data-i18n="t3d_lbl_splitA">Podíl dodavatele A (%)</label>
           <div class="score-slider-row" style="margin-bottom:0;">
             <input type="range" id="t3d-splitA" min="1" max="99" step="1" value="50"
-                   aria-label="Podíl dodavatele A v procentech"
+                   aria-label="Podíl dodavatele A v procentech" data-i18n-aria-label="t3d_share_a_aria"
                    oninput="document.getElementById('t3d-splitA-val').textContent=this.value+'%'; calcDualSourcing()">
             <span class="score-value" id="t3d-splitA-val">50%</span>
           </div>
@@ -1380,7 +1380,7 @@
 
           <!-- Bar chart -->
           <div class="chart-container">
-            <canvas id="chart-3d-dual" aria-label="Sloupcový graf – srovnání nákladů single A / single B / dual sourcing"></canvas>
+            <canvas id="chart-3d-dual" aria-label="Sloupcový graf – srovnání nákladů single A / single B / dual sourcing" data-i18n-aria-label="t3d_chart_aria"></canvas>
           </div>
 
         </div><!-- /result-box -->
@@ -1398,6 +1398,37 @@
     /* ===== i18n TEXTS ===== */
     const TEXTS = {
       cs: {
+        dec_sep: ',',   // Q4: desetinný oddělovač v textech výsledků (fixedDec)
+      // T-026 Q2/Q3: titulek stránky a aria-label v jazyce stránky
+      page_title: 'Procuppa Toolbox 3 – Dodavatelé & rizika',
+      nav_aria: 'Nástroje dodavatelé',
+      cur_more: 'Další…',
+      cur_more_aria: 'Další měny',
+      t3a_w_price_aria: 'Váha – Cena',
+      t3a_w_quality_aria: 'Váha – Kvalita',
+      t3a_w_delivery_aria: 'Váha – Dodávky',
+      t3a_w_comm_aria: 'Váha – Komunikace',
+      t3a_w_flex_aria: 'Váha – Flexibilita',
+      t3a_s_price_aria: 'Skóre – Cena',
+      t3a_s_quality_aria: 'Skóre – Kvalita',
+      t3a_s_delivery_aria: 'Skóre – Dodávky',
+      t3a_s_comm_aria: 'Skóre – Komunikace',
+      t3a_s_flex_aria: 'Skóre – Flexibilita',
+      t3a_radar_aria: 'Radar chart – dílčí skóre dodavatele',
+      t3b_suppliers_aria: 'Počet dodavatelů',
+      t3b_region_aria: 'Region dodavatelů',
+      t3b_criticality_aria: 'Kritičnost komodity',
+      t3b_logistics_aria: 'Logistická náročnost',
+      t3b_singlesource_aria: 'Závislost na jednom zdroji',
+      t3c_spend_aria: 'Podíl spendu v procentech',
+      t3c_alts_aria: 'Počet alternativních dodavatelů',
+      t3c_weeks_aria: 'Doba náhrady v týdnech',
+      t3c_criticality_aria: 'Kritičnost položky 1 až 5',
+      t3d_price_a_aria: 'Cena za kus – dodavatel A',
+      t3d_price_b_aria: 'Cena za kus – dodavatel B',
+      t3d_volume_aria: 'Celkový objem v kusech',
+      t3d_share_a_aria: 'Podíl dodavatele A v procentech',
+      t3d_chart_aria: 'Sloupcový graf – srovnání nákladů single A / single B / dual sourcing',
         // D2/D2b: odkazy a přenos hodnot mezi nástroji (T-016)
         xfer_manual: 'Přenést ručně (kopírovat data)',
         xfer_fallback_intro: 'Automatický přenos tady nefunguje (soubor otevřený z disku, vložení do cizí stránky nebo zablokované cookies). Zkopírujte data, otevřete cílový nástroj a vložte je do pole „Vložit data z jiného nástroje“.',
@@ -1408,7 +1439,7 @@
         xfer_selected: 'Text je označený, zkopírujte ho Ctrl+C (Cmd+C).',
         xfer_open_target: 'Otevřít cílový nástroj ↗',
         xfer_btn_t6c: 'Přenést do kontroly varovných signálů ↗',
-        xfer_need_result_3b: 'Vyplňte počet dodavatelů a kritičnost nebo region.',
+        xfer_need_result_3b: 'Vyplňte kritičnost a počet dodavatelů nebo závislost na jednom zdroji, případně počet dodavatelů a region.',
         xfer_need_result_3c: 'Vyplňte alternativy a kritičnost.',
         t3b_to_3c: 'Pokračovat na závislost →',
         // Tab labels
@@ -1651,6 +1682,37 @@
         t3d_chart_label_dual: 'Dual sourcing',
       },
       en: {
+        dec_sep: '.',   // Q4: decimal separator in result texts (fixedDec)
+      // T-026 Q2/Q3: page title and aria-label in the page language
+      page_title: 'Procuppa Toolbox 3 – Suppliers & risks',
+      nav_aria: 'Supplier tools',
+      cur_more: 'More…',
+      cur_more_aria: 'More currencies',
+      t3a_w_price_aria: 'Weight – Price',
+      t3a_w_quality_aria: 'Weight – Quality',
+      t3a_w_delivery_aria: 'Weight – Delivery',
+      t3a_w_comm_aria: 'Weight – Communication',
+      t3a_w_flex_aria: 'Weight – Flexibility',
+      t3a_s_price_aria: 'Score – Price',
+      t3a_s_quality_aria: 'Score – Quality',
+      t3a_s_delivery_aria: 'Score – Delivery',
+      t3a_s_comm_aria: 'Score – Communication',
+      t3a_s_flex_aria: 'Score – Flexibility',
+      t3a_radar_aria: 'Radar chart – supplier sub-scores',
+      t3b_suppliers_aria: 'Number of suppliers',
+      t3b_region_aria: 'Supplier region',
+      t3b_criticality_aria: 'Commodity criticality',
+      t3b_logistics_aria: 'Logistics complexity',
+      t3b_singlesource_aria: 'Single-source dependency',
+      t3c_spend_aria: 'Spend share in percent',
+      t3c_alts_aria: 'Number of alternative suppliers',
+      t3c_weeks_aria: 'Replacement time in weeks',
+      t3c_criticality_aria: 'Item criticality 1 to 5',
+      t3d_price_a_aria: 'Unit price – supplier A',
+      t3d_price_b_aria: 'Unit price – supplier B',
+      t3d_volume_aria: 'Total volume in units',
+      t3d_share_a_aria: 'Supplier A share in percent',
+      t3d_chart_aria: 'Bar chart – cost comparison single A / single B / dual sourcing',
         // D2/D2b: odkazy a přenos hodnot mezi nástroji (T-016)
         xfer_manual: 'Transfer manually (copy data)',
         xfer_fallback_intro: 'Automatic transfer is not available here (file opened from disk, embedded in another site or cookies blocked). Copy the data, open the target tool and paste it into "Paste data from another tool".',
@@ -1661,7 +1723,7 @@
         xfer_selected: 'Text is selected, copy it with Ctrl+C (Cmd+C).',
         xfer_open_target: 'Open the target tool ↗',
         xfer_btn_t6c: 'Send to red flag checker ↗',
-        xfer_need_result_3b: 'Fill in the number of suppliers and criticality or region.',
+        xfer_need_result_3b: 'Fill in criticality and the number of suppliers or single-source dependency, or the number of suppliers and region.',
         xfer_need_result_3c: 'Fill in alternatives and criticality.',
         t3b_to_3c: 'Continue to dependency →',
         // Tab labels
@@ -1977,10 +2039,23 @@
       document.querySelectorAll('[data-tool-link]').forEach(a => setToolLink(a, a.getAttribute('data-tool-link')));
       const tool = toolFromLocation();
       if (tool) activateToolById(tool, { focus: false, remember: false });
+      // Q8: písmo nebo styly můžou šířku tabů změnit až po prvním vykreslení, aktivní tab proto ukázat znovu
+      const again = () => revealTab(document.querySelector('.tab-btn.active'));
+      window.addEventListener('load', again);
+      try { if (document.fonts && document.fonts.ready) document.fonts.ready.then(again); } catch (e) { /* bez FontFaceSet */ }
       window.addEventListener('hashchange', () => {
         const t = toolFromLocation();
         if (t) activateToolById(t, { focus: true, remember: false });
       });
+    }
+    /** Q8: aktivní tab do viditelné části lišty tabů (na mobilu se lišta posouvá do strany). Posouvá jen lištu, ne
+        stránku ani rodičovskou stránku při vložení přes <iframe>, proto ne scrollIntoView. Jako inline: 'nearest'. */
+    function revealTab(btn) {
+      const nav = btn && typeof btn.closest === 'function' ? btn.closest('.tab-nav') : null;
+      if (!nav || !(nav.scrollWidth > nav.clientWidth) || typeof btn.getBoundingClientRect !== 'function') return;
+      const n = nav.getBoundingClientRect(), b = btn.getBoundingClientRect();
+      if (b.left < n.left) nav.scrollLeft += b.left - n.left;
+      else if (b.right > n.right) nav.scrollLeft += Math.min(b.right - n.right, b.left - n.left);
     }
     // ROUTER-SHARED-END
 
@@ -1998,8 +2073,28 @@
     const XFER_ID = /^t([1-6])-\1[a-d]$/;
     const xferHas = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
 
-    function xferAttrs(maxAge) {
-      return '; path=/; max-age=' + maxAge + '; SameSite=Lax' + (location.protocol === 'https:' ? '; Secure' : '');
+    /** Adresář cesty URL: '/procuppa-toolbox/toolbox-2-naklady.html' → '/procuppa-toolbox/'. Nečitelná cesta → '/'. */
+    function xferDir(pathname) {
+      const p = String(pathname || '');
+      const d = p.slice(0, p.lastIndexOf('/') + 1);
+      return /^\/[^;,\s]*$/.test(d) ? d : '/';
+    }
+
+    /** Cesta cookie: nejdelší společný adresář této stránky a cílové stránky, ne celý web. Na GitHub Pages
+        '/procuppa-toolbox/', v CMS s adresami '/nastroje/kalkulacky/' a '/nastroje/naklady/' '/nastroje/'. */
+    function xferPath(targetHref) {
+      let here = '/', there = '/';
+      try {
+        here = xferDir(location.pathname);
+        there = targetHref ? xferDir(new URL(targetHref, location.href).pathname) : here;
+      } catch (e) { return '/'; }
+      let i = 0;
+      while (i < here.length && here[i] === there[i]) i++;
+      return here.slice(0, here.lastIndexOf('/', i - 1) + 1) || '/';
+    }
+
+    function xferAttrs(maxAge, path) {
+      return '; path=' + path + '; max-age=' + maxAge + '; SameSite=Lax' + (location.protocol === 'https:' ? '; Secure' : '');
     }
 
     /** Surová (zakódovaná) hodnota cookie, nebo null. */
@@ -2010,20 +2105,27 @@
       return hit ? hit.slice(XFER_COOKIE.length + 1) : null;
     }
 
+    /** Smazání v adresáři stránky i ve všech nadřazených: zdroj mohl cookie zapsat na společný adresář (xferPath). */
     function xferClear() {
-      try { document.cookie = XFER_COOKIE + '=' + xferAttrs(0); } catch (e) { /* cookies zablokované */ }
+      let dir = '/';
+      try { dir = xferDir(location.pathname); } catch (e) { /* bez location: jen '/' */ }
+      for (let p = dir; ; p = p.slice(0, p.lastIndexOf('/', p.length - 2) + 1)) {
+        try { document.cookie = XFER_COOKIE + '=' + xferAttrs(0, p); } catch (e) { return; /* cookies zablokované */ }
+        if (p === '/') return;
+      }
     }
 
     function xferMake(from, to, values, now = Date.now()) {
       return { v: XFER_VERSION, from, to, ts: now, values };
     }
 
-    /** Zápis a zpětné čtení. → { ok, reason?, json }; json se při neúspěchu nabídne ke zkopírování. */
-    function xferSend(payload) {
+    /** Zápis a zpětné čtení. targetHref = odkaz na cílovou stránku (cesta cookie). → { ok, reason?, json };
+        json se při neúspěchu nabídne ke zkopírování. */
+    function xferSend(payload, targetHref) {
       const json = JSON.stringify(payload);
       const enc = encodeURIComponent(json);
       if (enc.length > XFER_MAX_BYTES) return { ok: false, reason: 'tooLarge', json };
-      try { document.cookie = XFER_COOKIE + '=' + enc + xferAttrs(XFER_MAX_AGE); } catch (e) { return { ok: false, reason: 'blocked', json }; }
+      try { document.cookie = XFER_COOKIE + '=' + enc + xferAttrs(XFER_MAX_AGE, xferPath(targetHref)); } catch (e) { return { ok: false, reason: 'blocked', json }; }
       return xferRead() === enc ? { ok: true, json } : { ok: false, reason: 'blocked', json };
     }
 
@@ -2160,7 +2262,7 @@
     /* ===== D2b: ZDROJE PŘENOSU – toolbox-3, 3b a 3c → toolbox-6, 6c (mapa převodů D2b, řádky 4–6) ===== */
     const XFER_SOURCES = {
       t3b: { from: 't3-3b', to: 't6-6c', tool: '6c', need: 'xfer_need_result_3b', values: () => {
-        const v = xferValuesT3b({ suppliers: xferSelect('t3b-suppliers'), criticality: xferSelect('t3b-criticality'), region: xferSelect('t3b-region') });
+        const v = xferValuesT3b(riskAnswers(), xferSelect('t3b-region'));
         return Object.keys(v).length ? v : null;
       } },
       t3c: { from: 't3-3c', to: 't6-6c', tool: '6c', need: 'xfer_need_result_3c', values: () => xferValuesT3c(xferT3cInputs()) },
@@ -2174,11 +2276,22 @@
       return { alts: read('t3c-alts', n => n >= 0), criticality: read('t3c-criticality', n => n >= 1 && n <= 5) };
     }
 
-    /** 3b: surové hodnoty selectů ('' = neověřeno). Neověřený vstup → klíč chybí (zdroj netvrdí, že signál neplatí). */
-    function xferValuesT3b({ suppliers, criticality, region }) {
+    /**
+     * 3b → 6c. answers = riskAnswers() (ověřené odpovědi, null = neověřeno), region = hodnota selectu ('' = neověřeno).
+     * rf09 je přesně kritický spouštěč 3b (riskCriticalTrigger, jediné pravidlo pro obě místa): klíč se pošle jen tehdy,
+     * když výsledek nezávisí na neověřených odpovědích (spouštěč vyjde stejně pro nejhorší i nejlepší doplnění).
+     * Jinak klíč chybí, zdroj netvrdí, že signál neplatí. rf10: jediný dodavatel a vysoce rizikový region.
+     */
+    function xferValuesT3b(answers, region) {
       const v = {};
-      if (suppliers !== '' && criticality !== '') v.rf09 = suppliers === '30' && (criticality === '15' || criticality === '20');
-      if (suppliers !== '' && region !== '') v.rf10 = suppliers === '30' && region === '25';
+      const fill = (crit, yes) => ({
+        criticality: answers.criticality === null ? crit : answers.criticality,
+        soleSupplier: answers.soleSupplier === null ? yes : answers.soleSupplier,
+        singleSource: answers.singleSource === null ? yes : answers.singleSource,
+      });
+      const worst = riskCriticalTrigger(fill(5, true)), best = riskCriticalTrigger(fill(1, false));
+      if (worst === best) v.rf09 = worst;
+      if (answers.soleSupplier !== null && region !== '') v.rf10 = answers.soleSupplier === true && region === '25';
       return v;
     }
 
@@ -2193,13 +2306,21 @@
        -xfer-fallback (<details>), -xfer-json (readonly textarea), -xfer-copy. Hodnoty jdou z výsledku výpočtu,
        nikdy z textu v DOM. */
 
+    /** Klíč nápovědy u neaktivního tlačítka: hodnota, kterou by cíl odmítl (src.rejected), jinak chybějící výsledek. */
+    function xferNeedKey(src) {
+      return (src.rejected && src.rejected()) || src.need;
+    }
+
     /** Stav tlačítka: aktivní jen s platnými hodnotami. JSON pro ruční přenos je vždy aktuální. → values | null. */
     function xferSourceRefresh(p) {
       const src = XFER_SOURCES[p];
       const values = src.values();
       const ok = values !== null;
+      const hint = document.getElementById(p + '-xfer-hint');
+      const need = xferNeedKey(src);
       document.getElementById(p + '-xfer-btn').setAttribute('aria-disabled', ok ? 'false' : 'true');
-      document.getElementById(p + '-xfer-hint').hidden = ok;
+      hint.hidden = ok;
+      if (hint.getAttribute('data-i18n') !== need) { hint.setAttribute('data-i18n', need); hint.textContent = TEXTS[currentLang][need]; }
       document.getElementById(p + '-xfer-copy').disabled = !ok;
       document.getElementById(p + '-xfer-json').value = ok ? JSON.stringify(xferMake(src.from, src.to, values)) : '';
       if (!ok) document.getElementById(p + '-xfer-status').textContent = '';
@@ -2214,10 +2335,10 @@
       const values = xferSourceRefresh(p);
       if (values === null) {
         if (e) e.preventDefault();
-        status.textContent = T[src.need];
+        status.textContent = T[xferNeedKey(src)];
         return 'disabled';
       }
-      const res = xferSend(xferMake(src.from, src.to, values));
+      const res = xferSend(xferMake(src.from, src.to, values), toolboxHref(src.tool));
       document.getElementById(p + '-xfer-json').value = res.json;
       if (res.ok) { status.textContent = ''; return 'sent'; }
       if (e) e.preventDefault();
@@ -2232,7 +2353,7 @@
       const T = TEXTS[currentLang];
       const status = document.getElementById(p + '-xfer-status');
       const ta = document.getElementById(p + '-xfer-json');
-      if (xferSourceRefresh(p) === null) { status.textContent = T[XFER_SOURCES[p].need]; return Promise.resolve('disabled'); }
+      if (xferSourceRefresh(p) === null) { status.textContent = T[xferNeedKey(XFER_SOURCES[p])]; return Promise.resolve('disabled'); }
       return copyText(ta.value, ta).then(r => { status.textContent = r === 'copied' ? T.xfer_copied : T.xfer_selected; return r; });
     }
 
@@ -2448,6 +2569,12 @@
     }
 
     /* ===== I18N ENGINE ===== */
+    /** Q4: číslo s pevným počtem desetinných míst do textu výsledku; desetinný oddělovač podle jazyka (TEXTS.dec_sep:
+        CZ čárka, EN tečka). Jediné místo pro toFixed ve výstupu (hlídá iter-013-t026-tests.js). */
+    function fixedDec(x, digits) {
+      return Number(x).toFixed(digits).replace('.', TEXTS[currentLang].dec_sep);
+    }
+
     function setLang(lang) {
       currentLang = lang;
       document.documentElement.lang = lang;
@@ -2470,9 +2597,16 @@
         }
       });
 
+      document.querySelectorAll('[data-i18n-aria-label]').forEach(el => {
+        const key = el.getAttribute('data-i18n-aria-label');
+        if (TEXTS[lang][key] !== undefined) el.setAttribute('aria-label', TEXTS[lang][key]);
+      });
+      document.title = TEXTS[lang].page_title;
+
       document.querySelectorAll('.lang-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.lang === lang);
       });
+      refreshShownResults();   // Q2: zobrazené výsledky a vysvětlení v novém jazyce
     }
 
     /* ===== CURRENCY FUNCTIONS ===== */
@@ -2492,10 +2626,14 @@
       });
 
       updateCurrencyLabels();
-      setLang(currentLang);
-      // 3a is dimensionless – no re-render needed for currency change
-      // 3d: re-run calculation + redraw chart with new currency symbol
-      calcDualSourcing();
+      setLang(currentLang);   // přepočítá i zobrazené výsledky (3d s novým symbolem měny)
+    }
+
+    /** Přepočítá jen nástroje, jejichž výsledek je zobrazený (po změně jazyka nebo měny; prázdný formulář nehlásí chyby). */
+    function refreshShownResults() {
+      [['t3a-result', calcScorecard], ['t3b-result', calcRisk], ['t3c-result', calcDependency], ['t3d-result', calcDualSourcing]].forEach(([id, calc]) => {
+        if (document.getElementById(id).style.display === 'block') calc();
+      });
     }
 
     /* ===== TAB NAVIGATION ===== */
@@ -2556,6 +2694,7 @@
         panel.classList.add('active');
         panel.removeAttribute('hidden');
       }
+      revealTab(btn);
     }
 
     /** D2: aktivuje tab podle id nástroje ('1d'). focus = fokus na tlačítko tabu, remember = kotva #tool= v adrese.
@@ -2679,7 +2818,7 @@
         }
         // T3-4: závažné selhání nahradí verdikt, skóre (průměr) zůstává beze změny
         if (serious === 'yes') { verdictKey = 't3a_verdict_serious'; badgeClass = 'danger'; }
-        document.getElementById('t3a-overall-score').textContent = res.score.toFixed(1);
+        document.getElementById('t3a-overall-score').textContent = fixedDec(res.score, 1);
         badge.textContent = T[verdictKey];
         badge.className = 'risk-badge ' + badgeClass;
         note.textContent = '';
@@ -2702,7 +2841,7 @@
         row.className = 'result-row';
         row.innerHTML =
           '<span class="result-row-label">' + escHtml(T[CRITERIA_KEYS[i]]) + '</span>' +
-          '<span class="result-row-value">' + (res.partial[i] === null ? escHtml(T.t3a_unverified) : res.partial[i].toFixed(1)) + '</span>';
+          '<span class="result-row-value">' + (res.partial[i] === null ? escHtml(T.t3a_unverified) : fixedDec(res.partial[i], 1)) + '</span>';
         partialContainer.appendChild(row);
       }
 
@@ -2754,7 +2893,7 @@
             legend: { display: false },
             tooltip: {
               callbacks: {
-                label: ctx2 => ' ' + (ctx2.parsed.r === null ? T.t3a_unverified : ctx2.parsed.r.toFixed(1))
+                label: ctx2 => ' ' + (ctx2.parsed.r === null ? T.t3a_unverified : fixedDec(ctx2.parsed.r, 1))
               }
             }
           },
@@ -3016,7 +3155,7 @@
       }
 
       // Zobraz index + badge
-      document.getElementById('t3c-index-value').textContent = indexRounded.toFixed(1);
+      document.getElementById('t3c-index-value').textContent = fixedDec(indexRounded, 1);
       const badge = document.getElementById('t3c-dep-badge');
       badge.textContent = depLevel;
       badge.className = 'risk-badge ' + badgeClass;
@@ -3047,18 +3186,18 @@
         row.className = 'result-row';
         row.innerHTML =
           '<span class="result-row-label">' + escHtml(T[c.labelKey]) + '</span>' +
-          '<span class="result-row-value">' + c.value.toFixed(1) + '</span>';
+          '<span class="result-row-value">' + fixedDec(c.value, 1) + '</span>';
         components.appendChild(row);
       });
 
       // Interpretace
       const interpText = T.t3c_interp
-        .replace('{index}', indexRounded.toFixed(1))
+        .replace('{index}', fixedDec(indexRounded, 1))
         .replace('{level}', depLevel);
       document.getElementById('t3c-interpretation').textContent = interpText;
 
       // Doporučení (s interpolací spendShare pro střední úroveň)
-      const recomText = T[recomKey].replace('{spend}', spendShare.toFixed(0));
+      const recomText = T[recomKey].replace('{spend}', fixedDec(spendShare, 0));
       document.getElementById('t3c-recommendation').textContent = recomText;
 
       // Zobraz result box

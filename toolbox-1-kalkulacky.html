@@ -552,7 +552,7 @@
   </header>
 
   <!-- TAB NAVIGATION -->
-  <nav class="tab-nav" role="tablist" aria-label="Nástroje kalkulačky">
+  <nav class="tab-nav" role="tablist" aria-label="Nástroje kalkulačky" data-i18n-aria-label="nav_aria">
     <button class="tab-btn active" role="tab" data-tab="tab-1a"
             id="tab-btn-1a" aria-selected="true" aria-controls="tab-1a" tabindex="0"
             data-i18n="tab1a">Procenta</button>
@@ -847,21 +847,21 @@
         <div class="input-group">
           <label for="t1c-currency" data-i18n="t1c_currencyLabel">Měna</label>
           <select id="t1c-currency" class="input-field">
-            <option value="USD">USD – Americký dolar</option>
-            <option value="EUR">EUR – Euro</option>
-            <option value="GBP">GBP – Britská libra</option>
-            <option value="CHF">CHF – Švýcarský frank</option>
-            <option value="JPY">JPY – Japonský jen</option>
-            <option value="HUF">HUF – Maďarský forint</option>
-            <option value="PLN">PLN – Polský zlotý</option>
-            <option value="SEK">SEK – Švédská koruna</option>
-            <option value="NOK">NOK – Norská koruna</option>
-            <option value="DKK">DKK – Dánská koruna</option>
-            <option value="CAD">CAD – Kanadský dolar</option>
-            <option value="AUD">AUD – Australský dolar</option>
-            <option value="CNY">CNY – Čínský jüan</option>
-            <option value="RUB">RUB – Ruský rubl</option>
-            <option value="RON">RON – Rumunský leu</option>
+            <option value="USD" data-i18n="t1c_cur_USD">USD – Americký dolar</option>
+            <option value="EUR" data-i18n="t1c_cur_EUR">EUR – Euro</option>
+            <option value="GBP" data-i18n="t1c_cur_GBP">GBP – Britská libra</option>
+            <option value="CHF" data-i18n="t1c_cur_CHF">CHF – Švýcarský frank</option>
+            <option value="JPY" data-i18n="t1c_cur_JPY">JPY – Japonský jen</option>
+            <option value="HUF" data-i18n="t1c_cur_HUF">HUF – Maďarský forint</option>
+            <option value="PLN" data-i18n="t1c_cur_PLN">PLN – Polský zlotý</option>
+            <option value="SEK" data-i18n="t1c_cur_SEK">SEK – Švédská koruna</option>
+            <option value="NOK" data-i18n="t1c_cur_NOK">NOK – Norská koruna</option>
+            <option value="DKK" data-i18n="t1c_cur_DKK">DKK – Dánská koruna</option>
+            <option value="CAD" data-i18n="t1c_cur_CAD">CAD – Kanadský dolar</option>
+            <option value="AUD" data-i18n="t1c_cur_AUD">AUD – Australský dolar</option>
+            <option value="CNY" data-i18n="t1c_cur_CNY">CNY – Čínský jüan</option>
+            <option value="RUB" data-i18n="t1c_cur_RUB">RUB – Ruský rubl</option>
+            <option value="RON" data-i18n="t1c_cur_RON">RON – Rumunský leu</option>
           </select>
         </div>
 
@@ -944,6 +944,10 @@
             <div class="rate-row">
               <strong data-i18n="t1c_date_label">Datum kurzu</strong>
               <span id="t1c-date-detail"></span>
+            </div>
+            <div class="rate-row" id="t1c-source-row">
+              <strong data-i18n="t1c_source_label">Zdroj kurzu</strong>
+              <span id="t1c-source-detail"></span>
             </div>
           </div>
 
@@ -1120,6 +1124,25 @@
     /* ===== i18n TEXTS ===== */
     const TEXTS = {
       cs: {
+        dec_sep: ',',   // Q4: desetinný oddělovač v textech výsledků (fixedDec)
+      // T-026 Q2/Q3: titulek stránky a aria-label v jazyce stránky
+      page_title: 'Procuppa Toolbox 1 – Kalkulačky',
+      nav_aria: 'Nástroje kalkulačky',
+      t1c_cur_USD: 'USD – Americký dolar',
+      t1c_cur_EUR: 'EUR – Euro',
+      t1c_cur_GBP: 'GBP – Britská libra',
+      t1c_cur_CHF: 'CHF – Švýcarský frank',
+      t1c_cur_JPY: 'JPY – Japonský jen',
+      t1c_cur_HUF: 'HUF – Maďarský forint',
+      t1c_cur_PLN: 'PLN – Polský zlotý',
+      t1c_cur_SEK: 'SEK – Švédská koruna',
+      t1c_cur_NOK: 'NOK – Norská koruna',
+      t1c_cur_DKK: 'DKK – Dánská koruna',
+      t1c_cur_CAD: 'CAD – Kanadský dolar',
+      t1c_cur_AUD: 'AUD – Australský dolar',
+      t1c_cur_CNY: 'CNY – Čínský jüan',
+      t1c_cur_RUB: 'RUB – Ruský rubl',
+      t1c_cur_RON: 'RON – Rumunský leu',
         // D2/D2b: odkazy a přenos hodnot mezi nástroji (T-016)
         xfer_paste_summary: 'Vložit data z jiného nástroje',
         xfer_paste_label: 'Data zkopírovaná z jiného nástroje',
@@ -1293,10 +1316,14 @@
         t1c_result_label_fromczk: 'Výsledek v cizí měně',
         t1c_rate_label: 'Použitý kurz',
         t1c_date_label: 'Datum kurzu',
-        t1c_fallback_warn: 'Upozornění: Kurz pro {requestedDate} není dostupný (víkend nebo svátek). Použit kurz ke dni {usedDate}.',
+        t1c_fallback_warn: 'Upozornění: Kurz pro {requestedDate} ČNB nevyhlásila (víkend nebo svátek). Použit kurz ke dni {usedDate}.',
+        t1c_latest_warn: 'Upozornění: Kurz pro {requestedDate} ČNB zatím nevyhlásila (vyhlašuje ho v pracovní dny po 14:30). Použit nejnovější dostupný kurz ke dni {usedDate}.',
+        t1c_source_label: 'Zdroj kurzu',
+        t1c_source_mirror: 'ČNB (zrcadlo kurzů)',
+        t1c_source_proxy: 'ČNB přes proxy',
         t1c_interp_toczk: '{amount} {currency} = {result} CZK (kurz 1 {currency} = {rate} CZK ke dni {date})',
         t1c_interp_fromczk: '{amount} CZK = {result} {currency} (kurz 1 {currency} = {rate} CZK ke dni {date})',
-        err_cnb_unavailable: 'Kurz ČNB není dostupný. Zkuste to prosím za chvíli, nebo zadejte vlastní kurz.',
+        err_cnb_unavailable: 'Kurzy ČNB se nepodařilo načíst. Zkuste to prosím za chvíli, nebo zadejte vlastní kurz.',
         err_currency_not_found: 'Kurz pro zvolenou měnu nebyl nalezen.',
         err_invalid_date: 'Neplatný formát data.',
         err_amount_required: 'Zadejte částku.',
@@ -1371,6 +1398,25 @@
         numLocale: 'cs-CZ',
       },
       en: {
+        dec_sep: '.',   // Q4: decimal separator in result texts (fixedDec)
+      // T-026 Q2/Q3: page title and aria-label in the page language
+      page_title: 'Procuppa Toolbox 1 – Calculators',
+      nav_aria: 'Calculator tools',
+      t1c_cur_USD: 'USD – US dollar',
+      t1c_cur_EUR: 'EUR – Euro',
+      t1c_cur_GBP: 'GBP – British pound',
+      t1c_cur_CHF: 'CHF – Swiss franc',
+      t1c_cur_JPY: 'JPY – Japanese yen',
+      t1c_cur_HUF: 'HUF – Hungarian forint',
+      t1c_cur_PLN: 'PLN – Polish zloty',
+      t1c_cur_SEK: 'SEK – Swedish krona',
+      t1c_cur_NOK: 'NOK – Norwegian krone',
+      t1c_cur_DKK: 'DKK – Danish krone',
+      t1c_cur_CAD: 'CAD – Canadian dollar',
+      t1c_cur_AUD: 'AUD – Australian dollar',
+      t1c_cur_CNY: 'CNY – Chinese yuan',
+      t1c_cur_RUB: 'RUB – Russian rouble',
+      t1c_cur_RON: 'RON – Romanian leu',
         // D2/D2b: odkazy a přenos hodnot mezi nástroji (T-016)
         xfer_paste_summary: 'Paste data from another tool',
         xfer_paste_label: 'Data copied from another tool',
@@ -1544,10 +1590,14 @@
         t1c_result_label_fromczk: 'Result in foreign currency',
         t1c_rate_label: 'Exchange rate used',
         t1c_date_label: 'Rate date',
-        t1c_fallback_warn: 'Notice: No rate available for {requestedDate} (weekend or holiday). Rate from {usedDate} was used instead.',
+        t1c_fallback_warn: 'Notice: CNB published no rate for {requestedDate} (weekend or holiday). Rate from {usedDate} was used instead.',
+        t1c_latest_warn: 'Notice: CNB has not published the rate for {requestedDate} yet (it does so on working days after 2:30 pm). The latest available rate from {usedDate} was used instead.',
+        t1c_source_label: 'Rate source',
+        t1c_source_mirror: 'CNB (rates mirror)',
+        t1c_source_proxy: 'CNB via proxy',
         t1c_interp_toczk: '{amount} {currency} = {result} CZK (rate 1 {currency} = {rate} CZK as of {date})',
         t1c_interp_fromczk: '{amount} CZK = {result} {currency} (rate 1 {currency} = {rate} CZK as of {date})',
-        err_cnb_unavailable: 'CNB rate is unavailable. Please try again in a moment or enter your own rate.',
+        err_cnb_unavailable: 'CNB rates could not be loaded. Please try again in a moment or enter your own rate.',
         err_currency_not_found: 'Rate for the selected currency was not found.',
         err_invalid_date: 'Invalid date format.',
         err_amount_required: 'Please enter an amount.',
@@ -1653,6 +1703,14 @@
     const TOOLBOX_DEEP_LINK = true;       // false = odkaz bez #tool=… (otevře výchozí tab)
     const TOOLBOX_TOOLS = ['1a', '1b', '1c', '1d'];   // taby tohoto souboru (router)
 
+    /* ===== 1c: ZDROJ KURZŮ ČNB (pro admina webu) =====
+       CNB_MIRROR_BASE  adresa zrcadla kurzů ČNB: složka s index.json a rok-RRRR.txt (formát ČNB rok.txt), server musí
+                        posílat CORS hlavičku. Zrcadlo plní GitHub Action v pracovní dny po vyhlášení kurzu.
+                        Vlastní hosting: zkopírovat složku cnb/ z repa procuppa-toolbox na web a změnit adresu.
+                        Prázdná hodnota zrcadlo vypne; kurzy se pak berou jen z ČNB přes veřejnou CORS proxy,
+                        která bývá nespolehlivá. */
+    const CNB_MIRROR_BASE = 'https://erozaxx.github.io/procuppa-toolbox/cnb/';
+
     /* ===== D2: ROUTER #tool= A ODKAZY =====
        Blok mezi značkami ROUTER-SHARED je ve všech šesti toolboxech textově shodný (hlídá iter-013-gates.js, brána R).
        Každý soubor má vlastní activateToolById(id, { focus, remember }) nad svými taby.
@@ -1700,10 +1758,23 @@
       document.querySelectorAll('[data-tool-link]').forEach(a => setToolLink(a, a.getAttribute('data-tool-link')));
       const tool = toolFromLocation();
       if (tool) activateToolById(tool, { focus: false, remember: false });
+      // Q8: písmo nebo styly můžou šířku tabů změnit až po prvním vykreslení, aktivní tab proto ukázat znovu
+      const again = () => revealTab(document.querySelector('.tab-btn.active'));
+      window.addEventListener('load', again);
+      try { if (document.fonts && document.fonts.ready) document.fonts.ready.then(again); } catch (e) { /* bez FontFaceSet */ }
       window.addEventListener('hashchange', () => {
         const t = toolFromLocation();
         if (t) activateToolById(t, { focus: true, remember: false });
       });
+    }
+    /** Q8: aktivní tab do viditelné části lišty tabů (na mobilu se lišta posouvá do strany). Posouvá jen lištu, ne
+        stránku ani rodičovskou stránku při vložení přes <iframe>, proto ne scrollIntoView. Jako inline: 'nearest'. */
+    function revealTab(btn) {
+      const nav = btn && typeof btn.closest === 'function' ? btn.closest('.tab-nav') : null;
+      if (!nav || !(nav.scrollWidth > nav.clientWidth) || typeof btn.getBoundingClientRect !== 'function') return;
+      const n = nav.getBoundingClientRect(), b = btn.getBoundingClientRect();
+      if (b.left < n.left) nav.scrollLeft += b.left - n.left;
+      else if (b.right > n.right) nav.scrollLeft += Math.min(b.right - n.right, b.left - n.left);
     }
     // ROUTER-SHARED-END
 
@@ -1721,8 +1792,28 @@
     const XFER_ID = /^t([1-6])-\1[a-d]$/;
     const xferHas = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
 
-    function xferAttrs(maxAge) {
-      return '; path=/; max-age=' + maxAge + '; SameSite=Lax' + (location.protocol === 'https:' ? '; Secure' : '');
+    /** Adresář cesty URL: '/procuppa-toolbox/toolbox-2-naklady.html' → '/procuppa-toolbox/'. Nečitelná cesta → '/'. */
+    function xferDir(pathname) {
+      const p = String(pathname || '');
+      const d = p.slice(0, p.lastIndexOf('/') + 1);
+      return /^\/[^;,\s]*$/.test(d) ? d : '/';
+    }
+
+    /** Cesta cookie: nejdelší společný adresář této stránky a cílové stránky, ne celý web. Na GitHub Pages
+        '/procuppa-toolbox/', v CMS s adresami '/nastroje/kalkulacky/' a '/nastroje/naklady/' '/nastroje/'. */
+    function xferPath(targetHref) {
+      let here = '/', there = '/';
+      try {
+        here = xferDir(location.pathname);
+        there = targetHref ? xferDir(new URL(targetHref, location.href).pathname) : here;
+      } catch (e) { return '/'; }
+      let i = 0;
+      while (i < here.length && here[i] === there[i]) i++;
+      return here.slice(0, here.lastIndexOf('/', i - 1) + 1) || '/';
+    }
+
+    function xferAttrs(maxAge, path) {
+      return '; path=' + path + '; max-age=' + maxAge + '; SameSite=Lax' + (location.protocol === 'https:' ? '; Secure' : '');
     }
 
     /** Surová (zakódovaná) hodnota cookie, nebo null. */
@@ -1733,20 +1824,27 @@
       return hit ? hit.slice(XFER_COOKIE.length + 1) : null;
     }
 
+    /** Smazání v adresáři stránky i ve všech nadřazených: zdroj mohl cookie zapsat na společný adresář (xferPath). */
     function xferClear() {
-      try { document.cookie = XFER_COOKIE + '=' + xferAttrs(0); } catch (e) { /* cookies zablokované */ }
+      let dir = '/';
+      try { dir = xferDir(location.pathname); } catch (e) { /* bez location: jen '/' */ }
+      for (let p = dir; ; p = p.slice(0, p.lastIndexOf('/', p.length - 2) + 1)) {
+        try { document.cookie = XFER_COOKIE + '=' + xferAttrs(0, p); } catch (e) { return; /* cookies zablokované */ }
+        if (p === '/') return;
+      }
     }
 
     function xferMake(from, to, values, now = Date.now()) {
       return { v: XFER_VERSION, from, to, ts: now, values };
     }
 
-    /** Zápis a zpětné čtení. → { ok, reason?, json }; json se při neúspěchu nabídne ke zkopírování. */
-    function xferSend(payload) {
+    /** Zápis a zpětné čtení. targetHref = odkaz na cílovou stránku (cesta cookie). → { ok, reason?, json };
+        json se při neúspěchu nabídne ke zkopírování. */
+    function xferSend(payload, targetHref) {
       const json = JSON.stringify(payload);
       const enc = encodeURIComponent(json);
       if (enc.length > XFER_MAX_BYTES) return { ok: false, reason: 'tooLarge', json };
-      try { document.cookie = XFER_COOKIE + '=' + enc + xferAttrs(XFER_MAX_AGE); } catch (e) { return { ok: false, reason: 'blocked', json }; }
+      try { document.cookie = XFER_COOKIE + '=' + enc + xferAttrs(XFER_MAX_AGE, xferPath(targetHref)); } catch (e) { return { ok: false, reason: 'blocked', json }; }
       return xferRead() === enc ? { ok: true, json } : { ok: false, reason: 'blocked', json };
     }
 
@@ -1939,20 +2037,23 @@
       }
     }
 
-    /** { payload } | { error } → whitelist, zápis vše-nebo-nic, výpočet nástroje, aktivace tabu, poznámka. */
+    /** { payload } | { error } → whitelist, zápis vše-nebo-nic, výpočet nástroje, aktivace tabu, poznámka.
+        Aktivovaný tab se zapíše do kotvy #tool= (replaceState), aby obnovení stránky zůstalo na stejném nástroji. */
     function xferReceive(r) {
       if (!r) return false;
       const fail = (err, payload) => {
-        activateToolById(XFER_DEFAULT_TOOL, { focus: false, remember: false });
+        activateToolById(XFER_DEFAULT_TOOL, { focus: false, remember: true });
         const [key, vars] = xferErrorNote(err, payload);
         return xferSetNote(key, vars, true);
       };
       if (r.error) return fail(r, null);
       const c = xferCheck(r.payload, XFER_ROUTES, XFER_SELF);
       if (c.error) return fail(c, r.payload);
-      if (!xferApply(c.fields, currentLang)) return fail({ error: 'badRoute' }, r.payload);
+      // D2b: true zaškrtne, false nechá pole, jak je (vložená data neodškrtnou signál zaškrtnutý ručně)
+      const apply = c.fields.filter(f => !(f.type === 'bool' && f.value === false));
+      if (!xferApply(apply, currentLang)) return fail({ error: 'badRoute' }, r.payload);
       c.route.after(c.fields);
-      activateToolById(c.route.tool, { focus: false, remember: false });
+      activateToolById(c.route.tool, { focus: false, remember: true });
       const invalid = c.fields.some(f => f.id && document.getElementById(f.id).getAttribute('aria-invalid') === 'true');
       const noneTrue = c.fields.every(f => f.type === 'bool') && !c.fields.some(f => f.value === true);
       return xferSetNote(invalid ? 'xfer_ok_invalid' : noneTrue ? 'xfer_ok_none' : 'xfer_ok', { source: c.route.source }, false);
@@ -2100,6 +2201,12 @@
     }
 
     /* ===== i18n ===== */
+    /** Q4: číslo s pevným počtem desetinných míst do textu výsledku; desetinný oddělovač podle jazyka (TEXTS.dec_sep:
+        CZ čárka, EN tečka). Jediné místo pro toFixed ve výstupu (hlídá iter-013-t026-tests.js). */
+    function fixedDec(x, digits) {
+      return Number(x).toFixed(digits).replace('.', TEXTS[currentLang].dec_sep);
+    }
+
     function setLang(lang) {
       currentLang = lang;
       document.documentElement.lang = lang;
@@ -2114,6 +2221,12 @@
         if (TEXTS[lang][key] !== undefined) el.placeholder = fillCur(TEXTS[lang][key]);
       });
 
+      document.querySelectorAll('[data-i18n-aria-label]').forEach(el => {
+        const key = el.getAttribute('data-i18n-aria-label');
+        if (TEXTS[lang][key] !== undefined) el.setAttribute('aria-label', TEXTS[lang][key]);
+      });
+      document.title = TEXTS[lang].page_title;
+
       document.querySelectorAll('.lang-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.lang === lang);
       });
@@ -2121,6 +2234,7 @@
       // Update DPH amount label when language changes (depends on current mode)
       if (typeof updateVATAmountLabel === 'function') updateVATAmountLabel();
       if (typeof fillMonthOptions === 'function') fillMonthOptions();
+      refreshShownResults();   // Q2: zobrazené výsledky a vysvětlení v novém jazyce
       xferRenderNote();
     }
 
@@ -2130,8 +2244,7 @@
       currentCurrency = code;
       const sel = document.getElementById('t1-currency');
       if (sel.value !== code) sel.value = code;
-      setLang(currentLang);
-      refreshShownResults();
+      setLang(currentLang);   // přepočítá i zobrazené výsledky (refreshShownResults)
       return true;
     }
 
@@ -2202,6 +2315,7 @@
         panel.classList.add('active');
         panel.removeAttribute('hidden');
       }
+      revealTab(btn);
     }
 
     /** D2: aktivuje tab podle id nástroje ('1d'). focus = fokus na tlačítko tabu, remember = kotva #tool= v adrese.
@@ -2254,7 +2368,7 @@
       const pct    = (diff / orig) * 100;
 
       document.getElementById('t1a1-result').style.display = 'block';
-      document.getElementById('t1a1-result-value').textContent = pct.toFixed(2) + ' %';
+      document.getElementById('t1a1-result-value').textContent = fixedDec(pct, 2) + ' %';
 
       let interpretation;
       const noChange = Math.abs(diff) < 0.001;
@@ -2262,11 +2376,11 @@
         interpretation = T.t1a1_result_nochange;
       } else if (diff > 0) {
         interpretation = fillCur(T.t1a1_result_increase)
-          .replace('{pct}',  Math.abs(pct).toFixed(2))
+          .replace('{pct}',  fixedDec(Math.abs(pct), 2))
           .replace('{diff}', formatCurrency(Math.abs(diff)));
       } else {
         interpretation = fillCur(T.t1a1_result_decrease)
-          .replace('{pct}',  Math.abs(pct).toFixed(2))
+          .replace('{pct}',  fixedDec(Math.abs(pct), 2))
           .replace('{diff}', formatCurrency(Math.abs(diff)));
       }
       document.getElementById('t1a1-interpretation').textContent = interpretation;
@@ -2335,9 +2449,9 @@
       const pct      = (increase / base) * 100;
 
       document.getElementById('t1a2-result').style.display = 'block';
-      document.getElementById('t1a2-result-value').textContent = pct.toFixed(2) + ' %';
+      document.getElementById('t1a2-result-value').textContent = fixedDec(pct, 2) + ' %';
       document.getElementById('t1a2-interpretation').textContent = fillCur(T.t1a2_result_text)
-        .replace('{pct}',  pct.toFixed(2))
+        .replace('{pct}',  fixedDec(pct, 2))
         .replace('{diff}', formatCurrency(increase));
     }
 
@@ -2383,9 +2497,9 @@
       const pct = (discount / base) * 100;
 
       document.getElementById('t1a3-result').style.display = 'block';
-      document.getElementById('t1a3-result-value').textContent = pct.toFixed(2) + ' %';
+      document.getElementById('t1a3-result-value').textContent = fixedDec(pct, 2) + ' %';
       document.getElementById('t1a3-interpretation').textContent = fillCur(T.t1a3_result_text)
-        .replace('{pct}',  pct.toFixed(2))
+        .replace('{pct}',  fixedDec(pct, 2))
         .replace('{diff}', formatCurrency(discount));
     }
 
@@ -2427,7 +2541,7 @@
       document.getElementById('t1a4-result').style.display = 'block';
       document.getElementById('t1a4-result-value').textContent = money(newPrice);
       document.getElementById('t1a4-interpretation').textContent = fillCur(T.t1a4_result_text)
-        .replace('{pct}',      pct.toFixed(2))
+        .replace('{pct}',      fixedDec(pct, 2))
         .replace('{newPrice}', formatCurrency(newPrice))
         .replace('{diff}',     formatCurrency(diff));
     }
@@ -2477,7 +2591,7 @@
       document.getElementById('t1a5-result').style.display = 'block';
       document.getElementById('t1a5-result-value').textContent = money(newPrice);
       document.getElementById('t1a5-interpretation').textContent = fillCur(T.t1a5_result_text)
-        .replace('{pct}',      pct.toFixed(2))
+        .replace('{pct}',      fixedDec(pct, 2))
         .replace('{newPrice}', formatCurrency(newPrice))
         .replace('{diff}',     formatCurrency(diff));
     }
@@ -2713,21 +2827,24 @@
 
     const CNB_BASE_URL = 'https://www.cnb.cz/cs/financni-trhy/devizovy-trh/kurzy-devizoveho-trhu/kurzy-devizoveho-trhu/denni_kurz.txt';
 
-    // CORS_PROXIES: seřazeny dle preference. Iterujeme v pořadí při každém selhání.
-    // Přidání třetí proxy: stačí rozšířit pole – žádná jiná změna není potřeba.
+    const CNB_FETCH_TIMEOUT_MS = 8000;   // limit na každý zdroj (zrcadlo, každá proxy)
+
+    // Záloha za zrcadlem (CNB_MIRROR_BASE): denní lístek ČNB přes veřejnou CORS proxy, ČNB sama CORS nemá.
+    // Zkouší se v pořadí pole. corsproxy.io vyřazen, bez klíče vrací 401/403.
     const CORS_PROXIES = [
       {
-        url: 'https://api.allorigins.win/get?url=',   // primární – vrací JSON { contents }
-        extract: async r => { const j = await r.json(); if (!j.contents) throw new Error('contents_missing'); return j.contents; }
+        url: 'https://api.allorigins.win/raw?url=',   // vrací text lístku
+        extract: async r => r.text()
       },
       {
-        url: 'https://corsproxy.io/?',                // záloha – vrací raw text
-        extract: async r => r.text()
+        url: 'https://api.allorigins.win/get?url=',   // vrací JSON { contents }
+        extract: async r => { const j = await r.json(); if (!j || !j.contents) throw new Error('contents_missing'); return j.contents; }
       }
     ];
 
-    let cnbRateCache = {};          // { 'DD.MM.YYYY': { EUR: 25.12, USD: 23.45, ... } }
-    let cnbLastAvailableDate = null;
+    let cnbRateCache = {};          // denní lístky z proxy: { 'DD.MM.YYYY': { rates, usedDate, reason } }
+    let cnbMirrorIndex = null;      // index.json zrcadla: { years: [2020, …], lastDate: 'DD.MM.YYYY' }
+    let cnbMirrorYears = {};        // roční soubory zrcadla: { 2026: { days: { 'DD.MM.YYYY': rates }, dates: [vzestupně], last } }
     let cnbFetching = false;        // zamezí souběžnému fetch
 
     const CNB_CODE_RE = /^[A-Z]{3}$/;   // ISO 4217 – přesně 3 velká písmena
@@ -2786,6 +2903,45 @@
         rates[code] = rate / amount;  // vždy na 1 jednotku měny
       }
       return rates;
+    }
+
+    /** Datum vyhlášení z hlavičky denního lístku („23.10.2026 #205“), jinak null. */
+    function cnbDailyDate(text) {
+      const m = String(text || '').trim().match(/^(\d{2}\.\d{2}\.\d{4})\b/);
+      return m ? m[1] : null;
+    }
+
+    /**
+     * Parsuje roční soubor ČNB (rok-RRRR.txt ze zrcadla, formát ČNB rok.txt) na { 'DD.MM.YYYY': { KOD: kurz za 1 jednotku } }.
+     * Hlavička „Datum|1 AUD|…|100 JPY|1000 IDR“ se během roku může opakovat se změněným seznamem měn,
+     * každý řádek se čte podle poslední hlavičky nad ním. Množství z hlavičky dělí kurz (100 JPY = 13,862 → 0,13862).
+     * Validace jako parseCNBText: kód přesně 3 velká písmena, množství i kurz v (0, CNB_RATE_MAX), jinak se sloupec přeskočí.
+     */
+    function parseCNBYearText(text) {
+      const days = {};
+      let columns = null;
+      for (const line of String(text || '').split('\n')) {
+        const parts = line.trim().split('|');
+        if (parts[0] === 'Datum') {
+          columns = parts.slice(1).map(head => {
+            const m = head.trim().match(/^(\d+) ([A-Z]{3})$/);
+            const amount = m ? Number(m[1]) : 0;
+            return m && CNB_CODE_RE.test(m[2]) && amount > 0 && amount < CNB_RATE_MAX ? { amount, code: m[2] } : null;
+          });
+          continue;
+        }
+        if (!columns || !DATE_DDMMYYYY_RE.test(parts[0])) continue;
+        const rates = {};
+        columns.forEach((col, i) => {
+          const raw = parts[i + 1];
+          if (!col || raw === undefined || raw.trim() === '') return;
+          const rate = Number(raw.trim().replace(',', '.'));
+          if (!(rate > 0 && rate < CNB_RATE_MAX)) return;   // NaN i hodnoty mimo rozsah
+          rates[col.code] = rate / col.amount;
+        });
+        if (Object.keys(rates).length) days[parts[0]] = rates;
+      }
+      return days;
     }
 
     // =========================================================
@@ -2884,86 +3040,165 @@
       return d;
     }
 
+    /** Dnešek bez časové složky. */
+    function cnbToday() {
+      const now = new Date();
+      return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    }
+
+    /** fetch s časovým limitem CNB_FETCH_TIMEOUT_MS; HTTP ≠ 2xx, timeout i síťová chyba vyhodí výjimku. */
+    async function cnbFetch(url, extract = r => r.text()) {
+      const opts = typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function'
+        ? { signal: AbortSignal.timeout(CNB_FETCH_TIMEOUT_MS) } : {};
+      const response = await fetch(url, opts);
+      if (!response || !response.ok) throw new Error(`HTTP ${response ? response.status : '?'}`);
+      return extract(response);
+    }
+
+    function cnbMirrorUrl(file) {
+      return CNB_MIRROR_BASE.replace(/\/?$/, '/') + file;
+    }
+
+    /** index.json zrcadla (v paměti; fresh = stáhnout znovu, např. když je datum po lastDate). */
+    async function cnbMirrorIndexLoad(fresh = false) {
+      if (cnbMirrorIndex && !fresh) return cnbMirrorIndex;
+      const j = await cnbFetch(cnbMirrorUrl('index.json'), r => r.json());
+      const years = Array.isArray(j && j.years) ? j.years.filter(y => Number.isInteger(y)) : [];
+      if (!years.length || !DATE_DDMMYYYY_RE.test(String(j.lastDate))) throw new Error('mirror_index_invalid');
+      cnbMirrorIndex = { years, lastDate: j.lastDate };
+      return cnbMirrorIndex;
+    }
+
     /**
-     * Fetch kurzu ČNB pro zadané datum.
-     * Strategie (v pořadí):
-     *   1. Proaktivní přesun na předchozí pracovní den (oprava BUG-CNB-001)
-     *   2. Cache hit → okamžitý return
-     *   3. Iterace CORS_PROXIES (primary → fallback proxy)
-     *   4. Při selhání všech proxy → posun na předchozí pracovní den (oprava BUG-CNB-002), max. 7 pokusů
-     *   5. Absolutní fallback → poslední data z cache
+     * Roční soubor zrcadla, jedno stažení na rok. Soubor roku z lastDate se stáhne znovu, když index ohlásí novější den.
+     * Bere jen řádky daného roku (ČNB na neexistující rok vrací aktuální rok s HTTP 200).
+     */
+    async function cnbMirrorYear(year) {
+      const idx = cnbMirrorIndex;
+      const cached = cnbMirrorYears[year];
+      const stale = cached && idx && parseDDMMYYYY(idx.lastDate).getFullYear() === year && cached.last !== idx.lastDate;
+      if (cached && !stale) return cached;
+      const all = parseCNBYearText(await cnbFetch(cnbMirrorUrl(`rok-${year}.txt`)));
+      const dates = Object.keys(all)
+        .filter(d => parseDDMMYYYY(d).getFullYear() === year)
+        .sort((a, b) => parseDDMMYYYY(a) - parseDDMMYYYY(b));
+      if (!dates.length) throw new Error('mirror_year_empty');
+      const days = {};
+      dates.forEach(d => { days[d] = all[d]; });
+      cnbMirrorYears[year] = { days, dates, last: dates[dates.length - 1] };
+      return cnbMirrorYears[year];
+    }
+
+    /** Nejnovější den zrcadla (lastDate), pro datum po lastDate, když selže i proxy. */
+    async function cnbMirrorLatest() {
+      const idx = await cnbMirrorIndexLoad();
+      const y = await cnbMirrorYear(parseDDMMYYYY(idx.lastDate).getFullYear());
+      return { rates: y.days[y.last], usedDate: y.last, reason: 'latest' };
+    }
+
+    /**
+     * Kurz ze zrcadla pro datum. Den v datech chybí (víkend, svátek) → nejbližší předchozí den ze stejných dat,
+     * na začátku roku z předchozího roku. Datum po lastDate → { afterLast: true }, rozhodne denní lístek přes proxy;
+     * výjimkou je víkend nebo svátek hned po lastDate, kdy podle kalendáře platí kurz z lastDate.
+     * Síťová chyba, neplatný soubor nebo rok mimo zrcadlo vyhodí výjimku (→ proxy), nikdy se nevykládá jako víkend.
+     */
+    async function cnbFromMirror(date) {
+      let idx = await cnbMirrorIndexLoad();
+      if (date > parseDDMMYYYY(idx.lastDate)) idx = await cnbMirrorIndexLoad(true);   // index mohl od načtení zastarat
+      const lastDate = parseDDMMYYYY(idx.lastDate);
+      if (date > lastDate) {
+        // Víkend nebo svátek hned po lastDate (podle kalendáře, ne podle chyby): platí poslední vyhlášený kurz
+        if (getPreviousWorkingDay(date) <= lastDate) {
+          const last = await cnbMirrorYear(lastDate.getFullYear());
+          if (last.days[idx.lastDate]) return { rates: last.days[idx.lastDate], usedDate: idx.lastDate, reason: 'closed' };
+        }
+        return { afterLast: true };
+      }
+
+      const year = date.getFullYear();
+      if (!idx.years.includes(year)) throw new Error('mirror_year_missing');
+      const y = await cnbMirrorYear(year);
+      const key = formatDDMMYYYY(date);
+      if (y.days[key]) return { rates: y.days[key], usedDate: key, reason: null };
+      // Den po konci souboru letošního roku: soubor je starší než index, chybějící den nesmí vypadat jako víkend
+      if (year === lastDate.getFullYear() && date > parseDDMMYYYY(y.last)) return { afterLast: true };
+
+      const prev = [...y.dates].reverse().find(d => parseDDMMYYYY(d) < date);
+      if (prev) return { rates: y.days[prev], usedDate: prev, reason: 'closed' };
+      if (!idx.years.includes(year - 1)) throw new Error('mirror_year_missing');
+      const p = await cnbMirrorYear(year - 1);
+      return { rates: p.days[p.last], usedDate: p.last, reason: 'closed' };
+    }
+
+    /**
+     * Denní lístek ČNB přes CORS_PROXIES. Víkend a svátek posune kalendář (getPreviousWorkingDay) před dotazem,
+     * datum kurzu se bere z hlavičky lístku. Prázdná nebo neplatná odpověď znamená selhání zdroje, ne víkend.
+     * afterLast = zrcadlo už ví, že datum je po posledním vyhlášeném kurzu.
+     */
+    async function cnbFromProxy(date, afterLast) {
+      const working = getPreviousWorkingDay(date);
+      const key = formatDDMMYYYY(working);
+      if (cnbRateCache[key]) return cnbRateCache[key];
+      const cnbUrl = `${CNB_BASE_URL}?date=${key}`;
+      for (const proxy of CORS_PROXIES) {
+        try {
+          const text = await cnbFetch(`${proxy.url}${encodeURIComponent(cnbUrl)}`, proxy.extract);
+          const rates = parseCNBText(text);
+          if (Object.keys(rates).length === 0) throw new Error('empty');
+          const usedDate = cnbDailyDate(text) || key;
+          if (parseDDMMYYYY(usedDate) > working) throw new Error('date_mismatch');   // lístek z jiného dne než dotaz
+          const notYet = usedDate !== key && (afterLast || working >= cnbToday());
+          const hit = { rates, usedDate, reason: usedDate === formatDDMMYYYY(date) ? null : (notYet ? 'latest' : 'closed') };
+          if (!notYet) cnbRateCache[key] = hit;   // dnešní kurz se ještě může objevit, necachovat
+          return hit;
+        } catch (err) {
+          // další proxy v poli
+        }
+      }
+      throw new Error('cnb_unavailable');
+    }
+
+    /**
+     * Kurz ČNB pro zadané datum. Pořadí zdrojů:
+     *   1. zrcadlo CNB_MIRROR_BASE (roční soubor, víkend a svátek ze stejných dat),
+     *   2. denní lístek ČNB přes CORS_PROXIES (rok mimo zrcadlo, zrcadlo nedostupné, datum po lastDate),
+     *   3. datum po lastDate a proxy selhala → nejnovější kurz zrcadla s upozorněním.
+     * Selžou-li všechny zdroje, vyhodí 'cnb_unavailable'; výpadek nikdy neposouvá datum a nehlásí se jako víkend.
      *
-     * @param {string} dateStr - 'DD.MM.YYYY' (validovaný regexem před předáním) nebo '' pro aktuální
-     * @returns {Promise<{ rates: Object, usedDate: string, isFallback: boolean, requestedDate: string }>}
+     * @param {string} dateStr - 'DD.MM.YYYY' (validovaný regexem před předáním) nebo '' pro dnešek
+     * @returns {Promise<{ rates, usedDate, requestedDate, isFallback, fallbackReason: null|'closed'|'latest', source: 'mirror'|'proxy' }>}
      */
     async function fetchCNBRate(dateStr) {
-      const MAX_FALLBACK_DAYS = 7;
+      const requestedDate = dateStr ? parseDDMMYYYY(dateStr) : cnbToday();
+      const requestedDateStr = formatDDMMYYYY(requestedDate);
+      if (!DATE_DDMMYYYY_RE.test(requestedDateStr)) throw new Error('invalid_date_format');
 
-      // Výchozí datum z parametru nebo dnešek (bez časové složky, aby porovnání Date fungovalo)
-      const requestedDate = dateStr ? parseDDMMYYYY(dateStr) : new Date(
-        new Date().getFullYear(), new Date().getMonth(), new Date().getDate()
-      );
+      const done = (hit, source) => ({
+        rates: hit.rates, usedDate: hit.usedDate, requestedDate: requestedDateStr, source,
+        isFallback: hit.usedDate !== requestedDateStr,
+        fallbackReason: hit.usedDate !== requestedDateStr ? (hit.reason || 'closed') : null,
+      });
 
-      // [OPRAVA BUG-CNB-001] Proaktivně najdi předchozí pracovní den před prvním fetch pokusem
-      let workingDate = getPreviousWorkingDay(requestedDate);
-      let isFallback = workingDate.getTime() !== requestedDate.getTime();
-
-      const requestedDateStr = formatDDMMYYYY(requestedDate); // pro notifikaci uživateli
-
-      for (let attempt = 0; attempt < MAX_FALLBACK_DAYS; attempt++) {
-        const key = formatDDMMYYYY(workingDate);
-
-        // Guard: key musí být validní DD.MM.YYYY před sestavením URL
-        if (!DATE_DDMMYYYY_RE.test(key)) {
-          throw new Error('invalid_date_format');
+      let afterLast = false;
+      if (CNB_MIRROR_BASE) {
+        try {
+          const hit = await cnbFromMirror(requestedDate);
+          if (!hit.afterLast) return done(hit, 'mirror');
+          afterLast = true;
+        } catch (err) {
+          // zrcadlo nedostupné nebo rok mimo zrcadlo → proxy
         }
-
-        if (cnbRateCache[key]) {
-          return { rates: cnbRateCache[key], usedDate: key, isFallback, requestedDate: requestedDateStr };
-        }
-
-        // [MAJOR-002] Vždy explicitní ?date= – deterministické chování nezávislé na CNB API interpretaci
-        const cnbUrl = `${CNB_BASE_URL}?date=${key}`;
-
-        // Iterace přes CORS proxy – zkusíme každou proxy před posunutím data
-        let lastProxyError = null;
-        for (const proxy of CORS_PROXIES) {
-          try {
-            const proxyUrl = `${proxy.url}${encodeURIComponent(cnbUrl)}`;
-            const response = await fetch(proxyUrl, { signal: AbortSignal.timeout(8000) });
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            const text = await proxy.extract(response);
-
-            const rates = parseCNBText(text);
-            if (Object.keys(rates).length === 0) throw new Error('empty');
-
-            cnbRateCache[key] = rates;
-            cnbLastAvailableDate = key;
-            return { rates, usedDate: key, isFallback, requestedDate: requestedDateStr };
-
-          } catch (err) {
-            lastProxyError = err;
-            // Pokračovat na další proxy v poli
-          }
-        }
-
-        // [OPRAVA BUG-CNB-002] Všechny proxy selhaly → posunout o 1 den dozadu a přeskočit víkendy/svátky
-        const prevDay = new Date(workingDate.getFullYear(), workingDate.getMonth(), workingDate.getDate());
-        prevDay.setDate(prevDay.getDate() - 1);
-        workingDate = getPreviousWorkingDay(prevDay);
-        isFallback = true;
       }
 
-      // Absolutní fallback – použít naposledy dostupná data z cache
-      if (cnbLastAvailableDate && cnbRateCache[cnbLastAvailableDate]) {
-        return {
-          rates: cnbRateCache[cnbLastAvailableDate],
-          usedDate: cnbLastAvailableDate,
-          isFallback: true,
-          requestedDate: requestedDateStr
-        };
+      try {
+        return done(await cnbFromProxy(requestedDate, afterLast), 'proxy');
+      } catch (err) {
+        // i proxy selhala
       }
 
+      if (afterLast) {
+        try { return done(await cnbMirrorLatest(), 'mirror'); } catch (err) { /* nic dalšího */ }
+      }
       throw new Error('cnb_unavailable');
     }
 
@@ -3020,8 +3255,12 @@
       return new Intl.NumberFormat('cs-CZ', { minimumFractionDigits: 2, maximumFractionDigits: 6 }).format(rate);
     }
 
-    /** Zobrazí výsledek přepočtu. manual = vlastní kurz (T1-5): usedDate nese popis místo data. */
-    function renderCurrency({ result, usedDate, isFallback, requestedDate = usedDate, manual = false }) {
+    /**
+     * Zobrazí výsledek přepočtu. manual = vlastní kurz (T1-5): usedDate nese popis místo data.
+     * fallbackReason: 'closed' = ČNB pro den kurz nevyhlásila (víkend, svátek), 'latest' = ještě nevyhlásila.
+     * source: 'mirror' | 'proxy', odkud kurz je (u vlastního kurzu se řádek zdroje skryje).
+     */
+    function renderCurrency({ result, usedDate, isFallback, requestedDate = usedDate, manual = false, fallbackReason = 'closed', source = '' }) {
       const T = TEXTS[currentLang];
 
       // Skrýt chybovou zprávu
@@ -3032,7 +3271,7 @@
       // Fallback varování – zobrazí requestedDate (co uživatel zadal) i usedDate (co bylo použito)
       const warnEl = document.getElementById('t1c-fallback-warn');
       if (isFallback) {
-        warnEl.textContent = T.t1c_fallback_warn
+        warnEl.textContent = (fallbackReason === 'latest' ? T.t1c_latest_warn : T.t1c_fallback_warn)
           .replace('{requestedDate}', requestedDate)
           .replace('{usedDate}',      usedDate);
         warnEl.style.display = 'block';
@@ -3071,6 +3310,9 @@
 
       rateEl.textContent = '1 ' + result.currency + ' = ' + rateText + ' CZK';
       dateEl.textContent = usedDate;
+      const sourceText = { mirror: T.t1c_source_mirror, proxy: T.t1c_source_proxy }[source] || '';
+      document.getElementById('t1c-source-detail').textContent = sourceText;
+      document.getElementById('t1c-source-row').style.display = sourceText ? '' : 'none';
 
       resultEl.style.display = 'block';
     }
@@ -3144,7 +3386,7 @@
       showCNBLoading(true);
 
       try {
-        const { rates, usedDate, isFallback, requestedDate } = await fetchCNBRate(formattedDate);
+        const { rates, usedDate, isFallback, requestedDate, fallbackReason, source } = await fetchCNBRate(formattedDate);
         const rate = rates[currency];
         if (!rate) throw new Error('currency_not_found');
 
@@ -3152,7 +3394,7 @@
           ? { direction, czk: amount * rate, foreign: amount, rate, currency }
           : { direction, czk: amount, foreign: amount / rate, rate, currency };
 
-        renderCurrency({ result, usedDate, isFallback, requestedDate });
+        renderCurrency({ result, usedDate, isFallback, requestedDate, fallbackReason, source });
 
       } catch (err) {
         renderCurrencyError(err.message);
@@ -3249,14 +3491,14 @@
       let interp;
       if (hasTotal) {
         interp = T[increase ? 't1d_savings_interp_increase' : 't1d_savings_interp']
-          .replace('{qty}',   qty % 1 === 0 ? qty.toFixed(0) : qty.toFixed(2))
+          .replace('{qty}',   qty % 1 === 0 ? fixedDec(qty, 0) : fixedDec(qty, 2))
           .replace('{total}', formatCurrency(Math.abs(total)));
       } else {
         interp = T[increase ? 't1d_savings_interp_unit_increase' : 't1d_savings_interp_unit'] + ' ' + T.t1d_savings_qtyHint;
       }
       document.getElementById('t1d-s-interpretation').textContent = fillCur(interp)
         .replace('{perUnit}', formatCurrency(Math.abs(perUnit)))
-        .replace('{pct}',     Math.abs(pct).toFixed(2));
+        .replace('{pct}',     fixedDec(Math.abs(pct), 2));
     }
 
     /** Reset sekce A úspory */
@@ -3373,7 +3615,7 @@
       document.getElementById('t1d-sp-origspend-value').textContent = money(origSpend);
       document.getElementById('t1d-sp-newspend-value').textContent  = money(newSpend);
       document.getElementById('t1d-sp-diffkc-value').textContent    = money(Math.abs(diffKc));
-      document.getElementById('t1d-sp-diffpct-value').textContent   = Math.abs(diffPct).toFixed(2) + ' %';
+      document.getElementById('t1d-sp-diffpct-value').textContent   = fixedDec(Math.abs(diffPct), 2) + ' %';
 
       let interp;
       if (Math.abs(diffKc) < 0.005) {
@@ -3382,13 +3624,13 @@
       } else if (diffKc > 0) {
         interp = fillCur(T.t1d_spend_interp_save)
           .replace('{diffKc}',   formatCurrency(diffKc))
-          .replace('{diffPct}',  diffPct.toFixed(2))
+          .replace('{diffPct}',  fixedDec(diffPct, 2))
           .replace('{origSpend}', formatCurrency(origSpend))
           .replace('{newSpend}',  formatCurrency(newSpend));
       } else {
         interp = fillCur(T.t1d_spend_interp_increase)
           .replace('{diffKc}',   formatCurrency(Math.abs(diffKc)))
-          .replace('{diffPct}',  Math.abs(diffPct).toFixed(2))
+          .replace('{diffPct}',  fixedDec(Math.abs(diffPct), 2))
           .replace('{origSpend}', formatCurrency(origSpend))
           .replace('{newSpend}',  formatCurrency(newSpend));
       }
