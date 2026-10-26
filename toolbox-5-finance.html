@@ -1077,26 +1077,33 @@
         </div>
 
         <div class="checklist-detail-panel" id="checklist-detail">
-          <h3 class="checklist-type-title" id="cd-title"></h3>
-          <div class="checklist-section">
-            <h4 data-i18n="c5d_sec_description">Popis podmínky</h4>
-            <p id="cd-description"></p>
+          <div id="cd-copy-src">
+            <h3 class="checklist-type-title" id="cd-title"></h3>
+            <div class="checklist-section">
+              <h4 data-i18n="c5d_sec_description">Popis podmínky</h4>
+              <p id="cd-description"></p>
+            </div>
+            <div class="checklist-section checklist-risk">
+              <h4 data-i18n="c5d_sec_risk">Riziko</h4>
+              <p id="cd-risk"></p>
+            </div>
+            <div class="checklist-section checklist-impact">
+              <h4 data-i18n="c5d_sec_impact">Dopad na nákupčího</h4>
+              <p id="cd-impact"></p>
+            </div>
+            <div class="checklist-section checklist-countermeasures">
+              <h4 data-i18n="c5d_sec_countermeasures">Doporučená protiopatření</h4>
+              <ul id="cd-countermeasures"></ul>
+            </div>
+            <div class="checklist-section checklist-questions">
+              <h4 data-i18n="c5d_sec_questions">Kontrolní otázky ke smlouvě</h4>
+              <ul id="cd-questions"></ul>
+            </div>
           </div>
-          <div class="checklist-section checklist-risk">
-            <h4 data-i18n="c5d_sec_risk">Riziko</h4>
-            <p id="cd-risk"></p>
-          </div>
-          <div class="checklist-section checklist-impact">
-            <h4 data-i18n="c5d_sec_impact">Dopad na nákupčího</h4>
-            <p id="cd-impact"></p>
-          </div>
-          <div class="checklist-section checklist-countermeasures">
-            <h4 data-i18n="c5d_sec_countermeasures">Doporučená protiopatření</h4>
-            <ul id="cd-countermeasures"></ul>
-          </div>
-          <div class="checklist-section checklist-questions">
-            <h4 data-i18n="c5d_sec_questions">Kontrolní otázky ke smlouvě</h4>
-            <ul id="cd-questions"></ul>
+          <!-- D4: kopírování výsledku; je uvnitř výsledku, bez výsledku se tedy nezobrazí -->
+          <div class="copy-result" id="cd-copy-bar">
+            <button type="button" class="btn-copy-result" id="cd-copy" data-i18n="copy_result">Kopírovat výsledek</button>
+            <p class="copy-result-status" id="cd-copy-status" role="status"></p>
           </div>
         </div>
       </div>
@@ -1949,6 +1956,7 @@
       { btn: 'cf-copy', src: 'cf-copy-src', status: 'cf-copy-status' },
       { btn: 'pen-copy', src: 'pen-copy-src', status: 'pen-copy-status' },
       { btn: 'epr-copy', src: 'epr-copy-src', status: 'epr-copy-status' },
+      { btn: 'cd-copy', src: 'cd-copy-src', status: 'cd-copy-status' },
     ];
     const COPY_STATUS_MS = { copied: 3000, selected: 8000 };
     const copyStatusTimers = {};

@@ -1071,33 +1071,40 @@
 
         <!-- Výsledky -->
         <div class="result-box" id="t2d-result">
-          <div class="result-grid">
-            <div class="result-row">
-              <span class="result-row-label" id="t2d-result-total-label" data-i18n="t2d_result_total">Celková hodnota</span>
-              <span class="result-row-value" id="t2d-result-total"></span>
+          <div id="t2d-copy-src">
+            <div class="result-grid">
+              <div class="result-row">
+                <span class="result-row-label" id="t2d-result-total-label" data-i18n="t2d_result_total">Celková hodnota</span>
+                <span class="result-row-value" id="t2d-result-total"></span>
+              </div>
+              <div class="result-row" id="t2d-offer-row" hidden>
+                <span class="result-row-label" data-i18n="t2d_result_offer">Nabídková cena rozdělená podle podílů</span>
+                <span class="result-row-value" id="t2d-result-offer"></span>
+              </div>
             </div>
-            <div class="result-row" id="t2d-offer-row" hidden>
-              <span class="result-row-label" data-i18n="t2d_result_offer">Nabídková cena rozdělená podle podílů</span>
-              <span class="result-row-value" id="t2d-result-offer"></span>
+
+            <div data-i18n="t2d_breakdown_heading"
+                 style="font-size: var(--font-size-sm); font-weight: 600; margin: var(--space-sm) 0 var(--space-xs);">
+              Rozpad po složkách
             </div>
-          </div>
+            <table class="tco-breakdown-table" id="t2d-breakdown-table">
+              <thead>
+                <tr>
+                  <th data-i18n="t2d_breakdown_col_name">Složka</th>
+                  <th id="t2d-col-value-header" data-i18n="t2d_breakdown_col_value">Kč</th>
+                  <th data-i18n="t2d_breakdown_col_pct">%</th>
+                </tr>
+              </thead>
+              <tbody id="t2d-breakdown-body"></tbody>
+            </table>
 
-          <div data-i18n="t2d_breakdown_heading"
-               style="font-size: var(--font-size-sm); font-weight: 600; margin: var(--space-sm) 0 var(--space-xs);">
-            Rozpad po složkách
+            <div class="result-interpretation" id="t2d-interpretation"></div>
           </div>
-          <table class="tco-breakdown-table" id="t2d-breakdown-table">
-            <thead>
-              <tr>
-                <th data-i18n="t2d_breakdown_col_name">Složka</th>
-                <th id="t2d-col-value-header" data-i18n="t2d_breakdown_col_value">Kč</th>
-                <th data-i18n="t2d_breakdown_col_pct">%</th>
-              </tr>
-            </thead>
-            <tbody id="t2d-breakdown-body"></tbody>
-          </table>
-
-          <div class="result-interpretation" id="t2d-interpretation"></div>
+          <!-- D4: kopírování výsledku; je uvnitř výsledku, bez výsledku se tedy nezobrazí -->
+          <div class="copy-result" id="t2d-copy-bar">
+            <button type="button" class="btn-copy-result" id="t2d-copy" data-i18n="copy_result">Kopírovat výsledek</button>
+            <p class="copy-result-status" id="t2d-copy-status" role="status"></p>
+          </div>
 
           <div class="chart-container">
             <canvas id="chart-2d-breakdown" height="300"></canvas>
@@ -1799,6 +1806,7 @@
       { btn: 't2a-copy', src: 't2a-copy-src', status: 't2a-copy-status' },
       { btn: 't2b-copy', src: 't2b-copy-src', status: 't2b-copy-status' },
       { btn: 't2c-copy', src: 't2c-copy-src', status: 't2c-copy-status' },
+      { btn: 't2d-copy', src: 't2d-copy-src', status: 't2d-copy-status' },
     ];
     const COPY_STATUS_MS = { copied: 3000, selected: 8000 };
     const copyStatusTimers = {};
@@ -3185,7 +3193,7 @@
       if (isCzk) {
         const sym = CURRENCY_CONFIG[currentCurrency].symbol;
         totalEl.textContent = formatCurrency(total, 0) + ' ' + sym;
-        if (totalLabelEl) totalLabelEl.textContent = T.t2d_result_total_czk || T.t2d_result_total;
+        if (totalLabelEl) totalLabelEl.textContent = (T.t2d_result_total_czk || T.t2d_result_total).replace(/\{currency\}/g, sym);   // T-005b
       } else {
         totalEl.textContent = fixedDec(total, 1) + ' %';
         if (totalLabelEl) totalLabelEl.textContent = T.t2d_result_total;

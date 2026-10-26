@@ -941,25 +941,32 @@
 
         <!-- Result box -->
         <div class="result-box" id="t3a-result">
-          <!-- Celkové skóre + badge -->
-          <div style="display:flex; align-items:center; gap:var(--space-md); flex-wrap:wrap; margin-bottom:var(--space-sm);">
-            <div>
-              <div class="result-value" id="t3a-overall-score">–</div>
-              <div class="result-label" data-i18n="t3a_result_overall">Celkové vážené skóre (0–100)</div>
+          <div id="t3a-copy-src">
+            <!-- Celkové skóre + badge -->
+            <div style="display:flex; align-items:center; gap:var(--space-md); flex-wrap:wrap; margin-bottom:var(--space-sm);">
+              <div>
+                <div class="result-value" id="t3a-overall-score">–</div>
+                <div class="result-label" data-i18n="t3a_result_overall">Celkové vážené skóre (0–100)</div>
+              </div>
+              <span class="risk-badge" id="t3a-verdict-badge"></span>
             </div>
-            <span class="risk-badge" id="t3a-verdict-badge"></span>
+            <div class="result-interpretation" id="t3a-note"></div>
+
+            <!-- T3-4: upozornění nezávislá na průměru -->
+            <div class="signal-list" id="t3a-alerts" role="status" aria-live="polite"></div>
+
+            <div class="section-divider"></div>
+
+            <!-- Dílčí skóre -->
+            <div style="font-size:var(--font-size-sm); font-weight:600; margin:var(--space-sm) 0 var(--space-xs);"
+                 data-i18n="t3a_partial_heading">Dílčí skóre (0–100)</div>
+            <div class="partial-scores-list" id="t3a-partial-scores"></div>
           </div>
-          <div class="result-interpretation" id="t3a-note"></div>
-
-          <!-- T3-4: upozornění nezávislá na průměru -->
-          <div class="signal-list" id="t3a-alerts" role="status" aria-live="polite"></div>
-
-          <div class="section-divider"></div>
-
-          <!-- Dílčí skóre -->
-          <div style="font-size:var(--font-size-sm); font-weight:600; margin:var(--space-sm) 0 var(--space-xs);"
-               data-i18n="t3a_partial_heading">Dílčí skóre (0–100)</div>
-          <div class="partial-scores-list" id="t3a-partial-scores"></div>
+          <!-- D4: kopírování výsledku; je uvnitř výsledku, bez výsledku se tedy nezobrazí -->
+          <div class="copy-result" id="t3a-copy-bar">
+            <button type="button" class="btn-copy-result" id="t3a-copy" data-i18n="copy_result">Kopírovat výsledek</button>
+            <p class="copy-result-status" id="t3a-copy-status" role="status"></p>
+          </div>
 
           <!-- Radar chart -->
           <div class="chart-container">
@@ -1044,38 +1051,43 @@
 
         <!-- Result box -->
         <div class="result-box" id="t3b-result" style="display:none;">
-
-          <!-- Badge + skóre -->
-          <div style="display:flex; align-items:center; gap:var(--space-md); flex-wrap:wrap; margin-bottom:var(--space-sm);">
-            <div>
-              <div class="result-value" id="t3b-score-value">–</div>
-              <div class="result-label" data-i18n="t3b_result_score_label">Celkové rizikové skóre (0–100)</div>
+          <div id="t3b-copy-src">
+            <!-- Badge + skóre -->
+            <div style="display:flex; align-items:center; gap:var(--space-md); flex-wrap:wrap; margin-bottom:var(--space-sm);">
+              <div>
+                <div class="result-value" id="t3b-score-value">–</div>
+                <div class="result-label" data-i18n="t3b_result_score_label">Celkové rizikové skóre (0–100)</div>
+              </div>
+              <span class="risk-badge" id="t3b-risk-badge"></span>
             </div>
-            <span class="risk-badge" id="t3b-risk-badge"></span>
+
+            <!-- Progress bar -->
+            <div class="progress-bar-container" aria-hidden="true">
+              <div class="progress-bar-fill" id="t3b-progress-bar" style="width:0%"></div>
+            </div>
+
+            <!-- T3-6: kritický spouštěč nezávislý na skóre -->
+            <div class="signal-list" id="t3b-critical" role="status" aria-live="polite"></div>
+
+            <div class="section-divider"></div>
+
+            <!-- Red flags -->
+            <div style="font-size:var(--font-size-sm); font-weight:600; margin:var(--space-sm) 0 var(--space-xs);"
+                 data-i18n="t3b_red_flags_heading">Red flags</div>
+            <div id="t3b-red-flags-container"></div>
+
+            <div class="section-divider"></div>
+
+            <!-- Doporučení -->
+            <div style="font-size:var(--font-size-sm); font-weight:600; margin:var(--space-sm) 0 var(--space-xs);"
+                 data-i18n="t3b_recommendation_heading">Doporučení</div>
+            <div class="recommendation-box" id="t3b-recommendation"></div>
           </div>
-
-          <!-- Progress bar -->
-          <div class="progress-bar-container" aria-hidden="true">
-            <div class="progress-bar-fill" id="t3b-progress-bar" style="width:0%"></div>
+          <!-- D4: kopírování výsledku; je uvnitř výsledku, bez výsledku se tedy nezobrazí -->
+          <div class="copy-result" id="t3b-copy-bar">
+            <button type="button" class="btn-copy-result" id="t3b-copy" data-i18n="copy_result">Kopírovat výsledek</button>
+            <p class="copy-result-status" id="t3b-copy-status" role="status"></p>
           </div>
-
-          <!-- T3-6: kritický spouštěč nezávislý na skóre -->
-          <div class="signal-list" id="t3b-critical" role="status" aria-live="polite"></div>
-
-          <div class="section-divider"></div>
-
-          <!-- Red flags -->
-          <div style="font-size:var(--font-size-sm); font-weight:600; margin:var(--space-sm) 0 var(--space-xs);"
-               data-i18n="t3b_red_flags_heading">Red flags</div>
-          <div id="t3b-red-flags-container"></div>
-
-          <div class="section-divider"></div>
-
-          <!-- Doporučení -->
-          <div style="font-size:var(--font-size-sm); font-weight:600; margin:var(--space-sm) 0 var(--space-xs);"
-               data-i18n="t3b_recommendation_heading">Doporučení</div>
-          <div class="recommendation-box" id="t3b-recommendation"></div>
-
         </div><!-- /result-box -->
 
 
@@ -1163,39 +1175,44 @@
 
         <!-- Result box -->
         <div class="result-box" id="t3c-result" style="display:none;">
-
-          <!-- Badge + index -->
-          <div style="display:flex; align-items:center; gap:var(--space-md); flex-wrap:wrap; margin-bottom:var(--space-sm);">
-            <div>
-              <div class="result-value" id="t3c-index-value">–</div>
-              <div class="result-label" data-i18n="t3c_result_index_label">Index závislosti (0–100)</div>
+          <div id="t3c-copy-src">
+            <!-- Badge + index -->
+            <div style="display:flex; align-items:center; gap:var(--space-md); flex-wrap:wrap; margin-bottom:var(--space-sm);">
+              <div>
+                <div class="result-value" id="t3c-index-value">–</div>
+                <div class="result-label" data-i18n="t3c_result_index_label">Index závislosti (0–100)</div>
+              </div>
+              <span class="risk-badge" id="t3c-dep-badge"></span>
             </div>
-            <span class="risk-badge" id="t3c-dep-badge"></span>
+
+            <!-- Progress bar -->
+            <div class="progress-bar-container" aria-hidden="true">
+              <div class="progress-bar-fill" id="t3c-progress-bar" style="width:0%"></div>
+            </div>
+
+            <!-- T3-9: kritický signál a mezera mezi náhradou a pokrytím -->
+            <div class="signal-list" id="t3c-signals" role="status" aria-live="polite"></div>
+
+            <div class="section-divider"></div>
+
+            <!-- Složky indexu -->
+            <div style="font-size:var(--font-size-sm); font-weight:600; margin:var(--space-sm) 0 var(--space-xs);"
+                 data-i18n="t3c_components_heading">Složky indexu</div>
+            <div class="partial-scores-list" id="t3c-components"></div>
+
+            <div class="section-divider"></div>
+
+            <!-- Interpretace -->
+            <div id="t3c-interpretation" class="result-interpretation"></div>
+
+            <!-- Doporučení -->
+            <div class="recommendation-box" id="t3c-recommendation" style="margin-top:var(--space-sm);"></div>
           </div>
-
-          <!-- Progress bar -->
-          <div class="progress-bar-container" aria-hidden="true">
-            <div class="progress-bar-fill" id="t3c-progress-bar" style="width:0%"></div>
+          <!-- D4: kopírování výsledku; je uvnitř výsledku, bez výsledku se tedy nezobrazí -->
+          <div class="copy-result" id="t3c-copy-bar">
+            <button type="button" class="btn-copy-result" id="t3c-copy" data-i18n="copy_result">Kopírovat výsledek</button>
+            <p class="copy-result-status" id="t3c-copy-status" role="status"></p>
           </div>
-
-          <!-- T3-9: kritický signál a mezera mezi náhradou a pokrytím -->
-          <div class="signal-list" id="t3c-signals" role="status" aria-live="polite"></div>
-
-          <div class="section-divider"></div>
-
-          <!-- Složky indexu -->
-          <div style="font-size:var(--font-size-sm); font-weight:600; margin:var(--space-sm) 0 var(--space-xs);"
-               data-i18n="t3c_components_heading">Složky indexu</div>
-          <div class="partial-scores-list" id="t3c-components"></div>
-
-          <div class="section-divider"></div>
-
-          <!-- Interpretace -->
-          <div id="t3c-interpretation" class="result-interpretation"></div>
-
-          <!-- Doporučení -->
-          <div class="recommendation-box" id="t3c-recommendation" style="margin-top:var(--space-sm);"></div>
-
         </div><!-- /result-box -->
 
 
@@ -2230,6 +2247,9 @@
        (role="status") leží uvnitř prvku, který výsledek ukazuje a skrývá, takže bez výsledku nejsou vidět.
        Kopíruje se innerText obsahu <p>-copy-src: jen viditelný text výsledku, bez tlačítek a grafů. */
     const COPY_RESULTS = [
+      { btn: 't3a-copy', src: 't3a-copy-src', status: 't3a-copy-status' },
+      { btn: 't3b-copy', src: 't3b-copy-src', status: 't3b-copy-status' },
+      { btn: 't3c-copy', src: 't3c-copy-src', status: 't3c-copy-status' },
       { btn: 't3d-copy', src: 't3d-copy-src', status: 't3d-copy-status' },
     ];
     const COPY_STATUS_MS = { copied: 3000, selected: 8000 };

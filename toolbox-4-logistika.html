@@ -968,9 +968,16 @@
         </div>
 
         <div class="result-box">
-          <div class="lt-result-total" id="lt-result-total">—</div>
-          <div class="result-label" data-i18n="t4b_result_label">Celkový lead time</div>
-          <div class="lt-result-breakdown" id="lt-result-breakdown"></div>
+          <div id="lt-copy-src">
+            <div class="lt-result-total" id="lt-result-total">—</div>
+            <div class="result-label" data-i18n="t4b_result_label">Celkový lead time</div>
+            <div class="lt-result-breakdown" id="lt-result-breakdown"></div>
+          </div>
+          <!-- D4: kopírování výsledku; lištu bez hotového výsledku skrývá render (atribut hidden) -->
+          <div class="copy-result" id="lt-copy-bar" hidden>
+            <button type="button" class="btn-copy-result" id="lt-copy" data-i18n="copy_result">Kopírovat výsledek</button>
+            <p class="copy-result-status" id="lt-copy-status" role="status"></p>
+          </div>
         </div>
 
         <button class="btn-reset" id="lt-reset" data-i18n="btn_reset">Resetovat</button>
@@ -1813,6 +1820,7 @@
        (role="status") leží uvnitř prvku, který výsledek ukazuje a skrývá, takže bez výsledku nejsou vidět.
        Kopíruje se innerText obsahu <p>-copy-src: jen viditelný text výsledku, bez tlačítek a grafů. */
     const COPY_RESULTS = [
+      { btn: 'lt-copy', src: 'lt-copy-src', status: 'lt-copy-status' },
       { btn: 'ss-copy', src: 'ss-copy-src', status: 'ss-copy-status' },
     ];
     const COPY_STATUS_MS = { copied: 3000, selected: 8000 };
@@ -2177,6 +2185,7 @@
       const T = TEXTS[currentLang];
       const unitText = T.t4b_result_unit;
       const phases = readPhases();
+      document.getElementById('lt-copy-bar').hidden = !phases;   // D4: kopírovat jen hotový výsledek
 
       if (!phases) {
         LT_PHASES.forEach(p => {

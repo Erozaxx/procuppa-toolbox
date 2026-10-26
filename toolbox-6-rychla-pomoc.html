@@ -84,8 +84,6 @@
     .eb-subject-line { font-size: var(--font-size-sm); font-weight: 600; color: var(--color-text-muted); margin-bottom: var(--space-xs); }
     .eb-subject-value { font-size: var(--font-size-sm); color: var(--color-text); background: var(--color-bg); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-sm) var(--space-md); margin-bottom: var(--space-md); word-break: break-word; }
     .eb-output { width: 100%; min-height: 180px; padding: var(--space-md); border: 1px solid var(--color-border); border-radius: var(--radius-md); font-family: var(--font-base); font-size: var(--font-size-sm); color: var(--color-text); background: var(--color-bg); resize: vertical; line-height: 1.6; }
-    .eb-copy-confirm { color: var(--color-success); font-size: var(--font-size-sm); font-weight: 600; display: none; }
-    .eb-copy-error { color: var(--color-danger); font-size: var(--font-size-sm); display: none; }
 
     /* ===== 6b ARGUMENTY ===== */
     .arg-situation-select, .arg-goal-select { width: 100%; max-width: 500px; }
@@ -166,6 +164,14 @@
     .tool-links { margin-top: var(--space-md); font-size: var(--font-size-sm); }
     .tool-links a { color: var(--color-primary); font-weight: 600; }
     .xfer-box[hidden], .xfer-box [hidden], .tool-links [hidden], .xfer-note[hidden] { display: none !important; }
+    /* ===== D4: Kopírovat výsledek (T-017, T6 doplněno v T-005 iter-014) ===== */
+    .copy-result { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-sm); margin-top: var(--space-md); }
+    .copy-result[hidden] { display: none; }
+    .btn-copy-result { padding: var(--space-xs) var(--space-md); border: 1px solid var(--color-primary); border-radius: var(--radius-sm);
+                       background: var(--color-surface); color: var(--color-primary); font: inherit; font-size: var(--font-size-sm); font-weight: 600; cursor: pointer; }
+    .btn-copy-result:hover { background: var(--color-accent); color: var(--color-accent-text, var(--color-primary)); }
+    .btn-copy-result:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+    .copy-result-status { margin: 0; font-size: var(--font-size-sm); color: var(--color-text-muted); }
   </style>
 </head>
 <body>
@@ -224,8 +230,7 @@
           <div class="btn-group">
             <button class="btn eb-copy-btn" onclick="copyEmail()" data-i18n="copyBtn">Kopírovat email</button>
             <button class="btn-reset" onclick="resetEmail()" data-i18n="resetBtn">Resetovat</button>
-            <span class="eb-copy-confirm" id="eb-copy-confirm" data-i18n="copyConfirm">Zkopírováno!</span>
-            <span class="eb-copy-error" id="eb-copy-error" data-i18n="copyErrorMsg">Kopírování selhalo. Vyberte text ručně.</span>
+            <p class="copy-result-status" id="eb-copy-status" role="status"></p>
           </div>
         </div>
       </div>
@@ -252,14 +257,21 @@
         </div>
 
         <div class="arg-output-section" id="arg-output-section" style="display:none;">
-          <div class="section-heading" data-i18n="argumentsTitle">Argumenty</div>
-          <ul class="arg-list" id="arg-list"></ul>
+          <div id="arg-copy-src">
+            <div class="section-heading" data-i18n="argumentsTitle">Argumenty</div>
+            <ul class="arg-list" id="arg-list"></ul>
 
-          <div class="section-heading" data-i18n="counterArgsTitle">Možné protiargumenty</div>
-          <ul class="arg-counter-list" id="arg-counter-list"></ul>
+            <div class="section-heading" data-i18n="counterArgsTitle">Možné protiargumenty</div>
+            <ul class="arg-counter-list" id="arg-counter-list"></ul>
 
-          <div class="section-heading" data-i18n="recommendedStyle">Doporučený styl</div>
-          <span class="arg-style-badge" id="arg-style-badge"></span>
+            <div class="section-heading" data-i18n="recommendedStyle">Doporučený styl</div>
+            <span class="arg-style-badge" id="arg-style-badge"></span>
+          </div>
+          <!-- D4: kopírování výsledku; je uvnitř výsledku, bez výsledku se tedy nezobrazí -->
+          <div class="copy-result" id="arg-copy-bar">
+            <button type="button" class="btn-copy-result" id="arg-copy" data-i18n="copy_result">Kopírovat výsledek</button>
+            <p class="copy-result-status" id="arg-copy-status" role="status"></p>
+          </div>
         </div>
       </div>
     </section>
@@ -292,23 +304,30 @@
         <div id="rf-cat-communication"></div>
 
         <div class="rf-score-section">
-          <div class="rf-score-label"><span data-i18n="rfScoreLabel">Skóre rizika z označených bodů</span>: <strong id="rf-score-value">—</strong>/100</div>
-          <div class="rf-score-bar"><div class="rf-score-fill" id="rf-score-fill"></div></div>
-          <div id="rf-level-badge-wrap" style="margin-bottom:1rem;"></div>
-          <p class="rf-partial-note hidden" id="rf-partial-note" data-i18n="rfPartialNote">Výsledek vychází jen z označených bodů. Neoznačený příznak neznamená, že je ověřený.</p>
+          <div id="rf-copy-src">
+            <div class="rf-score-label"><span data-i18n="rfScoreLabel">Skóre rizika z označených bodů</span>: <strong id="rf-score-value">—</strong>/100</div>
+            <div class="rf-score-bar"><div class="rf-score-fill" id="rf-score-fill"></div></div>
+            <div id="rf-level-badge-wrap" style="margin-bottom:1rem;"></div>
+            <p class="rf-partial-note hidden" id="rf-partial-note" data-i18n="rfPartialNote">Výsledek vychází jen z označených bodů. Neoznačený příznak neznamená, že je ověřený.</p>
 
-          <div class="rf-critical hidden" id="rf-critical" role="alert">
-            <strong data-i18n="rfCriticalTitle">Prioritně prověřit</strong>: <span data-i18n="rfCriticalText">tento signál je vážný sám o sobě, bez ohledu na skóre. Úroveň rizika je proto nejméně střední.</span>
-            <ul id="rf-critical-list"></ul>
+            <div class="rf-critical hidden" id="rf-critical" role="alert">
+              <strong data-i18n="rfCriticalTitle">Prioritně prověřit</strong>: <span data-i18n="rfCriticalText">tento signál je vážný sám o sobě, bez ohledu na skóre. Úroveň rizika je proto nejméně střední.</span>
+              <ul id="rf-critical-list"></ul>
+            </div>
+
+            <div id="rf-active-flags" class="rf-active-flags hidden">
+              <div class="section-heading" data-i18n="rfActiveFlagsLabel">Aktivní příznaky</div>
+              <ul id="rf-active-flags-list"></ul>
+            </div>
+
+            <div class="rf-recommendation hidden" id="rf-recommendation">
+              <strong data-i18n="rfRecommendationLabel">Doporučení</strong>: <span id="rf-recommendation-text"></span>
+            </div>
           </div>
-
-          <div id="rf-active-flags" class="rf-active-flags hidden">
-            <div class="section-heading" data-i18n="rfActiveFlagsLabel">Aktivní příznaky</div>
-            <ul id="rf-active-flags-list"></ul>
-          </div>
-
-          <div class="rf-recommendation hidden" id="rf-recommendation">
-            <strong data-i18n="rfRecommendationLabel">Doporučení</strong>: <span id="rf-recommendation-text"></span>
+          <!-- D4: kopírování výsledku; lištu bez hotového výsledku skrývá render (atribut hidden) -->
+          <div class="copy-result" id="rf-copy-bar" hidden>
+            <button type="button" class="btn-copy-result" id="rf-copy" data-i18n="copy_result">Kopírovat výsledek</button>
+            <p class="copy-result-status" id="rf-copy-status" role="status"></p>
           </div>
         </div>
 
@@ -329,19 +348,26 @@
         <div id="pos-factors-container"></div>
 
         <div class="pos-result-section" id="pos-result-section" style="display:none;">
-          <div class="section-heading"></div>
-          <div class="pos-score-label"><span data-i18n="posScoreLabel">Celkové skóre pozice</span>: <strong id="pos-score-value">0</strong>/100</div>
-          <div class="pos-score-bar"><div class="pos-score-fill" id="pos-score-fill"></div></div>
-          <div id="pos-level-badge-wrap" style="margin-bottom:1rem;"></div>
+          <div id="pos-copy-src">
+            <div class="section-heading"></div>
+            <div class="pos-score-label"><span data-i18n="posScoreLabel">Celkové skóre pozice</span>: <strong id="pos-score-value">0</strong>/100</div>
+            <div class="pos-score-bar"><div class="pos-score-fill" id="pos-score-fill"></div></div>
+            <div id="pos-level-badge-wrap" style="margin-bottom:1rem;"></div>
 
-          <div class="pos-critical hidden" id="pos-critical" role="alert">
-            <strong data-i18n="posCriticalTitle">Nejdřív zajistěte proveditelnou variantu</strong>: <span data-i18n="posCriticalText">nemáte alternativního dodavatele a komodita je kritická nebo je časový tlak urgentní. Ostatní výhody nepovažujte za dostatečnou pojistku. Ověřte proveditelnou alternativu včetně kvalifikace, kapacity a termínu, případně překlenovací řešení. Skóre se tím nemění.</span>
+            <div class="pos-critical hidden" id="pos-critical" role="alert">
+              <strong data-i18n="posCriticalTitle">Nejdřív zajistěte proveditelnou variantu</strong>: <span data-i18n="posCriticalText">nemáte alternativního dodavatele a komodita je kritická nebo je časový tlak urgentní. Ostatní výhody nepovažujte za dostatečnou pojistku. Ověřte proveditelnou alternativu včetně kvalifikace, kapacity a termínu, případně překlenovací řešení. Skóre se tím nemění.</span>
+            </div>
+
+            <div class="pos-comment" id="pos-comment"></div>
+
+            <div class="section-heading" id="pos-steps-heading" data-i18n="posStepsLabel" style="margin-top:1rem;">Doporučené kroky</div>
+            <ul class="pos-steps-list" id="pos-steps-list"></ul>
           </div>
-
-          <div class="pos-comment" id="pos-comment"></div>
-
-          <div class="section-heading" id="pos-steps-heading" data-i18n="posStepsLabel" style="margin-top:1rem;">Doporučené kroky</div>
-          <ul class="pos-steps-list" id="pos-steps-list"></ul>
+          <!-- D4: kopírování výsledku; lištu bez hotového výsledku skrývá render (atribut hidden) -->
+          <div class="copy-result" id="pos-copy-bar" hidden>
+            <button type="button" class="btn-copy-result" id="pos-copy" data-i18n="copy_result">Kopírovat výsledek</button>
+            <p class="copy-result-status" id="pos-copy-status" role="status"></p>
+          </div>
         </div>
       </div>
     </section>
@@ -970,8 +996,11 @@
       selectScenario: "Vyberte scénář", selectScenarioPlaceholder: "— vyberte scénář —",
       selectTone: "Tón emailu", toneFirm: "Pevný", tonePolite: "Zdvořilý", toneUrgent: "Urgentní",
       fillVariables: "Vyplňte proměnné", subjectLabel: "Předmět:", emailBody: "Text emailu:",
-      copyBtn: "Kopírovat email", copyConfirm: "Zkopírováno!", resetBtn: "Resetovat",
-      copyErrorMsg: "Kopírování selhalo. Vyberte text ručně.",
+      copyBtn: "Kopírovat email", resetBtn: "Resetovat",
+      // D4: Kopírovat výsledek (T-005 iter-014, texty shodné s toolboxy 1–5)
+      copy_result: 'Kopírovat výsledek',
+      copy_done: 'Výsledek zkopírován.',
+      copy_selected: 'Text je označený, zkopírujte ho Ctrl+C (Cmd+C).',
       selectSituation: "Vyberte situaci", selectSituationPlaceholder: "— vyberte situaci —",
       selectGoal: "Cíl nákupčího", argumentsTitle: "Argumenty",
       counterArgsTitle: "Možné protiargumenty", recommendedStyle: "Doporučený styl",
@@ -1043,8 +1072,11 @@
       selectScenario: "Select scenario", selectScenarioPlaceholder: "— select scenario —",
       selectTone: "Email tone", toneFirm: "Firm", tonePolite: "Polite", toneUrgent: "Urgent",
       fillVariables: "Fill in variables", subjectLabel: "Subject:", emailBody: "Email body:",
-      copyBtn: "Copy email", copyConfirm: "Copied!", resetBtn: "Reset",
-      copyErrorMsg: "Copy failed. Please select the text manually.",
+      copyBtn: "Copy email", resetBtn: "Reset",
+      // D4: Copy result (T-005 iter-014, same texts as toolboxes 1–5)
+      copy_result: 'Copy result',
+      copy_done: 'Result copied.',
+      copy_selected: 'Text is selected, copy it with Ctrl+C (Cmd+C).',
       selectSituation: "Select situation", selectSituationPlaceholder: "— select situation —",
       selectGoal: "Buyer goal", argumentsTitle: "Arguments",
       counterArgsTitle: "Possible counter-arguments", recommendedStyle: "Recommended style",
@@ -1345,6 +1377,46 @@
     }
     // XFER-SHARED-END
 
+    /* ===== D4: KOPÍROVAT VÝSLEDEK (T-017, v toolbox-6 od T-005 iter-014) =====
+       Tenká obálka nad copyText z XFER-SHARED, druhá implementace schránky nevzniká. Tlačítko a hláška
+       (role="status") leží uvnitř prvku, který výsledek ukazuje a skrývá; v 6c a 6d lištu navíc skrývá render,
+       dokud není hotový výsledek. Kopíruje se innerText obsahu <p>-copy-src: jen viditelný text výsledku.
+       6a (e-mail) má vlastní tlačítko „Kopírovat email“ (copyEmail), schránku i hlášky bere odsud. */
+    const COPY_RESULTS = [
+      { btn: 'arg-copy', src: 'arg-copy-src', status: 'arg-copy-status' },
+      { btn: 'rf-copy', src: 'rf-copy-src', status: 'rf-copy-status' },
+      { btn: 'pos-copy', src: 'pos-copy-src', status: 'pos-copy-status' },
+    ];
+    const COPY_STATUS_MS = { copied: 3000, selected: 8000 };
+    const copyStatusTimers = {};
+
+    /** Viditelný text výsledku po řádcích, bez prázdných řádků a okrajových mezer. */
+    function copyResultText(el) {
+      return String(el.innerText || '').split('\n').map(s => s.trim()).filter(Boolean).join('\n');
+    }
+
+    /** Hláška po kopírování ('copied' → copy_done, jinak copy_selected), po čase zmizí. */
+    function showCopyStatus(feedbackId, r) {
+      const status = document.getElementById(feedbackId);
+      const T = TEXTS[currentLang];
+      status.textContent = r === 'copied' ? T.copy_done : T.copy_selected;
+      clearTimeout(copyStatusTimers[feedbackId]);
+      copyStatusTimers[feedbackId] = setTimeout(() => { status.textContent = ''; }, COPY_STATUS_MS[r] || COPY_STATUS_MS.selected);
+      return r;
+    }
+
+    /** D4: zkopíruje výsledek `resultBoxId` a ohlásí to v `feedbackId`. → Promise<'copied' | 'selected'>. */
+    function copyResult(resultBoxId, feedbackId) {
+      const box = document.getElementById(resultBoxId);
+      return copyText(copyResultText(box), box)
+        .catch(() => 'selected')
+        .then(r => showCopyStatus(feedbackId, r));
+    }
+
+    function initCopyResults() {
+      COPY_RESULTS.forEach(c => document.getElementById(c.btn).addEventListener('click', () => copyResult(c.src, c.status)));
+    }
+
     /* ===== D2b: CÍL PŘENOSU – toolbox-6, nástroj 6c Red flags (mapa převodů D2b, řádky 4–6) ===== */
     const XFER_SELF = 't6';
     const XFER_DEFAULT_TOOL = '6c';
@@ -1497,8 +1569,6 @@
     if (argSit && argGoal) renderArguments(argSit, argGoal);
     calcRedFlags();
     calcPosition();
-    // update copy error text
-    document.getElementById('eb-copy-error').textContent = TEXTS[lang].copyErrorMsg;
     xferRenderNote();
   }
 
@@ -1603,35 +1673,15 @@
     document.getElementById('eb-variables-grid').innerHTML = '';
   }
 
-  async function copyEmail() {
+  /** 6a: zkopíruje předmět a text e-mailu přes copyText (XFER-SHARED). Když schránka nejde, označí se text e-mailu
+      (pole eb-output) a hláška vyzve ke Ctrl+C. → Promise<'copied' | 'selected'>. */
+  function copyEmail() {
     const subject = document.getElementById('eb-subject').textContent;
     const body = document.getElementById('eb-output').value;
     const text = (TEXTS[currentLang].subjectLabel + ' ' + subject + '\n\n' + body).trim();
-    const confirmEl = document.getElementById('eb-copy-confirm');
-    const errorEl = document.getElementById('eb-copy-error');
-    confirmEl.style.display = 'none';
-    errorEl.style.display = 'none';
-    try {
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        await navigator.clipboard.writeText(text);
-      } else {
-        const ta = document.createElement('textarea');
-        ta.value = text;
-        ta.style.position = 'fixed';
-        ta.style.opacity = '0';
-        document.body.appendChild(ta);
-        ta.select();
-        const ok = document.execCommand('copy');
-        document.body.removeChild(ta);
-        if (!ok) throw new Error('execCommand failed');
-      }
-      confirmEl.style.display = 'inline';
-      setTimeout(() => { confirmEl.style.display = 'none'; }, 2000);
-    } catch (e) {
-      errorEl.textContent = TEXTS[currentLang].copyErrorMsg;
-      errorEl.style.display = 'inline';
-      setTimeout(() => { errorEl.style.display = 'none'; }, 4000);
-    }
+    return copyText(text, document.getElementById('eb-output'))
+      .catch(() => 'selected')
+      .then(r => showCopyStatus('eb-copy-status', r));
   }
 
   // ============================================================
@@ -1733,6 +1783,7 @@
 
   function renderRedFlagResult({ score, level, critical, activeFlags }) {
     const T = TEXTS[currentLang];
+    document.getElementById('rf-copy-bar').hidden = level === 'none';   // D4: bez označeného příznaku není co kopírovat
     document.getElementById('rf-score-value').textContent = score === null ? '—' : score;
     const fill = document.getElementById('rf-score-fill');
     fill.style.width = (score || 0) + '%';
@@ -1829,6 +1880,7 @@
     const badgeWrap = document.getElementById('pos-level-badge-wrap');
     const stepsList = document.getElementById('pos-steps-list');
     const stepsHeading = document.getElementById('pos-steps-heading');
+    document.getElementById('pos-copy-bar').hidden = !complete;   // D4: kopírovat jen hotové skóre a verdikt
     if (!complete) {
       document.getElementById('pos-score-value').textContent = '—';
       fill.style.width = '0%';
@@ -1863,8 +1915,7 @@
     renderRedFlagCategories();
     renderPositionFactors();
     calcRedFlags();
-    // Set initial copy error text
-    document.getElementById('eb-copy-error').textContent = TEXTS[currentLang].copyErrorMsg;
+    initCopyResults();
     initRouter();
     xferBoot();
   });
